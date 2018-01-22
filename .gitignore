@@ -1,6 +1,4 @@
 # Ignore the decompressed version of the dataset file
-*NCDB_1999_to_2015.csv
-!*NCDB_1999_to_2015.csv.zip
 
 # macOS garbage files
 *.DS_Store
