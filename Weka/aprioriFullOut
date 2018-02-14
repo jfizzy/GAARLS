@@ -1,0 +1,59 @@
+=== Run information ===
+
+Scheme:       weka.associations.Apriori -N 10 -T 0 -C 0.9 -D 0.05 -U 1.0 -M 0.1 -S -1.0 -c -1
+Relation:     NCDB_1999_to_2015
+Instances:    6171328
+Attributes:   22
+              C_YEAR
+              C_MNTH
+              C_WDAY
+              C_HOUR
+              C_SEV
+              C_VEHS
+              C_CONF
+              C_RCFG
+              C_WTHR
+              C_RSUR
+              C_RALN
+              C_TRAF
+              V_ID
+              V_TYPE
+              V_YEAR
+              P_ID
+              P_SEX
+              P_AGE
+              P_PSN
+              P_ISEV
+              P_SAFE
+              P_USER
+=== Associator model (full training set) ===
+
+
+Apriori
+=======
+
+Minimum support: 0.65 (4011363 instances)
+Minimum metric <confidence>: 0.9
+Number of cycles performed: 7
+
+Generated sets of large itemsets:
+
+Size of set of large itemsets L(1): 8
+
+Size of set of large itemsets L(2): 7
+
+Size of set of large itemsets L(3): 1
+
+Best rules found:
+
+ 1. C_SEV=2 P_PSN=11 4073813 ==> P_ID=01 4046791    <conf:(0.99)> lift:(1.39) lev:(0.19) [1144548] conv:(43.35)
+ 2. P_PSN=11 4133643 ==> P_ID=01 4105999    <conf:(0.99)> lift:(1.39) lev:(0.19) [1161132] conv:(43)
+ 3. P_SAFE=02 4384254 ==> C_SEV=2 4328460    <conf:(0.99)> lift:(1) lev:(0) [17564] conv:(1.31)
+ 4. C_RALN=1 4393932 ==> C_SEV=2 4333055    <conf:(0.99)> lift:(1) lev:(0) [12643] conv:(1.21)
+ 5. V_TYPE=01 5084098 ==> C_SEV=2 5012036    <conf:(0.99)> lift:(1) lev:(0) [13006] conv:(1.18)
+ 6. P_ID=01 P_PSN=11 4105999 ==> C_SEV=2 4046791    <conf:(0.99)> lift:(1) lev:(0) [9494] conv:(1.16)
+ 7. P_PSN=11 4133643 ==> C_SEV=2 4073813    <conf:(0.99)> lift:(1) lev:(0) [9335] conv:(1.16)
+ 8. P_ID=01 4396542 ==> C_SEV=2 4329690    <conf:(0.98)> lift:(1) lev:(0) [6711] conv:(1.1)
+ 9. C_WTHR=1 4301206 ==> C_SEV=2 4232836    <conf:(0.98)> lift:(1) lev:(0) [3598] conv:(1.05)
+10. P_PSN=11 4133643 ==> C_SEV=2 P_ID=01 4046791    <conf:(0.98)> lift:(1.4) lev:(0.19) [1146703] conv:(14.2)
+
