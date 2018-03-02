@@ -40,7 +40,11 @@
 \usepackage{amssymb}
 \usepackage{tikz}
 \usepackage{changepage}
-\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage{xargs}   
+\usepackage{biblatex}
+\usepackage{multirow}
+\addbibresource{References.bib}
+% Use more than one optional parameter in a new commands
  
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 \newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
@@ -67,7 +71,6 @@
 \numberwithin{equation}{section}
 \newcommand\tab[1][1cm]{\hspace*{#1}}
 \begin{document}
-\bibliographystyle{alpha}
 
 
 \title{A Genetic Algorithm based Association Rule Learning System}
@@ -75,7 +78,7 @@
 %    Remove any unused author tags.
 
 %    author one information
-\author{Peter Ebear, David Engel, Eval Loughlin, James MacIsaac, and Shane Sims }
+\author{Peter Ebear, David Engel, Evan Loughlin, James MacIsaac, and Shane Sims }
 \address{}
 \curraddr{}
 \thanks{}
@@ -93,115 +96,399 @@
 \maketitle
 
 \section{Introduction}
-
-The task of this paper is to satisfy the Winter 2018 CPSC 599.44 Midterm Report requirements, and in so doing, present the proposal for the learning system that we indent to implement. To This end, we will present a sketch of our intended learning system in the following pages. The structure of this paper is as follows. We first present our learning method by means of introducing the key parts of our proposed system. We then describe how we intend to include relevant knowledge not already in the dataset into the learning system. Finally we describe how we intend to deal with the requirement of being able to read a list of already known association rules, and how these will be used to prevent our learning system from learning these rules again.
+The task of this paper is to satisfy the Winter 2018 CPSC 599.44 Midterm Report requirements, and in doing so, present the proposal for the learning system that we intend to implement. To this end, we will present a sketch of our intended learning system in the following pages. The structure of this paper is as follows. We first present our learning method by means of introducing key parts of our proposed system. We then describe how we intend to include relevant additional knowledge into the learning system. Finally we describe how we intend to deal with the requirement that our system be able to read a list of already known association rules, and how these will be used to prevent our system from learning these rules again.
 
 \section{Learning Method}
 
-For the task of learning association rules from Statistics Canada's \textit{1999 to 2014 National Collision Database}, we will implement a learning system whose learning system is based on a Genetic Algorithm. Our reasoning for this choice, and why we have not chosen to build a system that uses the \textit{apriori} algorithm is as follows:\newline
+For the task of learning association rules from Statistics Canada's \textit{1999 to 2015 National Collision Database}, we will implement a learning system that is based on a Genetic Algorithm. Our reasoning for this choice, and why we have not chosen to build a system that uses the Apriori algorithm is as follows:\newline
 
+%
 \begin{itemize}
-	\item \unsure{Need to verify/fact check this entire item} Given the size of our dataset (over 6 million examples), we believe that the intractability of using the \textit{apriori} algorithm with $i$-itemsets when $i\in \mathcal{Z}^+$ becomes large, makes it unsuitable for finding interesting association rules. This of course assumes that there exists interesting association rules with a large number of clauses on either of both sides of the implication. While the \textit{apriori} algorithm requires $i$ iterations over the dataset, the element of randomness inherent to a well designed genetic algorithm will allow our learning system to move around the search space in a non-breadth-first manor, potentially increasing the probability that novel association rules are found.  
-	\item By using a genetic algorithm as the basis of our learning system, it is conceptually clear how we will be able to meet the requirement that our system be able to use a list of already known rules to prevent these rules from being learned again. Moreover, by using a genetic algorithm, our system will be able to use this list to prevent repeated learning of these rules in a more intelligent way than simply filtering out already known rules during post processing. Our method for doing this is described in section 4 below. 
-	\item The ability to define our own fitness function provides an additional way to add knowledge to our learning system. Instead of using just coverage and accuracy as a measure of fitness, we might also add additional terms to our fitness function as a means of directing the search to areas that we wish to explore; for example by specifying the consequent, or a mandatory part of the antecedent. A further treatment of this idea is given in 3 below.
-	
-	Not only can we adjust weights in our fitness function to direct our learning system to different areas of the association rule search space, but we can also add elements to our fitness function to 
+	\item 
+    Kabir et al \cite{comparativeAnalysis} did a comparative study between the Apriori algorithm, and their proposed genetic algorithm, in the discovery of maximal frequent patterns with varying database sizes and minimum coverage values. The study showed that while Apriori did eventually outperform their genetic algorithm at larger minimum coverage values, the Apriori algorithm devolved to exponential growth at low coverage values, while their genetic algorithm maintained a relatively linear performance across the board. As one objective of this project is to uncover potentially interesting association rules, an algorithm that provides more consistent performance across a variety of parameter ranges is in our opinion, more ideal.   
+	\item By using a genetic algorithm as the basis of our learning system, it is conceptually clear how we will be able to meet the requirement that our system be able to use a list of already known rules to prevent these rules from being learned again. Our system will be able to use this list to prevent repeated learning of these rules in a more intelligent way than simply filtering out already learned rules during post-processing (See section 4). 
+    \item It is likely that some interesting association rules will include feature values that are within a range of accepted values (ex. $18 \leq P\_AGE \leq 25$), and not just discrete values. A genetic algorithm allows us the flexibility to structure individuals to capture such rules (see Section 2.1).
+	\item The ability to define the fitness function provides an additional way to add knowledge to our learning system. Instead of using just coverage and accuracy as a measure of fitness, we will also add additional terms to our fitness function to encourage the production of novel association rules (see Subsection 2.4). We can also use the fitness function as a means of directing the search to areas that we wish to explore; for example by specifying the consequent, or a mandatory part of the antecedent (see Section 3).\newline
 \end{itemize}
 
-Having provided our justification for choosing to build a genetic algorithm based learning system, a high-level description of the key parts of our system will provide clarity on our intentions. 
+Having provided our justification for choosing to build a genetic algorithm based learning system, a high-level description of key parts of our system will provide clarity on our intentions. \newline
 
 \subsection{Individual Representation}
+~\newline
 
-An individual in our system will be representative of an association rule. We will represent individuals of a given state in our learning system according to the following high level schematic:
+An individual in our system will represent an association rule. We will represent individuals of a given state in our learning system according to the following high level schematic:
 \vspace{.5cm}
-
-\unsure{There might be a better way to represent individuals, but note that any ideas we have should be compatible with the genetic operations}    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Comment here
 \begin{center}
 \begin{tabular}{ | c | c | c | c | c |}
  \hline
  Status & Status & $\hdots$ & Status & Status\\
  \hline
- C\_YEAR  & C\_MNTH  & $\hdots$ & P\_SAFE & P\_USER  \\
+ C\_YEAR\_upper  & C\_MNTH\_upper  & $\hdots$ & P\_USER\_upper & C\_CASE\_upper \\
+\hline
+ C\_YEAR\_lower  & C\_MNTH\_lower  & $\hdots$ & P\_USER\_lower & C\_CASE\_lower \\
 \hline
 \end{tabular}
 \end{center}
-
 \vspace{.5cm}
-Naturally this representation requires further comment: 
+Naturally, this representation requires further comment: 
 \begin{itemize}
-	\item `Status' can hold a value of either 0, 1, or 2. This represents if a feature is included in the rule, part of the antecedent, or part of the consequent, respectively.  
-	\item We do not include a field for the $C\_CASE$ field, as it is an incident identifier [cite data dictionary], and thus not meaningful in this context. 
-	\item As none of the features have a negative number as an allowable value, we will represent null with -1.
-	\item Allowable (but non-integer) values such as NN,UU, etc., will be mapped to unique negative numbers, so that type remains consistent in the implementation.
+	\item `Status' can hold a value of either 0, 1, or 2. This represents if a feature is not included in the rule, is part of the antecedent, or is part of the consequent, respectively.
+    \item *\_upper and *\_lower hold the upper and lower bounds on the value of *, respectively. If a feature has a discrete value, this is represented with *\_upper = *\_lower.
+	\item As none of the features have a negative number as an allowable value \cite{datadict}, we will represent null with -1.
+	\item Allowable but non-integer values such as NN,UU,M,F etc., will be mapped to unique integers (outside of the domain of the respective feature), so that type remains consistent in the implementation. 
 \end{itemize}
 
-This representation of an individual corresponds to a single association rule. It includes a index for every possible feature of an arbitrary example in our dataset; its presence and role in the given rule indicated by the `Status' number. This representation allows for simple implementation of genetic operators (described in section 5), as will be demonstrated with an example in the final section of this paper. With this representation scheme in mind, we would represent the association rule $(C\_WTHR = 1)\Rightarrow (C\_SEV = 2)$ as:
-
+This representation of an individual corresponds to a single association rule. It includes an index for every possible feature of an arbitrary example in our dataset \cite{datadict}; its presence and role in the given rule are indicated by the `Status' number. This representation allows for simple implementation of genetic operations (described in section 5), as will be demonstrated with an example in the final section of this paper. With this representation scheme in mind, we would represent the association rule $(C\_WTHR = 1)\Rightarrow (C\_SEV = 2)$ as:
+\small
 \begin{center}
-\begin{tabular}{ | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c |}
+\begin{tabular}{ | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c |}
  \hline
- 0 & 0 & 0 & 0 & \textbf{2} & 0 & 0 & 0 & \textbf{1} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+ 0 & 0 & 0 & 0 & \textbf{2} & 0 & 0 & 0 & \textbf{1} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
  \hline
- -1 & -1 & -1 & -1 & \textbf{2} & -1 & -1 & -1 & \textbf{1} & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 \\
+ -1 & -1 & -1 & -1 & \textbf{2} & -1 & -1 & -1 & \textbf{1} & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 \\
+\hline
+ -1 & -1 & -1 & -1 & \textbf{2} & -1 & -1 & -1 & \textbf{1} & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1\\
 \hline
 \end{tabular}
 \end{center}
 \vspace{.5cm}
-Of course there are a number of ways that this representation of an individual can be implemented. Most obviously this can be implemented as a vector, in the form as an array of small (ex. primitive type 'short' in Java) integer pairs, each index corresponding to a feature, with the pair at this location holding the status number and feature value respectively. If sparseness of these individuals becomes a concern for memory efficiency, we can also look at storing the individual as a pairs of small integers in a hash table, with their respective indices serving as a key. Consider the following as an example of how we could implement individuals as an array of arrays, using the above rule as the individual:
-\vspace{.5cm}
-\begin{center}
+\normalsize
+%Of course there are a number of ways that this representation of an individual can be implemented. Most obviously this can be implemented as a vector, in the form of an array of small integer (ex. primitive type 'short' in Java) pairs, each index corresponding to a feature, with the pair at this location holding the status number and feature value respectively. If sparseness of these individuals becomes a concern for memory efficiency, we can also look at storing the individual as a pair of small integers in a hash table, with their respective indices serving as a key. Consider the following as an example of how we could implement individuals as an array of arrays, using the above rule as the individual:
+%\vspace{.5cm}
 
-$[[0,-1],[0,-1],[0,-1],[0,-1],[2,2],[0,-1],[0,-1],[0,-1],[1,1],[0,-1], \hdots,[0,-1]]$
-\end{center}
-\vspace{.5cm}
+%$[[0,-1,-1],[0,-1,-1],[0,-1,-1],[0,-1,-1],[2,2,2],[0,-1,-1],\newline[0,-1,-1],[0,-1,-1],[1,1,1],[0,-1,-1], \hdots,[0,-1,-1]]$
+%\vspace{.5cm}
 \subsection{Initial Population}
+~\newline
 
-The initial population for our learning system will consist of $m$ individuals. The non-null features of a given individual will be chosen randomly so that even weight is given to rules rules of all sizes. For our purposes, the minimum rule size will be that with one feature in the consequent and one (different) feature in the antecedent. The value of each included feature in a given rule will also be chosen randomly from among the allowed values (as determined in the data dictionary). The value of $m$ will be determined empirically once our system is implemented. 
+The initial population for our learning system will consist of $m$ individuals. The non-null features of a given individual will be chosen randomly so that even weight is given to rules of all sizes. For our purposes, the minimum rule size will be that with one feature in the consequent and one in the antecedent. The value of each included feature in a given rule will also be chosen randomly from among the allowed values. The value of $m$ will be determined empirically once our system is implemented.\newline 
 
 \subsection{Genetic Operators}
-\unsure{should we include a section describing our control?}
-Our system will utilize the two usual genetic operators, namely crossover and mutation. How each of these will operate on an individual(s) selected for the operation in our system, is outlined as follows:
+~\newline
+
+Our system will utilize the two usual genetic operations, namely crossover and mutation. How each of these will operate on individuals selected for the given operation is outlined as follows:
 
 \begin{itemize}
-	\item $Crossover(rule_1,rule_2)$: This binary operation works by choosing a random number $r$ between 1 and 20 (recall that there are 22 features in our data items). This number $r$ then forms the crossover point of the operation. Then indices 0 to $r$ of $rule_1$ will be prepended to indices $r+1$ to 21 of $rule_2$.
-	\item$Mutation(rule)$: This unary operation requires three random numbers to be generated. First we choose a random number $r_1$ between 0 and 21. This corresponds to the index of our mutation point. We then randomly choose $r_2$ to be either 1 or 2. Let $s$ be the current value (0, 1, or 2) of `status' at index $r_1$ of $rule$. We randomly generate another number, $r_2$ as either 1 or 2. Next we compute $s' \equiv s + r_2\text{ (mod }3)$; forcing the status bit to change while allowing for all either of the possible alternative values with the same probability. Finally, if $s' \in \{1,2\}$, we generate $r_3$ as a random value in the domain of the feature corresponding to $r_1$, and we set the pair at index $r_1$ in $rule$ to be $(s', r_3)$. Otherwise, we set `status' to 0.
+	\item $Crossover(rule_1,rule_2)$: This operation works by obtaining a random number $r$ between 1 and 21\footnote{There are 23 features in our basic data items.}. This number $r$ then forms the crossover point of the operation. Then indices 0 to $r$ of $rule_1$ will be prepended to indices $r+1$ to 22 of $rule_2$.
+	\item$Mutate(rule)$: This operation requires four random numbers to be generated. First we choose a random number $r_1$ between 0 and 22. This corresponds to the index of our mutation point. Let $s$ be the current value (0, 1, or 2) of `status' at index $r_1$ of $rule$. We randomly generate another number, $r_2$ as either 1 or 2. Next we compute $s' \equiv s + r_2\text{ (mod }3)$; forcing the status bit to change while allowing for either of the possible alternative values with equal probability. Finally, if $s' \in \{1,2\}$, we generate $r_3$ and $r_4$ (with $r_3 \leq r_4$) as random values in the domain of the feature corresponding to $r_1$, and we set the triple at index $r_1$ in $rule$ to be $(s', r_3, r_4)$. Otherwise, we set `status' to 0.\footnote{We acknowledge that this scheme may add to much randomness to the mutation operation, and are prepared to experiment with mutation of fewer elements of the triple at index $r_1$.}\newline
 \end{itemize}
 
 \subsection{Fitness Function}
+~\newline
 
-Next we describe the basic version of our fitness function. Note that the next section provides a way that this basic structure can be enhanced to add additional knowledge to the system. Let $|D|$ be the number of items in our dataset. The basic version of our fitness function is composed of two terms, which are themselves functions:\newline
+In this section we describe our proposed fitness function, $fitness$. Some terms of $fitness$ provide a way to add additional knowledge to the system (and is thus listed in section 3).
+\newline
+
+\noindent We begin with the base term of our fitness function. Let $|D|$ be the number of items in our dataset. The basic version of our fitness function is composed of two terms, which are themselves functions:\newline
+\begin{center}
+$fitness_{base}(rule) =(                          \frac{coverage(rule)}{|D|} + accuracy(rule))\times\frac{1}{2}$
+\end{center}
+~\newline
+~\newline
+where $rule$ is the individual under consideration. Here \textit{coverage} and \textit{accuracy} are computed in the regular ways. Depending on the results of our initial system runs, this base function may be modified to return 0 if a minimum coverage is not met.\newline
+
+Part of the purpose of the learning system is to discover `interesting' association rules. Though the term `interesting' is relative, we choose to define it in accordance with the word `novel'. To this end, we will add a term to our fitness function that favours individuals that are different from common or expected association rules. We will define a rule as expected if it is contained in a list of association rules output by WEKA via the Apriori algorithm.\footnote{Another option is to use a list of rules produced by a previous run of our system using only the base fitness function.} To measure the novelty of an association rule, we will compute the Hamming distance\footnote{We acknowledge that there may be more appropriate distance measures, but will start our experimentation with this one and change to another measure if needed.} between the given rule and every rule in the WEKA produced list. We will then penalize the rule based on the lowest of these values (that is, the closer a rule is to one already produced by WEKA, the more it is penalized). We define this part of the fitness function as follows:\newline
+
+\noindent Let $W$ be the list of association rules produced by a standard run of WEKA's Apriori algorithm.\newline \newline
+Let $ham(w,rule)$ be the number of clauses (and their presence in the antecedent or consequent) common to $w\in W$ and  $rule$.\newline \newline
+Let $c$ be the number of features in the dataset\footnote{While there are 23 features in the basic dataset, this number will change as extend the dataset with new knowledge.}.
+Then\newline
+\begin{center}
+$fitness_{ext_1}(rule)=\frac{min(ham(w_0,rule),...,ham(w_{|W|},rule))}{c}$\newline
+\end{center}
+\noindent We use a dividend of $c$ to normalize this term to the other terms of $fitness$.\newline
+
+Another measure that will be considered as contributing to \textit{interestingness}, is the completeness factor\cite{confusion} of a rule. The simplicity of our base fitness function, when considering the accuracy of a rule, potentially favors rules that overfit the data. Given a rule with antecedent A and consequence C and coverage(A) = coverage(A and C), while the rule clearly has 100 percent accuracy it doesn't tell us anything about how often C occurs without A. We will introduce a completeness factor, which measures the coverage of C that is actually predicted by A, in essence penalizing rules that incompletely predict C. Rules found with a low completeness factor are either potential artifacts in the data set, or at the very least uninteresting given their low completeness rating. In either case a reduced fitness value is suitable for our purposes.   
+\newline
+
+\noindent Let $comp(rule)$ be the coverage of C predicted by A, relative to the coverage of C, with the range being between [0,1]:
+\begin{center}
+$comp(rule)=\frac{coverage(A\cup C)}{coverage(C)}$
+\end{center}
+Then \newline
+\begin{center}
+$fitness_{ext_2}(rule)= accuracy(rule) \times comp(rule) $\newline
+\end{center}
+\noindent Note that since $accuracy(rule)$ and $comp(rule)$ are both normalized values, the range of $fitness_{ext_2}$ is also [0,1].\newline
+
+\noindent Our overall fitness function is then just the average of our base fitness function and our defined extensions:\small
 \[
-  fitness(rule) =
+  fitness(rule)=
   \begin{cases}
-                                   0  \text{\hspace{2cm} if $rule$ has clauses in antecedent and} & \text{consequent} \\
-                                   (\frac{coverage(rule)}{|D|} + accuracy(rule))\times 100 & \text{otherwise} \\
+                                   0  \text{\hspace{4.1cm}; no clause in antecedent or consequent} \\
+                                   (fitness_{base}(rule) + fitness_{ext_1}(rule) + fitness_{ext_2}(rule))\times \frac{100}{3} \text{~~~~; otherwise} \\
   \end{cases}
 \]
-Here \textit{coverage} and \textit{accuracy} are computed in the regular ways. 
+\newline
+\subsection{Search Control}
+~\newline
+\normalsize
+As our system will essentially be {searching} for association rules, it is important that we have a clear and well defined search control. The search control is based around a single function, $f_{select}$. This function will use an element of randomness (so that even the least fit individuals in a state have \textit{some} chance to propagate if their fitness value is above 0), and $fitness$ to determine which individuals in a given state will be input to a genetic operator. Our search control operates by simply evoking $f_{select}$ to produce generation upon generation until our end condition is met. For our purposes, the end condition will be some number of generations, $g\in \mathbb{N}$, which will be given at runtime. This parameter will be established empirically. 
+\newline
 
+We describe the operation of $f_{select}$ in a given state $s_j$ where $1\leq j \leq g$ $(j\in\mathbb{N})$, as follows:
 
+\begin{enumerate}
+	\item Order all individuals of $s_j$ in descending order of fitness to get a vector, $fit$, of size $|s_j|$.
+	\item Let $FIT = \Sigma_{i=1}^{|s_j|} fitness(rule_i)$ represent the total fitness of the population of state $s_j$.
+	\item Associate with each individual a part of the interval $[1,FIT]$ as follows: $fit[i]$ gets $fitness(fit[|s_j| - i])$ out of the FIT number of positions in the interval.
+	\item If the current operation is a crossover, select two random numbers with $RNG(1,FIT)$. If mutation, select one. The corresponding individuals on the $[1,FIT]$ interval are those that have been selected.
+	\item Perform the crossover or mutation operation until a valid (and unique) offspring is found. 
+    \item Check that the offspring is not in the list of already known rules. If so go back to step 5. Otherwise add this individual to the population. 
+	\item If goal state reached, stop searching.
+	\item If operation results in a population of size greater than $\ell$, (the maximum allowed at the beginning of a state), then delete the least fit individuals until the population is again equal to $\ell$.
+\end{enumerate}
+
+We intend to establish the crossover to mutation ratio and $\ell$ empirically. 
 
 \section{Adding Knowledge}
 
-We propose the following ? ways of adding knowledge not already contained in our dataset, to our learning system:
-
+We propose the following four ways of adding knowledge to our learning system that is not already contained in our dataset:
 \begin{enumerate}
-	\item Expanding our dataset to include ? \unsure{James mentioned some ideas for this. I think this will be where any interesting new rules are learned and we should probably focus some energy on making a creative list of ideas here}
-	\item Accepting command line arguments specifying clauses that must be present in the antecedent and/or consequent of any learned rule. This would provide us with a means to explore certain areas of the association rule search space as guided by the knowledge of the operator at runtime. 
-	\item Adding a new term to our fitness function that captures a measure of how "interesting" a given association rule is. One way of doing this would be to check if the rule is in a list of known AR rules produced by WEKA's \textit{apriori} algorithm, and reducing a rules fitness score if this is the case. Alternatively, we might compute the Hamming distance between the given rule and the top 10 of those produced by WEKA, and assign a higher fitness for those rules with a higher mean distance. \unsure{how else might we quantify "interesting"?}
+	\item Twilight hours are those that occur during dusk and dawn. The onset and length of dusk and dawn, depend on location and month of the year. While we do not have sub-national location information in our dataset, we do have month and local time features. Local dusk and dawn times vary by about an hour in local time across Canada. Then we can use this information \cite{riseset} to establish an average Canadian local twilight time for each month of each year in our dataset. Using this information, we can add a feature that holds a boolean value that is True whenever the corresponding example occurred during our averaged twilight time, and False otherwise.
+	\item Accepting command line arguments specifying clauses that must be present in the antecedent and/or consequent of any learned rule. This would provide us with a means to explore certain areas of the association rule solution space as guided by the knowledge of the system operator at runtime. Examples of this type of knowledge could be the belief that accidents are more likely to occur when multiple young male passengers are present in the vehicle (distraction), or that a young male is less likely to drive riskily with an adult passenger in the vehicle. There are many more assumptions that could be easily investigated using our system.
+%	\item Adding a new term to our fitness function that captures a measure of how ``interesting" a given association rule is. One way of doing this would be to check if the rule is in a list of known AR rules produced by WEKA's \textit{apriori} algorithm, and reducing a rules fitness score if this is the case. Alternatively, we will compute the Hamming distance between the given rule and those produced by WEKA (accumulating distance for each differing clause value between two rules), and assign a higher fitness for those rules with a higher mean distance. We will evaluate each of these methods experimentally to determine which to keep in our system.
+\item Adding a new term to our fitness function that captures a measure of how ``interesting" a given association rule is. The way we propose to do this was described in section 2.4 above, with the definitions of $fitness_{ext_1}$ and $fitness_{ext_2}$.
+    \item Given a reliable source of monthly Canadian deaths\cite{deaths} along with the figures pertaining to fatalities that can be extracted from the collision dataset could produce very interesting association rules. 
+%We could apply this knowledge to our model by computing monthly death count ratios that are explained by this datasets' records and classifying each entry into an \textit{above average} or \textit{below average} category. The logic behind this would involve calculating how many deaths occur in a given month in the collision database and divide this by the monthly average provided by the new source of knowledge to give us a ratio of Canadian deaths for the given month that are explained by our collision-related dataset. With this series of values existing on a monthly basis, we can then calculate a mean value for monthly deaths for the duration of our dataset and explicitly state in each data row whether it was part of an above or below average month.
+To this end, we will add an additional feature by first calculating how many collision related deaths occur in a given month (from our dataset) and divide this by the monthly deaths (from [2]). This gives us a ratio of Canadian deaths explained by our collision-related dataset, for each month. Using these values, we will calculate a mean value for monthly deaths for the 1999-2014 period. With this mean value, we will then categorize each item in our dataset as belonging to an \textit{above average} or \textit{below average} category. 
+
+This feature could provide insight into the overall trend of motor vehicle deaths, and identify some possible outliers. These could be as simple as the month of first snowfall, as well as many other possibilities that we may not have considered. By using \textit{above average} in the consequent of a cmdline argument (see 2) above), we could direct our search to look for rules pertaining to this. These rules could confirm our initial suspicions, as well as prompt an investigation into those that are unexplained. Investigation of unexplained above average deaths could lead to the inclusion of a host of additional knowledge sources we may not have originally considered.
 \end{enumerate}
 
 \section{Detecting Applicable Knowledge}
 
-The requirement that our system be able to read a list of already known rules, and avoid producing those same rules throughout the course of learning, is relatively simple when using a genetic algorithm based learner. Our system fulfill this requirement by cross checking this list upon the creation of any new individual (be it during the creation of the initial population, or upon applying a genetic operator), and discarding any that is found to already exist in this list. \unsure{Should we be providing algorithm details on how this works? I.e. how we will parse the list, etc. ?}
+The requirement that our system be able to read a list of already known rules, and avoid producing those same rules throughout the course of learning, is relatively simple when using a genetic algorithm based learner. Our system fulfills this requirement by cross checking this list upon the creation of any new individual (be it during the creation of the initial population, or upon applying a genetic operator), and discarding any that is found to already exist in this list. 
+%As mentioned in Section 2, we can also do this in a more intelligent way than simply discarding any existing rules. If our system were to encounter an existing rule, or were to begin to approach an existing rule (we could see this by checking the Hamming Distance), we could ensure to apply more crossover operations at this time to allow us to move away from it in the search space and explore other possibilities. This will allow us to save time we would spend approaching a known rule and move our efforts to discovering those that are novel.
+
+We will accomplish this by taking an input file containing the list of known rules and parsing the list to convert the rules to the format of our internal rule representation structure. Once converted, we will keep them as a persistent list for the duration of program execution. Any rule produced by our genetic operations can then be cross-checked against this list and kept or discarded. This may add a significant overhead to processing a newly bred generation of rules, therefore we will exercise caution when deciding how many generations to allow to pass before re-examining the pool of rules. 
 
 \section{Example Association Rule Learning}
 
-(TODO: the example should show a couple of generations, and exhibit both genetic operators - using a simplified dataset (reduced features and examples))
+The following example demonstrates the functionality of the most basic version of our system. Namely, it demonstrates the individual representation, genetic operations, and the base version of the fitness function.\newline
 
-\unsure{We should work these our ASAP as it will probably reveal some shortcomings in our proposed system. It would also be a good idea for everyone to do a hand example, to get a solid idea of how the system works. This should help during implementation time.}
+Let the schema of a dataset $D$ be described as: \newline
 
-\bibliography{citations}
+$D(C\_Year,C\_Month,C\_Day, P\_Sex, P\_Age)$\newline
+
+Let $D = $
+\begin{tabular}{ | c | c | c | c | c |}
+ \hline
+1999 & 1 & 1 & 1 & 60 \\
+  \hline
+2000 & 1 & 2 & 1 & 63 \\
+  \hline
+2000 & 1 & 6 & 2 & 16 \\
+  \hline
+1999 & 2 & 7 & 2 & 16 \\
+  \hline
+1999 & 2 &  5 & 1 & 17 \\
+  \hline
+1999 & 4 & 2 & 1 & 72 \\
+  \hline
+2000 & 5 & 6 & 2 & 17 \\
+  \hline
+2000 & 11 & 6 & 2 & 17 \\
+  \hline
+2000 & 10 & 1 & 2 & 63\\
+\hline
+2000 & 10 & 5 & 2 & 62 \\
+\hline 
+2013 & 4 & 5 & 1 & 30 \\
+\hline
+\end{tabular}
+
+
+~\newline We will let $F=1$ and $M=2$ for the values of feature $P\_Sex$. An individual in our system would then be represented as: \newline
+
+\begin{tabular}{ | c | c | c | c | c |}
+ \hline
+ Status & Status & Status & Status & Status\\
+ \hline
+ C\_YEAR\_upper  & C\_MNTH\_upper & C\_Day\_upper & P\_Sex\_upper & P\_Age\_upper \\
+\hline
+ C\_YEAR\_lower & C\_MNTH\_lower & C\_Day\_lower & P\_Sex\_lower & P\_Age\_lower \\
+\hline 
+\end{tabular}
+
+~\newline 
+
+\noindent Suppose for demonstration purposes that we perform one cross-over operation before each mutation.\newline
+Let $\ell = 10$ be the maximum size of the population at any given time.\newline
+Let $m = 3$ be the size that the population is reduced to once the maximum population size is reached.\newline
+Let $s_0$ be the start state composed of three `randomly' generated individuals:\newline
+
+$s_0=\left \{
+\begin{tabular}{ | c | c | c | c | c |}
+ \hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 2 & 23 \\
+\hline
+ -1 & -1 & 5 & 2 & 10 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 1 & 50 \\
+\hline
+ -1 & -1 & 2 & 1 & 99 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 5 & 2 & 30 \\
+\hline
+ -1 & -1 & 4 & 2 & 31 \\
+\hline 
+\end{tabular}
+\right\}$
+~\newline
+
+Call these individuals $rule_1, rule_2$, and $rule_3$, respective to the order in which they appear above. These individuals represent the following association rules:
+\begin{itemize}
+	\item $rule_1: (5 \leq C\_Day 
+    \leq 7)\wedge(10 \leq P\_Age \leq 23)\rightarrow (P\_Sex = 2)$
+    \item $rule_2: (2 \leq C\_Day 
+    \leq 7)\wedge(50 \leq P\_Age \leq 99)\rightarrow (P\_Sex = 1)$
+    \item $rule_3: (4 \leq C\_Day 
+    \leq 5)\wedge(30 \leq P\_Age \leq 31)\rightarrow (P\_Sex = 2)$
+\end{itemize}
+
+Given this start state, the search control operates as follows:
+\begin{enumerate}
+	\item Calculate the $fitness$ value of each individual and place in increasing order in
+a vector, $fit$:
+	\begin{itemize}
+		\item $fitness_{base}(rule_1)= (\frac{5}{11} + \frac{4}{5})\times\frac{1}{2} = 0.63$
+        \item $fitness_{base}(rule_2)= (\frac{4}{11} + \frac{2}{4})\times\frac{1}{2} = 0.43$
+		\item $fitness_{base}(rule_3)=(\frac{1}{11} + \frac{0}{1})\times\frac{1}{2} = 0.05$
+    \end{itemize}
+    Then $fit=(rule_1,rule_2,rule_3)$.
+	\item Then $FIT = (0.63 + 0.43 + 0.05) \times 100 = 111$ 
+	\item $fit[1]$ gets from 1-63, $fit[2]$ gets from 64 - 106, and $fit[3]$ gets from 107-111.
+    \item After randomly obtained the numbers 10 and 109, individuals $fit[1]$ and $fit[3]$ are selected for the crossover operation. 
+    \item Suppose $Crossover(rule_1,rule_3)) = rule_4=\begin{tabular}{ | c | c | c | c | c | }
+ \hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 2 & 30 \\
+\hline
+ -1 & -1 & 5 & 2 & 31 \\
+\hline 
+\end{tabular} $, when the crossover point $r = 3$ was used. This gives the next state:\newline
+\small
+$s_1=\left \{
+\begin{tabular}{ | c | c | c | c | c |}
+ \hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 2 & 23 \\
+\hline
+ -1 & -1 & 5 & 2 & 10 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 1 & 50 \\
+\hline
+ -1 & -1 & 2 & 1 & 99 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 5 & 2 & 30 \\
+\hline
+ -1 & -1 & 4 & 2 & 31 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+ \hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 2 & 30 \\
+\hline
+ -1 & -1 & 5 & 2 & 31 \\
+\hline 
+\end{tabular}
+\right\}$
+\normalsize
+\item To update $fit$, we calculate $fitness_{base}(rule_4)=(\frac{1}{11}+\frac{0}{1})\times\frac{1}{2}=0.05$.\newline
+This gives $fit=(rule_1,rule_2,rule_3,rule_4)$.
+\item Then $FIT = (0.63+0.43+0.05+0.05)\times 100 = 116$.
+\item $fit[1]$ gets from 1-63, $fit[2]$ gets from 64-106, $fit[3]$ gets from 107-111, and $fit[4]$ gets from 112-116.
+\item After randomly obtaining 81, $fit[2]$ is selected for the mutation operation.
+\item Suppose $Mutate(rule_2)=rule_5=\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 2 & 0 & 1 & 2 & 1\\
+ \hline
+ 1999  & -1 & 7 & 1 & 50 \\
+\hline
+ 2000 & -1 & 2 & 1 & 99 \\
+\hline 
+\end{tabular}$, when $r_1=0,r_2=2,r_3=1999$, and $r_4=2000$.This gives the next state:\newline
+\small
+$s_2=\{
+\begin{tabular}{ | c | c | c | c | c |}
+ \hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 2 & 23 \\
+\hline
+ -1 & -1 & 5 & 2 & 10 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 1 & 50 \\
+\hline
+ -1 & -1 & 2 & 1 & 99 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 5 & 2 & 30 \\
+\hline
+ -1 & -1 & 4 & 2 & 31 \\
+\hline 
+\end{tabular},$\newline
+$\begin{tabular}{ | c | c | c | c | c |}
+ \hline
+ 0 & 0 & 1 & 2 & 1\\
+ \hline
+ -1  & -1 & 7 & 2 & 30 \\
+\hline
+ -1 & -1 & 5 & 2 & 31 \\
+\hline 
+\end{tabular},
+\begin{tabular}{ | c | c | c | c | c |}
+\hline
+ 2 & 0 & 1 & 2 & 1\\
+ \hline
+ 1999  & -1 & 7 & 1 & 50 \\
+\hline
+ 2000 & -1 & 2 & 1 & 99 \\
+\hline 
+\end{tabular}
+\}$
+\normalsize
+\item The process continues from here in much the same way. The fitness value for the newly introduced rule will be calculated, then steps 3-10 are repeated until such time as a stopping condition is reached. 
+\end{enumerate}
+ 
+\newpage
+\printbibliography
 \end{document}
 
 %-----------------------------------------------------------------------
