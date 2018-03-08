@@ -1,0 +1,48 @@
+/**
+ * Class: LookupTable
+ * Intended functionality: A container class that translates feature values into float values, and provides utility
+ * functions to generate feature values in a correct range
+ * Feature Owner: TODO
+ */
+
+public class LookupTable
+{
+    //public functions
+    public static LookupTable ParseFile(String filePath)
+    {
+        return null;
+    }
+
+    /**
+     * NOTE: This is not intended to be an actual function call. Only to illustrate typical api for feature value generation
+     * @param featureId feature to create values for
+     * @param toModify feature requirement that will house the changes
+     *                 NOTE: @toModify is altered through this function call
+     */
+    public void GenerateRandomValue(int featureId, FeatureRequirement toModify)
+    {
+        // The intention behind adding @toModify as a parameter to modify rather than returning a value is that depending
+        // on which feature is being generated for, the structure of the return type might change
+    }
+
+    /**
+     * ToString() method for a rule that inserts feature names and translates feature values into symbols appropriate for
+     * the data set
+     * @param rule
+     * @return
+     */
+    public String TranslateRule(Rule rule)
+    {
+        // ie TranslateRule(Rule[0,1]) = " Rule: Weather = Rainy; Day = Monday; \n"
+        return "";
+    }
+
+    // private functions
+    private LookupTable()
+    {
+
+    }
+
+    // private members
+
+}
