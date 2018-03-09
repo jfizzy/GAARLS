@@ -15,7 +15,7 @@ import org.junit.runners.Suite;
  * @author Peter Ebear, David Engel, Evan Loughlin, James MacIsaac, Shane Sims
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({Testing.RuleTest.class})
+@Suite.SuiteClasses({Testing.FeatureRequirementTest.class})
 public class TestManager {
     
 }

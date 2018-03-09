@@ -1,7 +1,5 @@
 package RuleManager;
 
-import java.lang.Float;
-
 /**
  * Class: FeatureRequirement Intended functionality: Associated with a feature
  * for a given data set. Encodes a value range that a feature is expected to
@@ -11,13 +9,17 @@ import java.lang.Float;
 public class FeatureRequirement {
 
     // private members
-    //private final int featureID; // not sure that we need this 
-    // as the index in the rule specifies which 
-    // feature it pertains to
+    private final int featureID; //TODO revisit this
+    
     private pFlag participation;
     private float upperBound;
     private float lowerBound;
 
+    // Getters and Setters
+    public int getFeatureID(){
+        return this.featureID;
+    }
+    
     public int getParticipation() { // return the numeric value
         return participation.getValue();
     }
@@ -47,7 +49,7 @@ public class FeatureRequirement {
         if (comparison > 0) {
             this.upperBound = upperBound;
         } else if (comparison == 0) { // becoming discrete
-            //TODO
+            //TODO decide how to handle this, if at all
         } else {
             throw new InvalidFeatReqException("Attempted to set invalid Upper Bound");
         }
@@ -69,7 +71,8 @@ public class FeatureRequirement {
     }
 
     // public constructor
-    public FeatureRequirement(int pInt, float upper, float lower) throws InvalidFeatReqException {
+    public FeatureRequirement(int featureID, int pInt, float upper, float lower) throws InvalidFeatReqException {
+        this.featureID = featureID;
         switch (pInt) {
             case 0:
                 this.participation = pFlag.IGNORE;
@@ -96,9 +99,9 @@ public class FeatureRequirement {
     }
 
     //private constructor (used to make copies)
-    private FeatureRequirement(pFlag p, float upper, float lower) {
+    private FeatureRequirement(int featureID, pFlag p, float upper, float lower) {
+        this.featureID = featureID;
         this.participation = p;
-
         this.upperBound = upper;
         this.lowerBound = lower;
     }
@@ -110,12 +113,13 @@ public class FeatureRequirement {
      * @param value value for feature. ASSUMPTION: Does not check if the value
      * is valid for a feature set or comes from a feature that this requirement
      * is associated with
-     * @return if the value is in the range required
+     * @return true if the value is in the range required
+     *         false otherwise
      */
     public boolean evaluate(float value) {
         int compareUpper = Float.compare(this.upperBound, value);
         int compareLower = Float.compare(value, this.lowerBound);
-        return (compareUpper >= 0 && compareLower <= 0);
+        return (compareUpper >= 0 && compareLower >= 0);
     }
 
     /**
@@ -124,11 +128,12 @@ public class FeatureRequirement {
      * @return a shallow copy clone of current state.
      */
     public FeatureRequirement copy() {
-        return new FeatureRequirement(this.participation, this.upperBound, this.lowerBound); // private constructor
+        return new FeatureRequirement(this.featureID, this.participation, this.upperBound, this.lowerBound);
     }
 
     // public fields
-    private enum pFlag { // flag for rule participation
+    // TODO may want to 
+    public enum pFlag { // flag for rule participation
         IGNORE(0), ANTECEDENT(1), CONSEQUENT(2); // corresponding numerical values
 
         private final int value;
