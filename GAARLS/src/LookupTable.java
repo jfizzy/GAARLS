@@ -10,7 +10,7 @@ public class LookupTable
     //public functions
     public static LookupTable ParseFile(String filePath)
     {
-        return null;
+        return new LookupTable();
     }
 
     /**
@@ -35,6 +35,18 @@ public class LookupTable
     {
         // ie TranslateRule(Rule[0,1]) = " Rule: Weather = Rainy; Day = Monday; \n"
         return "";
+    }
+
+    /**
+     * Util function used when parsing the database to translate a value in the database to it's float representation
+     * @param featureId
+     * @param symbol symbol in the database assigned to @featureId in the item
+     * @return the float representation of the symbol.
+     */
+    public float TranslateFeatureSymbol(int featureId, String symbol)
+    {
+        // TODO
+        return -1f;
     }
 
     // private functions
