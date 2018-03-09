@@ -3,7 +3,7 @@ import java.util.ArrayList;
 /**
  * Class: Rule
  * Intended functionality: Container class of FeatureRequirements. Container size should be equal to LookupTable.NUM_FEATURES
- * Feature Owner: TODO
+ * Feature Owner: James
  */
 
 

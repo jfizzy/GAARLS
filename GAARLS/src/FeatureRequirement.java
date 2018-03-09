@@ -2,7 +2,7 @@
  * Class: FeatureRequirement
  * Intended functionality: Associated with a feature for a given data set. Encodes a value range that a feature is expected to
  * exist in and an evaluation function that determines if a feature value is within that range
- * Feature Owner: TODO
+ * Feature Owner: James
  */
 
 public class FeatureRequirement

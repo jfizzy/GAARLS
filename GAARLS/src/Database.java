@@ -1,7 +1,7 @@
 /**
  * Class: Database
  * Intended functionality: A container class that houses a value array with look up functions to access it
- * Feature Owner: TODO
+ * Feature Owner: Peter
  */
 
 public class Database

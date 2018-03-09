@@ -2,7 +2,7 @@
  * Class: FitnessManager
  * Intended functionality: Util class that is in charge of all fitness function calculations, using the feature database
  * for value queries
- * Feature Owner: TODO
+ * Feature Owner: Shane, Evan, David
  */
 
 

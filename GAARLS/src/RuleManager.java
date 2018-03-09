@@ -3,7 +3,7 @@ import java.util.ArrayList;
 /**
  * Class: RuleManager
  * Intended functionality: Util class that is in charge of mutations, cross overs and rule generation
- * Feature Owner: TODO
+ * Feature Owner: Shane, David
  */
 
 

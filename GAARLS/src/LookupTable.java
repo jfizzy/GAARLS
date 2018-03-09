@@ -2,7 +2,7 @@
  * Class: LookupTable
  * Intended functionality: A container class that translates feature values into float values, and provides utility
  * functions to generate feature values in a correct range
- * Feature Owner: TODO
+ * Feature Owner: Peter
  */
 
 public class LookupTable
