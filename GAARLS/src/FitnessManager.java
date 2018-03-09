@@ -1,3 +1,6 @@
+
+import RuleManager.Rule;
+
 /**
  * Class: FitnessManager
  * Intended functionality: Util class that is in charge of all fitness function calculations, using the feature database

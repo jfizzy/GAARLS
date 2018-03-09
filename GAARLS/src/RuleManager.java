@@ -1,3 +1,4 @@
+import RuleManager.Rule;
 import java.util.ArrayList;
 
 /**

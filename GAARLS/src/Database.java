@@ -1,3 +1,4 @@
+import RuleManager.Rule;
 import java.io.*;
 import java.util.Scanner;
 

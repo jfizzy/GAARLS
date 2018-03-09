@@ -1,3 +1,5 @@
+package RuleManager;
+
 import java.util.ArrayList;
 
 /**
@@ -9,10 +11,17 @@ import java.util.ArrayList;
 
 public class Rule
 {
+    
+    // private members
+    private FeatureRequirement featureReqs[]; //  
+    private final int features = 23; // should probably move this somewhere better
+    
+    
+    
     // public methods
     public Rule()
     {
-
+        this.featureReqs = new FeatureRequirement[this.features];
     }
 
     /**
@@ -52,6 +61,5 @@ public class Rule
 
     // private methods
 
-    // private members
-    FeatureRequirement[] mFeatureRequirements;
+    
 }
