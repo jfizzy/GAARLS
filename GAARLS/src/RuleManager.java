@@ -24,7 +24,7 @@ public class RuleManager
      */
     public Rule Mutate(Rule mutationTemplate)
     {
-        Rule mutatedRule = mutationTemplate.Clone();
+        Rule mutatedRule = mutationTemplate.copy();
 
         // mutate
 
