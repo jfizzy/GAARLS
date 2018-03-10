@@ -4,7 +4,13 @@ package RuleManager;
  * Class: FeatureRequirement Intended functionality: Associated with a feature
  * for a given data set. Encodes a value range that a feature is expected to
  * exist in and an evaluation function that determines if a feature value is
- * within that range Feature Owner: James
+ * within that range.
+ * 
+ * Key Methods: evaluate -> is a given float acceptable for the requirements of 
+ *                          this feature?
+ *              copy -> make a exact copy of this FeatureRequirement object.
+ * 
+ * Feature Owner: James
  */
 public class FeatureRequirement {
 
@@ -71,6 +77,15 @@ public class FeatureRequirement {
     }
 
     // public constructor
+    /**
+     * Creates a FeatureRequirement (probably for usage in a Rule)
+     * 
+     * @param featureID
+     * @param pInt
+     * @param upper
+     * @param lower
+     * @throws RuleManager.FeatureRequirement.InvalidFeatReqException 
+     */
     public FeatureRequirement(int featureID, int pInt, float upper, float lower) throws InvalidFeatReqException {
         this.featureID = featureID;
         switch (pInt) {
@@ -98,7 +113,7 @@ public class FeatureRequirement {
         }
     }
 
-    //private constructor (used to make copies)
+    //private constructor (used to make copies only)
     private FeatureRequirement(int featureID, pFlag p, float upper, float lower) {
         this.featureID = featureID;
         this.participation = p;
@@ -110,7 +125,8 @@ public class FeatureRequirement {
     /**
      * Checks if a value is within the range required
      *
-     * @param value value for feature. ASSUMPTION: Does not check if the value
+     * @param value value for feature. 
+     * TODO ASSUMPTION: Does not check if the value
      * is valid for a feature set or comes from a feature that this requirement
      * is associated with
      * @return true if the value is in the range required
@@ -132,7 +148,7 @@ public class FeatureRequirement {
     }
 
     // public fields
-    // TODO may want to 
+    // TODO may want to make changes to this for negation?
     public enum pFlag { // flag for rule participation
         IGNORE(0), ANTECEDENT(1), CONSEQUENT(2); // corresponding numerical values
 
@@ -147,7 +163,7 @@ public class FeatureRequirement {
         }
     }
 
-    // exceptions
+    // custom exceptions
     public class InvalidFeatReqException extends Exception {
 
         public InvalidFeatReqException(String message) {
