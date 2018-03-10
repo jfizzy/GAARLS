@@ -107,9 +107,9 @@ public class FeatureRequirementTest {
             assertFalse(fr1.evaluate(3.5f)); //TOO LOW
             //test with negatives
             FeatureRequirement fr2 = new FeatureRequirement(0, 1, -3.738f, -20.5f);
-            assertTrue(fr1.evaluate(-10.0f)); // GOOD
-            assertFalse(fr1.evaluate(-2.0f)); //TOO HIGH
-            assertFalse(fr1.evaluate(-40.67f)); //TOO LOW
+            assertTrue(fr2.evaluate(-10.0f)); // GOOD
+            assertFalse(fr2.evaluate(-2.0f)); //TOO HIGH
+            assertFalse(fr2.evaluate(-40.67f)); //TOO LOW
         } catch (InvalidFeatReqException ifre) {
             fail(ifre.getMessage());
         }
