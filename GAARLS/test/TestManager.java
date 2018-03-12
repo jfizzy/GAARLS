@@ -5,7 +5,6 @@
  * Professor:	Dr. Jörg Denzinger
  * University:	University of Calgary
  */
-package Testing;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -15,7 +14,7 @@ import org.junit.runners.Suite;
  * @author Peter Ebear, David Engel, Evan Loughlin, James MacIsaac, Shane Sims
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({Testing.FeatureRequirementTest.class, Testing.RuleTest.class})
+@Suite.SuiteClasses({Testing.FeatureRequirementTest.class, RuleTest.class})
 public class TestManager {
     
 }

@@ -5,7 +5,6 @@
  * Professor:	Dr. Jörg Denzinger
  * University:	University of Calgary
  */
-package Testing;
 
 import RuleManager.FeatureRequirement;
 import RuleManager.Rule;
@@ -27,6 +26,7 @@ public class RuleTest {
     public RuleTest() {
         // set up some testable FeatureRequirements
         try {
+            Database db;
             fr1 = new FeatureRequirement(0, 0, 10.5f, 4.5f); //IGNORE
             fr2 = new FeatureRequirement(0, 1, 3.738f, -2.5f); //ANTECEDENT
             fr3 = new FeatureRequirement(0, 1, 3.45f, 0f); //ANTECEDENT
