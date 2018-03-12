@@ -21,7 +21,7 @@ public class FitnessManager
  *                       will not change functionality of rule
      * @return normalized value between 0-1 TODO: Shane is this correct?
      */
-    public float FitnessOf(Rule rule)
+    public float fitnessOf(Rule rule)
     {
         // get rule to do burpees until it pukes
         return 0; // rule apparently is out of shape

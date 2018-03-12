@@ -21,7 +21,7 @@ public class RuleManager
      * @param mutationTemplate
      * @return a mutated rule
      */
-    public Rule Mutate(Rule mutationTemplate)
+    public Rule mutate(Rule mutationTemplate)
     {
         Rule mutatedRule = mutationTemplate.Clone();
 
@@ -36,7 +36,7 @@ public class RuleManager
      * @param parent2
      * @return merged rule of @parent1 and @parent2
      */
-    public Rule Crossover(Rule parent1, Rule parent2)
+    public Rule crossover(Rule parent1, Rule parent2)
     {
         ArrayList<Boolean> whoGetsWhatList = null; // do some calculations
         return parent1.Merge(parent2, whoGetsWhatList);
@@ -47,7 +47,7 @@ public class RuleManager
      * Creates a new rule with randomized requirements found from LookupTable
      * @return random new rule
      */
-    public Rule GenerateRule()
+    public Rule generateRule()
     {
         Rule newRule = new Rule();
         // for i in range newRule.featureRequirement.size()
