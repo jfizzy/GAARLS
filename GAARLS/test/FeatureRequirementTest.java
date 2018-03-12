@@ -7,11 +7,10 @@
  * Professor:	Dr. Jörg Denzinger
  * University:	University of Calgary
  */
-import RuleManager.FeatureRequirement;
-import RuleManager.FeatureRequirement.InvalidFeatReqException;
-import RuleManager.Rule;
-
-import RuleManager.FeatureRequirement;
+import Rule.FeatureRequirement;
+import Rule.FeatureRequirement.InvalidFeatReqException;
+import Rule.Rule;
+import Rule.FeatureRequirement;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

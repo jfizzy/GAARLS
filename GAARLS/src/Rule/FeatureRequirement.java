@@ -1,4 +1,4 @@
-package RuleManager;
+package Rule;
 
 /**
  * Class: FeatureRequirement Intended functionality: Associated with a feature

@@ -6,8 +6,8 @@
  * University:	University of Calgary
  */
 
-import RuleManager.FeatureRequirement;
-import RuleManager.Rule;
+import Rule.FeatureRequirement;
+import Rule.Rule;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
