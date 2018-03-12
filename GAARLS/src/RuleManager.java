@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 /**
  * Class: RuleManager
- * Intended functionality: Util class that is in charge of mutations, cross overs and rule generation
+ * Intended functionality: Util class that is in charge of mutations, cross-overs and rule generation
  * Feature Owner: Shane, David
  */
 
@@ -18,12 +18,12 @@ public class RuleManager
     /**
      * Creates a new rule with @mutationTemplate as the base rule
      * NOTE: Does not modify the state of @mutationTemplate
-     * @param mutationTemplate
+     * @param parent
      * @return a mutated rule
      */
-    public Rule mutate(Rule mutationTemplate)
+    public Rule mutate(Rule parent)
     {
-        Rule mutatedRule = mutationTemplate.Clone();
+        Rule mutatedRule = parent;
 
         // mutate
 

@@ -1,5 +1,6 @@
 import javafx.util.Pair;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 
@@ -49,13 +50,13 @@ public class EvolutionManager
      *  Initialization function creating an initial population
      *  @param populationSize: initial population size
      */
-    private ArrayList<Pair<Float, Rule>> intializePopulation(int populationSize) {
+    private ArrayList<Pair<Float, Rule>> initializePopulation(int populationSize) {
 
         ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
 
         Rule potentialRule;
         Float ruleFitness;
-        for(int i = 0; i < (populationSize-1); i++){
+        for(int i = 0; i < populationSize; i++){
             potentialRule = new Rule();
         //  while(knownRules.contains(potentialRule)
         //      potentialRule = new Rule();
@@ -76,7 +77,12 @@ public class EvolutionManager
     public void evolve(int startSize, int forGenerations, int maxPop) {
         int numGenerations = 0;
         int cullToSize = maxPop - 100;
-        ArrayList<Pair<Float,Rule>> state = this.intializePopulation(startSize);
+        ArrayList<Pair<Float,Rule>> state = this.initializePopulation(startSize);
+
+
+
+        System.out.println("Size of initial pop: " + state.size());
+        System.out.println("FIrst individual: " + state.get(0));
 
         while (numGenerations < forGenerations) {
             state = fSelect(state);
@@ -125,12 +131,18 @@ public class EvolutionManager
             }
 
         }
-
         // Select individual(s) for genetic operation and call
         Random rand = new Random();
 
         if(crossoversDone == crossToMut){                   // Do mutation
             crossoversDone = 0;
+            int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
+            Rule parent = nextState.get(parentIndex).getValue();
+            Rule child = theRuleManager.mutate(parent);
+            Float childFitness = theFitnessManager.fitnessOf(child);
+            nextState.add(new Pair<>(childFitness, child));
+        }
+        else{                                               // Do crossover
             int parent1Index, parent2Index;
             do {
                 parent1Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
@@ -139,13 +151,6 @@ public class EvolutionManager
             Rule parent1 = nextState.get(parent1Index).getValue();
             Rule parent2 = nextState.get(parent2Index).getValue();
             Rule child = theRuleManager.crossover(parent1,parent2);
-            Float childFitness = theFitnessManager.fitnessOf(child);
-            nextState.add(new Pair<>(childFitness, child));
-        }
-        else{                                               // Do crossover
-            int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
-            Rule parent = nextState.get(parentIndex).getValue();
-            Rule child = theRuleManager.mutate(parent);
             Float childFitness = theFitnessManager.fitnessOf(child);
             nextState.add(new Pair<>(childFitness, child));
             crossoversDone++;
@@ -165,4 +170,5 @@ public class EvolutionManager
     }
 
 */
+
 }
