@@ -1,5 +1,5 @@
 
-import RuleManager.Rule;
+import Rule.Rule;
 
 /**
  * Class: FitnessManager

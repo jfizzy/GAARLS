@@ -1,4 +1,4 @@
-package RuleManager;
+package Rule;
 
 import java.util.ArrayList;
 

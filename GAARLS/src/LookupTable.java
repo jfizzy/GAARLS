@@ -1,6 +1,6 @@
 
-import RuleManager.FeatureRequirement;
-import RuleManager.Rule;
+import Rule.FeatureRequirement;
+import Rule.Rule;
 
 /**
  * Class: LookupTable
