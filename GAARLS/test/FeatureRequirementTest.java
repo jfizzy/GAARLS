@@ -1,4 +1,4 @@
-package Testing;
+
 
 /*
  * Authors: 	Peter Ebear, David Engel, Evan Loughlin, James MacIsaac, Shane Sims
