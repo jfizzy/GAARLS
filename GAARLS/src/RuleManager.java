@@ -39,21 +39,25 @@ public class RuleManager
      * Creates a new rule with @parent1 and @parent2 as the base rules
      * @param parent1 
      * @param parent2 
-     * @return merged rule (uglyChild) of @parent1 and @parent2
+     * @return merged rule (child) of @parent1 and @parent2
      */
     public Rule Crossover(Rule parent1, Rule parent2)
     {
-        Rule uglyChild = new Rule(); // The offspring of parent1 and parent2 after a couple drinks and some bad life choices
-        Random rand = new Random();
+		// This needs to be tested!
+
+	    Random rand = new Random();
         int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
+		
+		FeatureRequirements parent1FeatReqs[] = parent1.getFeatureReqs();
+		FeatureRequirements parent2FeatReqs[] = parent2.getFeatureReqs();
+		FeatureRequirements childFeatReqs[] = parent1.getFeatureReqs();
         
-        for(int i = 0; i < pivot; i++)
-            uglyChild.replaceFeatureRequirement(i, parent1.getFeatureReqs()[i]);
-        
-        for(int i = pivot; i < num_features; i++)
-            uglyChild.replaceFeatureRequirement(i, parent2.getFeatureReqs()[i]);
-        
-        return uglyChild;
+        for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
+				childFeatReqs[i] = parent2FeatReqs[i];
+			
+        Rule child = new Rule(childFeatReqs);
+
+        return child;
     }
 
     /**
