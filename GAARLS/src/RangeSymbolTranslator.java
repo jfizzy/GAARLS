@@ -30,7 +30,7 @@ public class RangeSymbolTranslator extends SymbolTranslatorBase
         int lowerBound = value1 < value2 ? value1 : value2;
         int upperBound = value1 < value2 ? value2 : value1;
 
-        toRandomize.setBoundRange(lowerBound, upperBound);
+        toRandomize.setBoundRange(lowerBound, upperBound, 0.5f); //TODO: want to pass a real rangeCoverage value
     }
 
     @Override

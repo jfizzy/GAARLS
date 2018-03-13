@@ -679,7 +679,7 @@ public class LookupTable
 
         try
         {
-            FeatureRequirement feature = new FeatureRequirement(11, 0, 0,0);
+            FeatureRequirement feature = new FeatureRequirement(11, 0, 0, 0, 0);
             lookupTable.GenerateRandomValue(11, feature);
             System.out.println( lookupTable.TranslateFeatureRequirement(11, feature));
         }

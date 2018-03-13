@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Rule {
 
     // private members
-    private FeatureRequirement featureReqs[]; //  
+    private FeatureRequirement featureReqs[]; 
     private static int features;
 
     // getters and setters
@@ -29,7 +29,7 @@ public class Rule {
         this.featureReqs = new FeatureRequirement[this.features];
         try {
             for (int i = 0; i < this.featureReqs.length; i++) {
-                featureReqs[i] = new FeatureRequirement(i, 0, 0f, 0f); // default initial value
+                featureReqs[i] = new FeatureRequirement(i, 0, 0f, 0f, 0f); // default initial value
             }
         } catch (FeatureRequirement.InvalidFeatReqException ifre) {
             System.out.println(ifre.getMessage());
