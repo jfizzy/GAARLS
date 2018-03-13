@@ -498,7 +498,7 @@ public class LookupTable
             values[counter] = 98; translations[counter] = "Outside passenger compartment"; symbols[counter] = Integer.toString(values[counter]);counter++;
             values[counter] = 99; translations[counter] = "Pedestrian"; symbols[counter] = Integer.toString(values[counter]);counter++;
 
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations); // TODO: Range?
+            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations); // TODO: Range?
         }
 
         // Feature 20: Injury Severity
