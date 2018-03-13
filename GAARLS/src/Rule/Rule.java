@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Rule {
 
     // private members
-    private FeatureRequirement featureReqs[]; //  
+    private FeatureRequirement featureReqs[]; 
     private static int features;
 
     // getters and setters

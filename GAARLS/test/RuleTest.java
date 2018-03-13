@@ -52,6 +52,9 @@ public class RuleTest {
 
     @Before
     public void setUp() {
+        Rule.setNumFeatures(22); // This is set for testing purposes.
+                                 // normally this would be passed in by the RuleManager
+        
     }
 
     @After
@@ -70,6 +73,7 @@ public class RuleTest {
     @Test
     public void testSettingFeatureRequirements() {
         Rule r2 = new Rule();
+        System.out.println("Feature Reqs: "+r2.getFeatureReqs().length);
 
         assertFalse(r2.getFeatureReqs()[0].evaluate(5.5f)); // default wont allow this
         assertTrue(r2.getFeatureReqs()[0].evaluate(0f)); // by default this works
