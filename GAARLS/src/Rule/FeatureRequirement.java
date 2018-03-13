@@ -15,11 +15,11 @@ package Rule;
 public class FeatureRequirement {
 
     // private members
-    private final int featureID; //TODO revisit this
-    
+    private final int featureID;
     private pFlag participation;
     private float upperBound;
     private float lowerBound;
+    private float rangeCoverage;
 
     // Getters and Setters
     public int getFeatureID(){
@@ -76,10 +76,16 @@ public class FeatureRequirement {
      * -Peter
      * @param lowerBound
      * @param upperBound
+     * @param rangeCoverage
      */
-    public void setBoundRange(float lowerBound, float upperBound) {
+    public void setBoundRange(float lowerBound, float upperBound, float rangeCoverage) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
+        this.rangeCoverage = rangeCoverage;
+    }
+
+    public float getRangeCoverage() {
+        return rangeCoverage;
     }
 
     // public constructor
@@ -92,7 +98,7 @@ public class FeatureRequirement {
      * @param lower
      * @throws FeatureRequirement.InvalidFeatReqException
      */
-    public FeatureRequirement(int featureID, int pInt, float upper, float lower) throws InvalidFeatReqException {
+    public FeatureRequirement(int featureID, int pInt, float upper, float lower, float rangeCoverage) throws InvalidFeatReqException {
         this.featureID = featureID;
         switch (pInt) {
             case 0:
@@ -114,6 +120,7 @@ public class FeatureRequirement {
         }
         this.upperBound = upper;
         this.lowerBound = lower;
+        this.rangeCoverage = rangeCoverage;
     }
 
     //private constructor (used to make copies only)
@@ -122,6 +129,7 @@ public class FeatureRequirement {
         this.participation = p;
         this.upperBound = upper;
         this.lowerBound = lower;
+        this.rangeCoverage = 0;
     }
 
     // public functions
