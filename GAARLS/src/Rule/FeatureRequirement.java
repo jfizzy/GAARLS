@@ -52,13 +52,10 @@ public class FeatureRequirement {
 
     public void setUpperBound(float upperBound) throws InvalidFeatReqException {
         int comparison = Float.compare(upperBound, this.lowerBound);
-        if (comparison > 0) {
-            this.upperBound = upperBound;
-        } else if (comparison == 0) { // becoming discrete
-            //TODO decide how to handle this, if at all
-        } else {
+        if (comparison < 0) {
             throw new InvalidFeatReqException("Attempted to set invalid Upper Bound");
         }
+        this.upperBound = upperBound;
     }
 
     public float getLowerBound() {
@@ -67,13 +64,22 @@ public class FeatureRequirement {
 
     public void setLowerBound(float lowerBound) throws InvalidFeatReqException{
         int comparison = Float.compare(this.upperBound, lowerBound);
-        if (comparison > 0) {
-            this.lowerBound = lowerBound;
-        }else if(comparison == 0){ // becoming discrete
-            //TODO
-        }else{
+        if (comparison < 0) {
             throw new InvalidFeatReqException("Attempted to set invalid Lower Bound");
         }
+        this.lowerBound = lowerBound;
+    }
+
+    /**
+     * Note: Assumes lowerBound and upperBound are valid values.
+     * "Chose not to throw from this function because I don't want Rule package imported into lookupTable
+     * -Peter
+     * @param lowerBound
+     * @param upperBound
+     */
+    public void setBoundRange(float lowerBound, float upperBound) {
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
     }
 
     // public constructor
@@ -84,7 +90,7 @@ public class FeatureRequirement {
      * @param pInt
      * @param upper
      * @param lower
-     * @throws RuleManager.FeatureRequirement.InvalidFeatReqException 
+     * @throws FeatureRequirement.InvalidFeatReqException
      */
     public FeatureRequirement(int featureID, int pInt, float upper, float lower) throws InvalidFeatReqException {
         this.featureID = featureID;
@@ -103,14 +109,11 @@ public class FeatureRequirement {
         }
         
         int comparison = Float.compare(upper, lower);
-        if (comparison > 0) { // this must be enforced
-            this.upperBound = upper;
-            this.lowerBound = lower;
-        } else if (comparison == 0) { // this means it is discrete
-            //TODO
-        } else {
+        if (comparison < 0) { // this must be enforced
             throw new InvalidFeatReqException("Upper Bound < Lower Bound which is invalid");
         }
+        this.upperBound = upper;
+        this.lowerBound = lower;
     }
 
     //private constructor (used to make copies only)

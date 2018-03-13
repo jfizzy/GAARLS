@@ -1,3 +1,5 @@
+import Rule.FeatureRequirement;
+
 /**
  * Class: DiscreteSymbolTranslator
  * Intended functionality: impliments a discrete value generation for GenerateRandomFeatureRequirements given a list of
@@ -22,13 +24,13 @@ public class DiscreteSymbolTranslator extends SymbolTranslatorBase
         int randomValueIdx = mRandomValueGenerator.nextInt(mSymbolValues.length);
         int newValue = mSymbolValues[randomValueIdx];
 
-        // TODO: Assign to low and high in toRandomize
+        toRandomize.setBoundRange(newValue, newValue);
     }
 
     @Override
     public String FeatureRequirementToDescription(FeatureRequirement featureRequirement)
     {
-        int featureValue = 0; // = featureRequirement.lowerBound
+        int featureValue = (int)featureRequirement.getLowerBound();
         if (mTranslationLookupTable.containsKey(featureValue))
         {
             return mFeatureName + ": " + mTranslationLookupTable.get(featureValue);

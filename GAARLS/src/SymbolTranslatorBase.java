@@ -1,6 +1,6 @@
-import javafx.util.Pair;
 import java.util.HashMap;
 import java.util.Random;
+import Rule.FeatureRequirement;
 
 /**
  * Class: SymbolTranslatorBase
@@ -30,13 +30,28 @@ public abstract class SymbolTranslatorBase
 
     public String FeatureValueToKey(float value)
     {
-        if (mSymbolLookupTable.containsKey(value))
+        int key = (int)value;
+        if (mSymbolLookupTable.containsKey(key))
         {
-            return mSymbolLookupTable.get(value);
+            return mSymbolLookupTable.get(key);
         }
         else
         {
-            System.out.println("Key not found for feature " + mFeatureName + ". Got: " + value);
+            System.out.println("Key not found for feature " + mFeatureName + ". Got: " + key);
+            return "UNDEFINED";
+        }
+    }
+
+    public String FeatureValueToDescription(float value)
+    {
+        int key = (int)value;
+        if (mTranslationLookupTable.containsKey(key))
+        {
+            return mFeatureName + ": " + mTranslationLookupTable.get(key);
+        }
+        else
+        {
+            System.out.println("Key not found for feature " + mFeatureName + ". Got: " + key);
             return "UNDEFINED";
         }
     }

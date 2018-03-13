@@ -6,6 +6,8 @@ import Rule.Rule;
  * Class: LookupTable
  * Intended functionality: A container class that translates feature values into float values, and provides utility
  * functions to generate feature values in a correct range
+ * NOTE: ParseFile is hard coded for each column in the data set, and does not include the last column.
+ * Any reordering of the data set or additions/removals will need to be reflected in
  * Feature Owner: Peter
  */
 
@@ -14,7 +16,9 @@ public class LookupTable
     //public functions
     public static LookupTable ParseFile(String filePath)
     {
-        SymbolTranslatorBase[] symbolTranslatorBases = new SymbolTranslatorBase[23];
+        final int NUM_FEATURES = 22;
+
+        SymbolTranslatorBase[] symbolTranslatorBases = new SymbolTranslatorBase[NUM_FEATURES];
         int translatorIdx = 0;
 
         // Feature 1: Collision Year
@@ -159,18 +163,18 @@ public class LookupTable
             values[counter] = 5; translations[counter] = "One Vehicle: Rollover on roadway"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
             values[counter] = 6; translations[counter] = "One Vehicle: Other one vehicle configuration"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
 
-            values[counter] = 21; translations[counter] = "Two Vehicle (SD): Rear end collision"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 22; translations[counter] = "Two Vehicle (SD): Approaching side-swipe"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 23; translations[counter] = "Two Vehicle (SD): Left turn across opposing traffic"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 24; translations[counter] = "Two Vehicle (SD): Right turn including turn conflicts"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 25; translations[counter] = "Two Vehicle (SD): Other two vehicle (SD) configuration"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 21; translations[counter] = "Two Vehicle (SameDir): Rear end collision"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 22; translations[counter] = "Two Vehicle (SameDir): Approaching side-swipe"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 23; translations[counter] = "Two Vehicle (SameDir): Left turn across opposing traffic"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 24; translations[counter] = "Two Vehicle (SameDir): Right turn including turn conflicts"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 25; translations[counter] = "Two Vehicle (SameDir): Other two vehicle (SD) configuration"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
 
-            values[counter] = 31; translations[counter] = "Two Vehicle (DD): Head on collision"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 32; translations[counter] = "Two Vehicle (DD): Approaching side-swipe"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 33; translations[counter] = "Two Vehicle (DD): Left turn across opposing traffic"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 34; translations[counter] = "Two Vehicle (DD): Right turn including turn conflicts"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 35; translations[counter] = "Two Vehicle (DD): Right angle collision"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
-            values[counter] = 36; translations[counter] = "Two Vehicle (DD): Other two vehicle (DD) configuration"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 31; translations[counter] = "Two Vehicle (DiffDir): Head on collision"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 32; translations[counter] = "Two Vehicle (DiffDir): Approaching side-swipe"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 33; translations[counter] = "Two Vehicle (DiffDir): Left turn across opposing traffic"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 34; translations[counter] = "Two Vehicle (DiffDir): Right turn including turn conflicts"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 35; translations[counter] = "Two Vehicle (DiffDir): Right angle collision"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
+            values[counter] = 36; translations[counter] = "Two Vehicle (DiffDir): Other two vehicle (DD) configuration"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
 
             values[counter] = 41; translations[counter] = "Two Vehicle (Parked): Hit a parked motor vehicle"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
 
@@ -219,7 +223,7 @@ public class LookupTable
             String[] translations = new String[numValues];
             for (int i = 0; i < numValues; i++) {
                 values[i] = i + 1;
-                symbols[i] = (values[i] < 10 ? "0" : "") + Integer.toString(values[i]);
+                symbols[i] = Integer.toString(values[i]);
             }
 
             translations = new String[]{
@@ -245,7 +249,7 @@ public class LookupTable
             String[] translations = new String[numValues];
             for (int i = 0; i < numValues; i++) {
                 values[i] = i + 1;
-                symbols[i] = (values[i] < 10 ? "0" : "") + Integer.toString(values[i]);
+                symbols[i] = Integer.toString(values[i]);
             }
 
             translations = new String[]{
@@ -273,7 +277,7 @@ public class LookupTable
             String[] translations = new String[numValues];
             for (int i = 0; i < numValues; i++) {
                 values[i] = i + 1;
-                symbols[i] = (values[i] < 10 ? "0" : "") + Integer.toString(values[i]);
+                symbols[i] = Integer.toString(values[i]);
             }
 
             translations = new String[]{
@@ -337,7 +341,7 @@ public class LookupTable
                 values[i] = i + 1;
                 translations[i] = symbols[i] = (values[i] < 10 ? "0" : "") + Integer.toString(values[i]);
             }
-            values[numValues - 1] = numValues - 1;
+            values[numValues - 1] = numValues;
             symbols[numValues - 1] = symbols[numValues - 1] = (values[numValues - 1] < 10 ? "0" : "") + Integer.toString(values[numValues - 1]);
             translations[numValues - 1] = "Vehicle sequence number assigned to pedestrians";
 
@@ -458,7 +462,7 @@ public class LookupTable
 
         // Feature 19: Passenger Position
         {
-            int numValues = 28;
+            int numValues = 31;
             int symbolSize = 2;
             String featureName = "P_PSN";
 
@@ -552,6 +556,8 @@ public class LookupTable
             symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
         }
 
+        assert (NUM_FEATURES == translatorIdx); // Surface level check to make sure no one's fucking around with features or at least fucking around correctly
+
         return new LookupTable(symbolTranslatorBases);
     }
 
@@ -582,12 +588,33 @@ public class LookupTable
     public String TranslateRule(Rule rule)
     {
         String translation = "Rule: ";
+        FeatureRequirement[] featureRequirements = rule.getFeatureReqs();
         for (int i = 0; i < mFeatureLookupTable.length - 1; ++i)
         {
-            translation += mFeatureLookupTable[i].FeatureRequirementToDescription(rule.mFeatureRequirements[i]) + " | ";
+            translation += mFeatureLookupTable[i].FeatureRequirementToDescription(featureRequirements[i]) + " | ";
         }
-        translation += mFeatureLookupTable[mFeatureLookupTable.length - 1].FeatureRequirementToDescription(rule.mFeatureRequirements[mFeatureLookupTable.length - 1]) + "\n";
+        translation += mFeatureLookupTable[mFeatureLookupTable.length - 1].FeatureRequirementToDescription(featureRequirements[mFeatureLookupTable.length - 1]) + "\n";
         return translation;
+    }
+
+    /**
+     * ToString() method for a featureRequirement that inserts the feature name and translates the feature value into symbols appropriate for
+     * that feature
+     * @param featureId
+     * @param featureRequirement
+     * @return
+     */
+    private String TranslateFeatureRequirement(int featureId, FeatureRequirement featureRequirement)
+    {
+        if (featureId >= 0 && featureId < mFeatureLookupTable.length)
+        {
+            return mFeatureLookupTable[featureId].FeatureRequirementToDescription(featureRequirement);
+        }
+        else
+        {
+            System.out.println("Error: LookupTable.TranslateFeatureRequirement(): featureId out of range. Got: " + featureId);
+            return "INVALID";
+        }
     }
 
     /**
@@ -609,13 +636,59 @@ public class LookupTable
         }
     }
 
+    /**
+     * Util function used when parsing the database to translate a value in the database to it's float representation
+     * @param featureId
+     * @param value feature value for @featureId
+     * @return the float representation of the symbol.
+     */
+    public String TranslateFeatureValue(int featureId, float value)
+    {
+        if (featureId >= 0 && featureId < mFeatureLookupTable.length)
+        {
+            return mFeatureLookupTable[featureId].FeatureValueToDescription(value);
+        }
+        else
+        {
+            System.out.println("Error: LookupTable.TranslateFeatureSymbol(): featureId out of range. Got: " + featureId);
+            return "INVALID";
+        }
+    }
+
     // private functions
     private LookupTable(SymbolTranslatorBase[] featureLookupTable)
     {
         mFeatureLookupTable = featureLookupTable;
+        NumFeatures = mFeatureLookupTable.length;
     }
 
     // private members
     private SymbolTranslatorBase[] mFeatureLookupTable;
+    public int NumFeatures;
 
+    public static void main(String args[])
+    {
+        LookupTable lookupTable = LookupTable.ParseFile(""); // parse lookup table file
+        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", lookupTable, 10); // parse database file
+        float[] datatable = database.GetDatabase();
+        for (int i = 0; i < lookupTable.NumFeatures; ++i)
+        {
+            System.out.print(lookupTable.TranslateFeatureValue(i, datatable[i]) + " ");
+        }
+        System.out.println();
+
+        try
+        {
+            FeatureRequirement feature = new FeatureRequirement(11, 0, 0,0);
+            lookupTable.GenerateRandomValue(11, feature);
+            System.out.println( lookupTable.TranslateFeatureRequirement(11, feature));
+        }
+        catch (Exception e)
+        {
+
+        }
+        RuleManager ruleManager = new RuleManager(lookupTable);
+        Rule testRule = ruleManager.GenerateRule();
+        System.out.println(lookupTable.TranslateRule(testRule));
+    }
 }

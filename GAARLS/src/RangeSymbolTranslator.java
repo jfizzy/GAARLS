@@ -1,3 +1,5 @@
+import Rule.FeatureRequirement;
+
 /**
  * Class: DiscreteSymbolTranslator
  * Intended functionality: impliments a discrete value generation for GenerateRandomFeatureRequirements given a list of
@@ -28,14 +30,14 @@ public class RangeSymbolTranslator extends SymbolTranslatorBase
         int lowerBound = value1 < value2 ? value1 : value2;
         int upperBound = value1 < value2 ? value2 : value1;
 
-        // TODO: Assign to low and high in toRandomize
+        toRandomize.setBoundRange(lowerBound, upperBound);
     }
 
     @Override
     public String FeatureRequirementToDescription(FeatureRequirement featureRequirement)
     {
-        int lowerBound = 0; // = featureRequirement.lowerBound
-        int upperBound = 0; // = featureRequirement.upperBound
+        int lowerBound = (int)featureRequirement.getLowerBound();
+        int upperBound = (int)featureRequirement.getUpperBound();
         if (mTranslationLookupTable.containsKey(lowerBound) && mTranslationLookupTable.containsKey(upperBound))
         {
             return mFeatureName + ": [" + mTranslationLookupTable.get(lowerBound) + " - " + mTranslationLookupTable.get(upperBound) + "]";
