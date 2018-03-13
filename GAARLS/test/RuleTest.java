@@ -27,16 +27,16 @@ public class RuleTest {
         // set up some testable FeatureRequirements
         try {
             Database db;
-            fr1 = new FeatureRequirement(0, 0, 10.5f, 4.5f); //IGNORE
-            fr2 = new FeatureRequirement(0, 1, 3.738f, -2.5f); //ANTECEDENT
-            fr3 = new FeatureRequirement(0, 1, 3.45f, 0f); //ANTECEDENT
-            fr4 = new FeatureRequirement(0, 0, 0f, 0f); //IGNORE
-            fr5 = new FeatureRequirement(0, 0, 0f, 0f); //IGNORE
-            fr6 = new FeatureRequirement(0, 0, 0f, 0f); //IGNORE
-            fr7 = new FeatureRequirement(0, 0, 0f, 0f); //IGNORE
-            fr8 = new FeatureRequirement(0, 2, 10.367f, -5.62f); //CONSEQUENT
-            fr9 = new FeatureRequirement(0, 0, 0f, 0f); //IGNORE
-            fr10 = new FeatureRequirement(0, 0, 0f, 0f); //IGNORE
+            fr1 = new FeatureRequirement(0, 0, 10.5f, 4.5f, 0f); //IGNORE
+            fr2 = new FeatureRequirement(0, 1, 3.738f, -2.5f, 0f); //ANTECEDENT
+            fr3 = new FeatureRequirement(0, 1, 3.45f, 0f, 0f); //ANTECEDENT
+            fr4 = new FeatureRequirement(0, 0, 0f, 0f, 0f); //IGNORE
+            fr5 = new FeatureRequirement(0, 0, 0f, 0f, 0f); //IGNORE
+            fr6 = new FeatureRequirement(0, 0, 0f, 0f, 0f); //IGNORE
+            fr7 = new FeatureRequirement(0, 0, 0f, 0f, 0f); //IGNORE
+            fr8 = new FeatureRequirement(0, 2, 10.367f, -5.62f, 0f); //CONSEQUENT
+            fr9 = new FeatureRequirement(0, 0, 0f, 0f, 0f); //IGNORE
+            fr10 = new FeatureRequirement(0, 0, 0f, 0f, 0f); //IGNORE
         } catch (FeatureRequirement.InvalidFeatReqException ifre) {
             System.out.println(ifre.getMessage());
         }
