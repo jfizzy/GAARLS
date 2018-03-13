@@ -1,3 +1,7 @@
+
+import Rule.FeatureRequirement;
+import Rule.Rule;
+
 /**
  * Class: LookupTable
  * Intended functionality: A container class that translates feature values into float values, and provides utility

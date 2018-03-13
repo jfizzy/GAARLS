@@ -1,3 +1,4 @@
+import Rule.Rule;
 import java.util.ArrayList;
 
 /**
@@ -23,7 +24,11 @@ public class RuleManager
      */
     public Rule mutate(Rule parent)
     {
+<<<<<<< HEAD
         Rule mutatedRule = parent;
+=======
+        Rule mutatedRule = mutationTemplate.copy();
+>>>>>>> 8d08cb9e662ca52a48cf4778790080ed4f32b5a0
 
         // mutate
 

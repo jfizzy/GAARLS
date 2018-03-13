@@ -1,3 +1,4 @@
+import Rule.Rule;
 import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
