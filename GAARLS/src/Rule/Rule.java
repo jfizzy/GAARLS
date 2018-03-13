@@ -112,20 +112,17 @@ public class Rule {
      * @return
      */
     public Rule Merge(Rule toMerge, ArrayList<Boolean> featuresToMerge) {
-        // assert @featuresToMerge.size() == mFeatureRequirements.size();
-        // does a shallow copy of @mFeatureRequirements using FeatureRequirement.Clone()
-        /*
-        Rule rule = new Rule();
-
-        for i in range mFeatureRequirements.size()
-            if (featuresToMerge[i] == true
-                rule.mFeatureRequirements[i] = toMerge.mFeatureRequirement[i].Clone()
-            else
-                rule.mFeatureRequirements[i] = mFeatureRequirement[i].Clone()
-
-         */
-
-        return new Rule();
+        assert (featuresToMerge.size() == Rule.features); // Safety check for fuckery!
+        FeatureRequirement newFeatureReqs[] = new FeatureRequirement[Rule.features];
+        
+        for(int i=0;i<Rule.features;i++){
+            if(featuresToMerge.get(i)){ // True meaning !this
+                newFeatureReqs[i] = toMerge.getFeatureReqs()[i].copy();
+            }else{ // False meaning this
+                newFeatureReqs[i] = this.getFeatureReqs()[i].copy();
+            }
+        }
+        return new Rule(newFeatureReqs); // make a new Rule using the merged 
     }
 
     // private methods
