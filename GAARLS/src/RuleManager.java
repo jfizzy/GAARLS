@@ -1,5 +1,6 @@
 import Rule.Rule;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Class: RuleManager
@@ -10,6 +11,9 @@ import java.util.ArrayList;
 
 public class RuleManager
 {
+    
+    private final int num_features = 23; // TODO set this to LookupTable.NUM_FEATURES
+    
     // public methods
     public RuleManager(LookupTable lookupTable)
     {
@@ -33,14 +37,23 @@ public class RuleManager
 
     /**
      * Creates a new rule with @parent1 and @parent2 as the base rules
-     * @param parent1
-     * @param parent2
-     * @return merged rule of @parent1 and @parent2
+     * @param parent1 
+     * @param parent2 
+     * @return merged rule (uglyChild) of @parent1 and @parent2
      */
     public Rule Crossover(Rule parent1, Rule parent2)
     {
-        ArrayList<Boolean> whoGetsWhatList = null; // do some calculations
-        return parent1.Merge(parent2, whoGetsWhatList);
+        Rule uglyChild = new Rule(); // The offspring of parent1 and parent2 after a couple drinks and some bad life choices
+        Random rand = new Random();
+        int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
+        
+        for(int i = 0; i < pivot; i++)
+            uglyChild.replaceFeatureRequirement(i, parent1.getFeatureReqs()[i]);
+        
+        for(int i = pivot; i < num_features; i++)
+            uglyChild.replaceFeatureRequirement(i, parent2.getFeatureReqs()[i]);
+        
+        return uglyChild;
     }
 
     /**
