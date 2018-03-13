@@ -1,5 +1,7 @@
 import Rule.Rule;
+import Rule.FeatureRequirement;
 import java.util.ArrayList;
+
 
 /**
  * Class: RuleManager
@@ -14,6 +16,7 @@ public class RuleManager
     public RuleManager(LookupTable lookupTable)
     {
         mLookupTable = lookupTable;
+        Rule.setNumFeatures(lookupTable.NumFeatures);
     }
 
     /**
@@ -50,9 +53,14 @@ public class RuleManager
      */
     public Rule GenerateRule()
     {
+        // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
+        // -Peter
         Rule newRule = new Rule();
-        // for i in range newRule.featureRequirement.size()
-        // mLookupTable.GenerateRandomValue(i, newRule.featureRequirement[i]);
+        FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
+        for (int i = 0; i < featureRequirements.length; ++i)
+        {
+            mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
+        }
         return newRule;
     }
 

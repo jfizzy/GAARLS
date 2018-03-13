@@ -12,11 +12,16 @@ public class Rule {
 
     // private members
     private FeatureRequirement featureReqs[]; //  
-    private final int features = 23; // TODO set this to LookupTable.NUM_FEATURES
+    private static int features;
 
     // getters and setters
     public FeatureRequirement[] getFeatureReqs() {
         return featureReqs;
+    }
+
+    public static void setNumFeatures(int numFeatures)
+    {
+        features = numFeatures;
     }
 
     //public constructor
