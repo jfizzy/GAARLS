@@ -42,8 +42,8 @@ public class RuleManager
      */
     public Rule Crossover(Rule parent1, Rule parent2)
     {
-        ArrayList<Boolean> whoGetsWhatList = null; // do some calculations
-        return parent1.Merge(parent2, whoGetsWhatList);
+        ArrayList<Boolean> whoGetsWhatList = new ArrayList<>(); // do some calculations
+        return parent1.merge(parent2, whoGetsWhatList);
     }
 
     /**
