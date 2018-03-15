@@ -27,10 +27,21 @@ public class RangeSymbolTranslator extends SymbolTranslatorBase
         int value1 = mSymbolValues[randomValueIdx1];
         int value2 = mSymbolValues[randomValueIdx2];
 
-        int lowerBound = value1 < value2 ? value1 : value2;
-        int upperBound = value1 < value2 ? value2 : value1;
+        float rangeCoverage = 0;
+        if (value1 < value2)
+        {
+            rangeCoverage = (value2 - value1 + 1) / (float)mSymbolValues.length;
+        }
+        else if (value1 > value2)
+        {
+            rangeCoverage = (mSymbolValues.length - (value1 - value2 + 1)) / (float)mSymbolValues.length;
+        }
+        else
+        {
+            rangeCoverage = 1 / (float)mSymbolValues.length;
+        }
 
-        toRandomize.setBoundRange(lowerBound, upperBound, 0.5f); //TODO: want to pass a real rangeCoverage value
+        toRandomize.setBoundRange(value1, value2, rangeCoverage);
     }
 
     @Override
