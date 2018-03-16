@@ -47,8 +47,8 @@ public class Rule {
         }
     }
 
-    //private constructor
-    private Rule(FeatureRequirement[] featureReqs) {
+    //public constructor that accepts featureReqs
+    public Rule(FeatureRequirement[] featureReqs) {
         this.featureReqs = new FeatureRequirement[this.features];
         for (int i = 0; i < this.featureReqs.length; i++) {
             this.featureReqs[i] = featureReqs[i].copy(); // shallow copy

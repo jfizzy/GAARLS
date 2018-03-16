@@ -13,6 +13,9 @@ import java.util.Random;
 
 public class RuleManager
 {
+    
+    private final int num_features = 23; // TODO set this to LookupTable.NUM_FEATURES
+    
     // public methods
     public RuleManager(LookupTable lookupTable)
     {
@@ -37,14 +40,29 @@ public class RuleManager
 
     /**
      * Creates a new rule with @parent1 and @parent2 as the base rules
-     * @param parent1
-     * @param parent2
-     * @return merged rule of @parent1 and @parent2
+     * @param parent1 
+     * @param parent2 
+     * @return merged rule (child) of @parent1 and @parent2
      */
     public Rule Crossover(Rule parent1, Rule parent2)
     {
-        ArrayList<Boolean> whoGetsWhatList = new ArrayList<>(); // do some calculations
-        return parent1.merge(parent2, whoGetsWhatList);
+
+		// This needs to be tested!
+
+	    Random rand = new Random();
+        int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
+		
+		FeatureRequirements parent1FeatReqs[] = parent1.getFeatureReqs();
+		FeatureRequirements parent2FeatReqs[] = parent2.getFeatureReqs();
+		FeatureRequirements childFeatReqs[] = parent1.getFeatureReqs();
+        
+        for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
+				childFeatReqs[i] = parent2FeatReqs[i];
+			
+        Rule child = new Rule(childFeatReqs);
+
+        return child;
+
     }
 
     /**
