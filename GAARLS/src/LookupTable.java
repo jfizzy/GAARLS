@@ -2,6 +2,8 @@
 import Rule.FeatureRequirement;
 import Rule.Rule;
 
+import java.util.ArrayList;
+
 /**
  * Class: LookupTable
  * Intended functionality: A container class that translates feature values into float values, and provides utility
@@ -36,7 +38,7 @@ public class LookupTable
                 symbols[i] = Integer.toString(year);
                 translations[i] = Integer.toString(year);
             }
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
         }
 
         // Feature 2: Collision Month
@@ -67,7 +69,7 @@ public class LookupTable
                     , "November"
                     , "December"
             };
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, true);
         }
 
         // Feature 3: Collision Day of the Week
@@ -93,7 +95,7 @@ public class LookupTable
                     , "Saturday"
                     , "Sunday"
             };
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, true);
         }
 
         // Feature 4: Collision Hour
@@ -111,7 +113,7 @@ public class LookupTable
                 String hour = Integer.toString(i);
                 translations[i] = hour + ":00 to " + hour + ":59";
             }
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, true);
         }
 
         // Feature 5: Collision Severity
@@ -143,7 +145,7 @@ public class LookupTable
             values[numValues - 1] = numValues - 1;
             symbols[numValues - 1] = Integer.toString(numValues - 1);
             translations[numValues - 1] = symbols[numValues - 1] + " or more vehicles involved";
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
         }
 
         // Feature 7: accident configuration
@@ -357,13 +359,15 @@ public class LookupTable
             int[] values = new int[numValues];
             String[] symbols = new String[numValues];
             String[] translations = new String[numValues];
+            int vehicleType = 1;
             for (int i = 0; i < numValues; i++) {
                 // Fuck me
-                if (i == 1) i = 4;
-                else if (i == 11) i = 13;
-                else if (i == 14) i = 15;
-                values[i] = i + 1;
-                symbols[i] = (values[i] < 10 ? "0" : "") + Integer.toString(values[i]);
+                if (vehicleType == 2) vehicleType = 5;
+                else if (vehicleType == 12) vehicleType = 14;
+                else if (vehicleType == 15) vehicleType = 16;
+                values[i] = vehicleType;
+                symbols[i] = (vehicleType < 10 ? "0" : "") + Integer.toString(values[i]);
+                vehicleType++;
             }
 
             translations = new String[]{
@@ -403,7 +407,7 @@ public class LookupTable
                 symbols[i] = Integer.toString(year);
                 translations[i] = Integer.toString(year);
             }
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
         }
 
         // Feature 16: Passenger id
@@ -457,7 +461,7 @@ public class LookupTable
             symbols[numValues - 1] = (values[numValues - 1] < 10 ? "0" : "") + Integer.toString(values[numValues - 1]);
             translations[numValues - 1] = Integer.toString(values[numValues - 1]) + " Years or older";
             
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
         }
 
         // Feature 19: Passenger Position
@@ -535,7 +539,7 @@ public class LookupTable
 
         // Feature 22: Passenger type
         {
-            int numValues = 5; // 1960-2015
+            int numValues = 5;
             int symbolSize = 1;
             String featureName = "P_USER";
 
@@ -543,8 +547,8 @@ public class LookupTable
             String[] symbols = new String[numValues];
             String[] translations = new String[numValues];
             for (int i = 0; i < numValues; i++) {
-                values[i] = i;
-                symbols[i] = Integer.toString(i);
+                values[i] = i + 1;
+                symbols[i] = Integer.toString(i + 1);
             }
             translations = new String[]{
                     "Motor Vehicle Driver"
@@ -587,13 +591,25 @@ public class LookupTable
      */
     public String TranslateRule(Rule rule)
     {
-        String translation = "Rule: ";
+        String translation = "Rule: [A] ";
         FeatureRequirement[] featureRequirements = rule.getFeatureReqs();
-        for (int i = 0; i < mFeatureLookupTable.length - 1; ++i)
+        ArrayList<Integer> antecedent = new ArrayList<>();
+        ArrayList<Integer> consequent= new ArrayList<>();
+        for (int i = 0; i < featureRequirements.length; ++i)
         {
-            translation += mFeatureLookupTable[i].FeatureRequirementToDescription(featureRequirements[i]) + " | ";
+            int participation = featureRequirements[i].getParticipation();
+            if (participation == FeatureRequirement.pFlag.ANTECEDENT.getValue()) antecedent.add(i);
+            else if (participation == FeatureRequirement.pFlag.CONSEQUENT.getValue()) consequent.add(i);
         }
-        translation += mFeatureLookupTable[mFeatureLookupTable.length - 1].FeatureRequirementToDescription(featureRequirements[mFeatureLookupTable.length - 1]) + "\n";
+        for (int id : antecedent)
+        {
+            translation += mFeatureLookupTable[id].FeatureRequirementToDescription(featureRequirements[id]) + " | ";
+        }
+        translation += " => [C] ";
+        for (int id : consequent)
+        {
+            translation += mFeatureLookupTable[id].FeatureRequirementToDescription(featureRequirements[id]) + " | ";
+        }
         return translation;
     }
 
