@@ -24,7 +24,7 @@ public class DiscreteSymbolTranslator extends SymbolTranslatorBase
         int randomValueIdx = mRandomValueGenerator.nextInt(mSymbolValues.length);
         int newValue = mSymbolValues[randomValueIdx];
 
-        toRandomize.setBoundRange(newValue, newValue, 0.5f);    //TODO: want to pass a real rangeCoverage value
+        toRandomize.setBoundRange(newValue, newValue, 0); 
     }
 
     @Override

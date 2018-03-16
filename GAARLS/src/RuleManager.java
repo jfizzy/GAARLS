@@ -1,6 +1,7 @@
 import Rule.Rule;
 import Rule.FeatureRequirement;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 /**
@@ -56,10 +57,12 @@ public class RuleManager
         // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
         // -Peter
         Rule newRule = new Rule();
+        Random random = new Random();
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
         for (int i = 0; i < featureRequirements.length; ++i)
         {
             mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
+            featureRequirements[i].setParticipation(random.nextInt(3));
         }
         return newRule;
     }

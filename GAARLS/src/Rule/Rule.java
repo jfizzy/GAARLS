@@ -13,6 +13,13 @@ public class Rule {
     // private members
     private FeatureRequirement featureReqs[]; 
     private static int features;
+    private float coverage;
+    private float accuracy;
+
+    public void setCoverage(float coverage) { this.coverage = coverage; }
+    public void setAccuracy(float accuracy) { this.accuracy = accuracy; }
+    public float getCoverage() { return coverage; }
+    public float getAccuracy() { return accuracy; }
 
     // getters and setters
     public FeatureRequirement getFeatureReq(int index){
