@@ -102,6 +102,42 @@ public class Rule {
             return false;
         }
     }
+    
+    /**
+     * Helper function to quickly return the featureReqs in the antecedent of the rule
+     * 
+     * 
+     * @return ArrayList containing the antecedents of this rule
+     *         null if there are none
+     */
+    public ArrayList<FeatureRequirement> antecedent(){
+        ArrayList<FeatureRequirement> ante = new ArrayList<>();
+        for(FeatureRequirement featureReq : this.featureReqs){
+            if(featureReq.getParticipation() == 1)
+                ante.add(featureReq);
+        }
+        if(ante.isEmpty())
+            return null;
+        return ante;
+    }
+    
+    /**
+     * Helper function to quickly return the featureReqs on the consequent of the rule
+     * 
+     * 
+     * @return ArrayList containing the antecedents of this rule
+     *         null if there are none
+     */
+    public ArrayList<FeatureRequirement> consequent(){
+        ArrayList<FeatureRequirement> cons = new ArrayList<>();
+        for (FeatureRequirement featureReq: this.featureReqs){
+            if(featureReq.getParticipation() == 2)
+                cons.add(featureReq);
+        }
+        if(cons.isEmpty())
+            return null;
+        return cons;
+    }
 
     /**
      * Helper function to assist with mutation/cross overs
