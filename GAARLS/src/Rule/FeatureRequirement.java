@@ -88,6 +88,7 @@ public class FeatureRequirement {
      * @param pInt
      * @param upper
      * @param lower
+     * @param rangeCoverage
      * @throws FeatureRequirement.InvalidFeatReqException
      */
     public FeatureRequirement(int featureID, int pInt, float upper, float lower, float rangeCoverage) throws InvalidFeatReqException {
@@ -111,12 +112,12 @@ public class FeatureRequirement {
     }
 
     //private constructor (used to make copies only)
-    private FeatureRequirement(int featureID, pFlag p, float upper, float lower) {
+    private FeatureRequirement(int featureID, pFlag p, float upper, float lower, float rangeCoverage) {
         this.featureID = featureID;
         this.participation = p;
         this.upperBound = upper;
         this.lowerBound = lower;
-        this.rangeCoverage = 0;
+        this.rangeCoverage = rangeCoverage;
     }
 
     // public functions
@@ -151,7 +152,7 @@ public class FeatureRequirement {
      * @return a shallow copy clone of current state.
      */
     public FeatureRequirement copy() {
-        return new FeatureRequirement(this.featureID, this.participation, this.upperBound, this.lowerBound);
+        return new FeatureRequirement(this.featureID, this.participation, this.upperBound, this.lowerBound, this.rangeCoverage);
     }
 
     // public fields

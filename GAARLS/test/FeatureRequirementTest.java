@@ -123,6 +123,7 @@ public class FeatureRequirementTest {
             assertEquals(frCopy.getParticipation(), 0); // check IGNORE
             assertEquals(frCopy.getUpperBound(), 10.5f, 0.0f);
             assertEquals(frCopy.getLowerBound(), 4.5f, 0.0f);
+            assertEquals(frCopy.getRangeCoverage(), 0f, 0f);
             //test eval on copy
             assertTrue(frCopy.evaluate(5.5f)); // GOOD
             assertFalse(frCopy.evaluate(11.5f)); //TOO HIGH
