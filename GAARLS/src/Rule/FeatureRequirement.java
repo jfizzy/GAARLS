@@ -51,10 +51,6 @@ public class FeatureRequirement {
     }
 
     public void setUpperBound(float upperBound) throws InvalidFeatReqException {
-        int comparison = Float.compare(upperBound, this.lowerBound);
-        if (comparison < 0) {
-            throw new InvalidFeatReqException("Attempted to set invalid Upper Bound");
-        }
         this.upperBound = upperBound;
     }
 
@@ -63,10 +59,6 @@ public class FeatureRequirement {
     }
 
     public void setLowerBound(float lowerBound) throws InvalidFeatReqException{
-        int comparison = Float.compare(this.upperBound, lowerBound);
-        if (comparison < 0) {
-            throw new InvalidFeatReqException("Attempted to set invalid Lower Bound");
-        }
         this.lowerBound = lowerBound;
     }
 
@@ -113,11 +105,6 @@ public class FeatureRequirement {
             default:
                 this.participation = pFlag.IGNORE; // ignore by default TODO: could decide to throw except
         }
-        
-        int comparison = Float.compare(upper, lower);
-        if (comparison < 0) { // this must be enforced
-            throw new InvalidFeatReqException("Upper Bound < Lower Bound which is invalid");
-        }
         this.upperBound = upper;
         this.lowerBound = lower;
         this.rangeCoverage = rangeCoverage;
@@ -144,9 +131,18 @@ public class FeatureRequirement {
      *         false otherwise
      */
     public boolean evaluate(float value) {
-        int compareUpper = Float.compare(this.upperBound, value);
-        int compareLower = Float.compare(value, this.lowerBound);
-        return (compareUpper >= 0 && compareLower >= 0);
+        // value on the edge. Always true
+        if (value == this.lowerBound || value == this.upperBound)
+            return true;
+        // discrete bounds check
+        if (this.lowerBound == this.upperBound)
+            return false; // value didn't equal either the upper or lower in the previous case
+        // normal bounds check
+        if (this.lowerBound < this.upperBound)
+            return value > this.lowerBound && value < this.upperBound;
+
+        // flipped bounds check. ie minFeatureValue <= value < (lowerBound,UpperBound) < value <= maxFeatureValue
+        return value < this.lowerBound || value > this.upperBound;
     }
 
     /**

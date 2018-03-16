@@ -12,10 +12,11 @@ import Rule.FeatureRequirement;
 public class RangeSymbolTranslator extends SymbolTranslatorBase
 {
     // public methods
-    public RangeSymbolTranslator(String featureName, int symbolSize, int[] values, String[] symbols,  String[] descriptions)
+    public RangeSymbolTranslator(String featureName, int symbolSize, int[] values, String[] symbols,  String[] descriptions, boolean canFlipRange)
     {
         super(featureName, symbolSize, values, symbols, descriptions);
         mSymbolValues = values;
+        mCanFlipRange = canFlipRange;
     }
 
     @Override
@@ -26,6 +27,13 @@ public class RangeSymbolTranslator extends SymbolTranslatorBase
 
         int value1 = mSymbolValues[randomValueIdx1];
         int value2 = mSymbolValues[randomValueIdx2];
+
+        if (!mCanFlipRange && value1 > value2)
+        {
+           int temp = value1;
+           value1 = value2;
+           value2 = temp;
+        }
 
         float rangeCoverage = 0;
         if (value1 < value2)
@@ -59,4 +67,6 @@ public class RangeSymbolTranslator extends SymbolTranslatorBase
             return mFeatureName + ": [UNDEFINED-UNDEFINED]";
         }
     }
+
+    boolean mCanFlipRange;
 }
