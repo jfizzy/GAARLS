@@ -1,6 +1,8 @@
 import Rule.Rule;
+import Rule.FeatureRequirement;
 import java.util.ArrayList;
 import java.util.Random;
+
 
 /**
  * Class: RuleManager
@@ -18,6 +20,7 @@ public class RuleManager
     public RuleManager(LookupTable lookupTable)
     {
         mLookupTable = lookupTable;
+        Rule.setNumFeatures(lookupTable.NumFeatures);
     }
 
     /**
@@ -43,6 +46,7 @@ public class RuleManager
      */
     public Rule Crossover(Rule parent1, Rule parent2)
     {
+
 		// This needs to be tested!
 
 	    Random rand = new Random();
@@ -58,6 +62,7 @@ public class RuleManager
         Rule child = new Rule(childFeatReqs);
 
         return child;
+
     }
 
     /**
@@ -67,9 +72,16 @@ public class RuleManager
      */
     public Rule GenerateRule()
     {
+        // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
+        // -Peter
         Rule newRule = new Rule();
-        // for i in range newRule.featureRequirement.size()
-        // mLookupTable.GenerateRandomValue(i, newRule.featureRequirement[i]);
+        Random random = new Random();
+        FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
+        for (int i = 0; i < featureRequirements.length; ++i)
+        {
+            mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
+            featureRequirements[i].setParticipation(random.nextInt(3));
+        }
         return newRule;
     }
 
