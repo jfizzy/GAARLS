@@ -12,6 +12,10 @@ import java.util.Scanner;
 public class Database
 {
     // public functions
+    public int getNumDataItems(){
+        return mNumTableEntries;
+    }
+
 
     /**
      * Static util function to parse a file and return a new database object
@@ -191,7 +195,7 @@ public class Database
         for (int i = 0; i < 20; ++i)
         {
 
-            rule = ruleManager.GenerateRule();
+            rule = ruleManager.generateRule();
             System.out.println(table.TranslateRule(rule));
             if (rule.getCoverage() > 0 || rule.getAccuracy() > 0)
             {

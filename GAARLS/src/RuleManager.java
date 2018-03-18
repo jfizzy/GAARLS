@@ -6,7 +6,7 @@ import java.util.Random;
 
 /**
  * Class: RuleManager
- * Intended functionality: Util class that is in charge of mutations, cross overs and rule generation
+ * Intended functionality: Util class that is in charge of mutations, cross-overs and rule generation
  * Feature Owner: Shane, David
  */
 
@@ -26,12 +26,13 @@ public class RuleManager
     /**
      * Creates a new rule with @mutationTemplate as the base rule
      * NOTE: Does not modify the state of @mutationTemplate
-     * @param mutationTemplate
+     * @param parent
      * @return a mutated rule
      */
-    public Rule Mutate(Rule mutationTemplate)
+    public Rule mutate(Rule parent)
     {
-        Rule mutatedRule = mutationTemplate.copy();
+        Rule mutatedRule = parent;
+
 
         // mutate
 
@@ -44,17 +45,18 @@ public class RuleManager
      * @param parent2 
      * @return merged rule (child) of @parent1 and @parent2
      */
-    public Rule Crossover(Rule parent1, Rule parent2)
+    public Rule crossover(Rule parent1, Rule parent2)
     {
+
 
 		// This needs to be tested!
 
 	    Random rand = new Random();
         int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
 		
-		FeatureRequirements parent1FeatReqs[] = parent1.getFeatureReqs();
-		FeatureRequirements parent2FeatReqs[] = parent2.getFeatureReqs();
-		FeatureRequirements childFeatReqs[] = parent1.getFeatureReqs();
+		FeatureRequirement parent1FeatReqs[] = parent1.getFeatureReqs();
+		FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
+		FeatureRequirement childFeatReqs[] = parent1.getFeatureReqs();
         
         for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
 				childFeatReqs[i] = parent2FeatReqs[i];
@@ -70,7 +72,7 @@ public class RuleManager
      * Creates a new rule with randomized requirements found from LookupTable
      * @return random new rule
      */
-    public Rule GenerateRule()
+    public Rule generateRule()
     {
         // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
         // -Peter
