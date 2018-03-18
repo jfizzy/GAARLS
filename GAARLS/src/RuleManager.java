@@ -1,5 +1,8 @@
 import Rule.Rule;
+import Rule.FeatureRequirement;
 import java.util.ArrayList;
+import java.util.Random;
+
 
 /**
  * Class: RuleManager
@@ -10,10 +13,14 @@ import java.util.ArrayList;
 
 public class RuleManager
 {
+    
+    private final int num_features = 23; // TODO set this to LookupTable.NUM_FEATURES
+    
     // public methods
     public RuleManager(LookupTable lookupTable)
     {
         mLookupTable = lookupTable;
+        Rule.setNumFeatures(lookupTable.NumFeatures);
     }
 
     /**
@@ -34,25 +41,30 @@ public class RuleManager
 
     /**
      * Creates a new rule with @parent1 and @parent2 as the base rules
-     * @param parent1
-     * @param parent2
-     * @return merged rule of @parent1 and @parent2
+     * @param parent1 
+     * @param parent2 
+     * @return merged rule (child) of @parent1 and @parent2
      */
     public Rule crossover(Rule parent1, Rule parent2)
     {
-        // choose parent to form as first part of child
 
 
-        //Rule head = ;
-        //Rule tail = ;
-        // choose crossover point randomly between index 0 and index size - 2
-        // (so that any crossover will include index from both parents
+		// This needs to be tested!
 
-        // create array for call to merge: should have 0 in elements belonging to head parent and 1s for taill
+	    Random rand = new Random();
+        int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
+		
+		FeatureRequirement parent1FeatReqs[] = parent1.getFeatureReqs();
+		FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
+		FeatureRequirement childFeatReqs[] = parent1.getFeatureReqs();
+        
+        for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
+				childFeatReqs[i] = parent2FeatReqs[i];
+			
+        Rule child = new Rule(childFeatReqs);
 
+        return child;
 
-        ArrayList<Boolean> whoGetsWhatList = null; // do some calculations
-        return parent1.Merge(parent2, whoGetsWhatList);
     }
 
     /**
@@ -62,9 +74,16 @@ public class RuleManager
      */
     public Rule generateRule()
     {
+        // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
+        // -Peter
         Rule newRule = new Rule();
-        // for i in range newRule.featureRequirement.size()
-        // mLookupTable.GenerateRandomValue(i, newRule.featureRequirement[i]);
+        Random random = new Random();
+        FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
+        for (int i = 0; i < featureRequirements.length; ++i)
+        {
+            mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
+            featureRequirements[i].setParticipation(random.nextInt(3));
+        }
         return newRule;
     }
 

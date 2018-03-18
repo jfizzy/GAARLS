@@ -15,11 +15,11 @@ package Rule;
 public class FeatureRequirement {
 
     // private members
-    private final int featureID; //TODO revisit this
-    
+    private final int featureID;
     private pFlag participation;
     private float upperBound;
     private float lowerBound;
+    private float rangeCoverage;
 
     // Getters and Setters
     public int getFeatureID(){
@@ -51,14 +51,7 @@ public class FeatureRequirement {
     }
 
     public void setUpperBound(float upperBound) throws InvalidFeatReqException {
-        int comparison = Float.compare(upperBound, this.lowerBound);
-        if (comparison > 0) {
-            this.upperBound = upperBound;
-        } else if (comparison == 0) { // becoming discrete
-            //TODO decide how to handle this, if at all
-        } else {
-            throw new InvalidFeatReqException("Attempted to set invalid Upper Bound");
-        }
+        this.upperBound = upperBound;
     }
 
     public float getLowerBound() {
@@ -66,14 +59,25 @@ public class FeatureRequirement {
     }
 
     public void setLowerBound(float lowerBound) throws InvalidFeatReqException{
-        int comparison = Float.compare(this.upperBound, lowerBound);
-        if (comparison > 0) {
-            this.lowerBound = lowerBound;
-        }else if(comparison == 0){ // becoming discrete
-            //TODO
-        }else{
-            throw new InvalidFeatReqException("Attempted to set invalid Lower Bound");
-        }
+        this.lowerBound = lowerBound;
+    }
+
+    /**
+     * Note: Assumes lowerBound and upperBound are valid values.
+     * "Chose not to throw from this function because I don't want Rule package imported into lookupTable
+     * -Peter
+     * @param lowerBound
+     * @param upperBound
+     * @param rangeCoverage
+     */
+    public void setBoundRange(float lowerBound, float upperBound, float rangeCoverage) {
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+        this.rangeCoverage = rangeCoverage;
+    }
+
+    public float getRangeCoverage() {
+        return rangeCoverage;
     }
 
     // public constructor
@@ -84,9 +88,10 @@ public class FeatureRequirement {
      * @param pInt
      * @param upper
      * @param lower
-     * @throws RuleManager.FeatureRequirement.InvalidFeatReqException 
+     * @param rangeCoverage
+     * @throws FeatureRequirement.InvalidFeatReqException
      */
-    public FeatureRequirement(int featureID, int pInt, float upper, float lower) throws InvalidFeatReqException {
+    public FeatureRequirement(int featureID, int pInt, float upper, float lower, float rangeCoverage) throws InvalidFeatReqException {
         this.featureID = featureID;
         switch (pInt) {
             case 0:
@@ -101,24 +106,18 @@ public class FeatureRequirement {
             default:
                 this.participation = pFlag.IGNORE; // ignore by default TODO: could decide to throw except
         }
-        
-        int comparison = Float.compare(upper, lower);
-        if (comparison > 0) { // this must be enforced
-            this.upperBound = upper;
-            this.lowerBound = lower;
-        } else if (comparison == 0) { // this means it is discrete
-            //TODO
-        } else {
-            throw new InvalidFeatReqException("Upper Bound < Lower Bound which is invalid");
-        }
+        this.upperBound = upper;
+        this.lowerBound = lower;
+        this.rangeCoverage = rangeCoverage;
     }
 
     //private constructor (used to make copies only)
-    private FeatureRequirement(int featureID, pFlag p, float upper, float lower) {
+    private FeatureRequirement(int featureID, pFlag p, float upper, float lower, float rangeCoverage) {
         this.featureID = featureID;
         this.participation = p;
         this.upperBound = upper;
         this.lowerBound = lower;
+        this.rangeCoverage = rangeCoverage;
     }
 
     // public functions
@@ -133,9 +132,18 @@ public class FeatureRequirement {
      *         false otherwise
      */
     public boolean evaluate(float value) {
-        int compareUpper = Float.compare(this.upperBound, value);
-        int compareLower = Float.compare(value, this.lowerBound);
-        return (compareUpper >= 0 && compareLower >= 0);
+        // value on the edge. Always true
+        if (value == this.lowerBound || value == this.upperBound)
+            return true;
+        // discrete bounds check
+        if (this.lowerBound == this.upperBound)
+            return false; // value didn't equal either the upper or lower in the previous case
+        // normal bounds check
+        if (this.lowerBound < this.upperBound)
+            return value > this.lowerBound && value < this.upperBound;
+
+        // flipped bounds check. ie minFeatureValue <= value < (lowerBound,UpperBound) < value <= maxFeatureValue
+        return value < this.lowerBound || value > this.upperBound;
     }
 
     /**
@@ -144,7 +152,7 @@ public class FeatureRequirement {
      * @return a shallow copy clone of current state.
      */
     public FeatureRequirement copy() {
-        return new FeatureRequirement(this.featureID, this.participation, this.upperBound, this.lowerBound);
+        return new FeatureRequirement(this.featureID, this.participation, this.upperBound, this.lowerBound, this.rangeCoverage);
     }
 
     // public fields
