@@ -14,12 +14,13 @@ import java.util.Random;
 public class RuleManager
 {
     
-    private final int num_features = 23; // TODO set this to LookupTable.NUM_FEATURES
+    private final int num_features;
     
     // public methods
     public RuleManager(LookupTable lookupTable)
     {
         mLookupTable = lookupTable;
+        num_features = lookupTable.NumFeatures;
         Rule.setNumFeatures(lookupTable.NumFeatures);
     }
 
@@ -52,7 +53,7 @@ public class RuleManager
 		// This needs to be tested!
 
 	    Random rand = new Random();
-        int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
+        int pivot = rand.nextInt(num_features-2) + 1; // Randomly selected pivot point (index of where the crossover will occur)
 		
 		FeatureRequirement parent1FeatReqs[] = parent1.getFeatureReqs();
 		FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
@@ -74,16 +75,38 @@ public class RuleManager
      */
     public Rule generateRule()
     {
+        Random rand = new Random();
+
         // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
         // -Peter
         Rule newRule = new Rule();
         Random random = new Random();
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
-        for (int i = 0; i < featureRequirements.length; ++i)
-        {
-            mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
-            featureRequirements[i].setParticipation(random.nextInt(3));
-        }
+        int size = featureRequirements.length;
+
+        // choose 3 features randomly for generating a random rule
+
+        int antecedent1 = rand.nextInt(size);
+        int antecedent2 = rand.nextInt(size);
+        while(antecedent1 == antecedent2)
+            antecedent2 = rand.nextInt(size);
+
+        int consequent = rand.nextInt(size);
+        while(consequent == antecedent1 || consequent == antecedent2)
+            consequent = rand.nextInt(size);
+
+        mLookupTable.GenerateRandomValue(antecedent1, featureRequirements[antecedent1]);
+        featureRequirements[antecedent1].setParticipation(1);
+
+//        mLookupTable.GenerateRandomValue(antecedent2, featureRequirements[antecedent2]);
+//        featureRequirements[antecedent2].setParticipation(1);
+
+        mLookupTable.GenerateRandomValue(consequent, featureRequirements[consequent]);
+        featureRequirements[consequent].setParticipation(2);
+
+
+
+
         return newRule;
     }
 

@@ -182,17 +182,20 @@ public class Database
     {
         LookupTable table = LookupTable.ParseFile("");
 
-        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, 500000);
+        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, -1);
         RuleManager ruleManager = new RuleManager(table);
 
         Rule rule = new Rule();
         FeatureRequirement[] featureRequirements = rule.getFeatureReqs();
-        featureRequirements[0].setBoundRange(1999, 1999, 2 / 16.f);
-        featureRequirements[0].setParticipation(1);
-        featureRequirements[1].setBoundRange(2, 1, 2 / 12.f);
-        featureRequirements[1].setParticipation(2);
+        featureRequirements[16].setBoundRange(0, 0, 0);
+        featureRequirements[16].setParticipation(1);
+        featureRequirements[0].setBoundRange(2000, 2015, 2 / 12.f);
+        featureRequirements[0].setParticipation(2);
         database.EvaluateRule(rule);
-        for (int i = 0; i < 20; ++i)
+        System.out.println(table.TranslateRule(rule));
+        System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
+
+/*        for (int i = 0; i < 20; ++i)
         {
 
             rule = ruleManager.generateRule();
@@ -202,6 +205,6 @@ public class Database
                 System.out.println(table.TranslateRule(rule));
                 System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
             }
-        }
+        }*/
     }
 }

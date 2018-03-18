@@ -26,13 +26,14 @@ public class FitnessManager {
      */
     public float fitnessOf(Rule rule)
     {
+        theDatabase.EvaluateRule(rule);
         //Basic version of fitness function:
-        float coverage = rule.getCoverage();
-        float accuracy = rule.getAccuracy();
+        float coverage = rule.getCoverage()*100;
+        float accuracy = rule.getAccuracy()*100;
+
         int sizeOfTheDatabase = theDatabase.getNumDataItems();
 
-
-        float fitnessBase = (((coverage/sizeOfTheDatabase) + accuracy)/2) * 100;
+        float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy)/2.0f) * 100;
         return fitnessBase;
     }
 

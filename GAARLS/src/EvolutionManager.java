@@ -55,13 +55,20 @@ public class EvolutionManager
         ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
 
         Rule potentialRule;
-        Float ruleFitness;
+        float ruleFitness;
         for(int i = 0; i < populationSize; i++){
-            potentialRule = new Rule();
+            do {
+                potentialRule = theRuleManager.generateRule();
+
+                ruleFitness = theFitnessManager.fitnessOf(potentialRule);
+               // System.out.println("Bad Rule: " + theRuleManager.TranslateRule(potentialRule));
+               // System.out.println("Bad Rule's coverage: " + potentialRule.getCoverage());
+            } while (ruleFitness == 0);                                         // may need generateRule to give rules with less clauses in them just to achieve coverage
         //  while(knownRules.contains(potentialRule)
         //      potentialRule = new Rule();
-            ruleFitness = theFitnessManager.fitnessOf(potentialRule);
-      //      System.out.println("Fitness of intial pop rule " + i + " :" + ruleFitness);
+            //System.out.println("Fitness of initial pop rule " + i + " :" + ruleFitness);
+            if(i%100 == 0)
+                System.out.println(i + " rules added to initial population");
             state.add(new Pair<>(ruleFitness, potentialRule));
         }
         return state;
@@ -118,7 +125,7 @@ public class EvolutionManager
         for(int i = 0; i < nextState.size(); i++){
             FIT += nextState.get(i).getKey();
         }
-
+        System.out.println("Population Fitness: " + FIT);
         // Associate to each individual, an portion of fitnessInterval according to their fitness
         // Note: As spots are determined with floor function, there may be an extra index available at the end
         // of fitness interval. This will hold 0 (null) and thus be allocated to the most fit individual.
