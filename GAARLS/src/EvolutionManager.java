@@ -61,6 +61,7 @@ public class EvolutionManager
         //  while(knownRules.contains(potentialRule)
         //      potentialRule = new Rule();
             ruleFitness = theFitnessManager.fitnessOf(potentialRule);
+      //      System.out.println("Fitness of intial pop rule " + i + " :" + ruleFitness);
             state.add(new Pair<>(ruleFitness, potentialRule));
         }
         return state;
@@ -82,7 +83,7 @@ public class EvolutionManager
 
 
         System.out.println("Size of initial pop: " + state.size());
-        System.out.println("FIrst individual: " + state.get(0));
+        System.out.println("First individual: " + state.get(0));
 
         while (numGenerations < forGenerations) {
             state = fSelect(state);

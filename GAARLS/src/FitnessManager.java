@@ -1,6 +1,5 @@
 
 import Rule.Rule;
-
 /**
  * Class: FitnessManager
  * Intended functionality: Util class that is in charge of all fitness function calculations, using the feature database
@@ -9,12 +8,13 @@ import Rule.Rule;
  */
 
 
-public class FitnessManager
-{
+public class FitnessManager {
+    private Database theDatabase;
+
     // public functions
     public FitnessManager(Database database)
     {
-        mDatabase = database;
+        theDatabase = database;
     }
 
     /**
@@ -22,12 +22,18 @@ public class FitnessManager
      * @param rule to evaluate
      *             NOTE: information relevant to rule will be cached inside rule at the same time
  *                       will not change functionality of rule
-     * @return normalized value between 0-1 TODO: Shane is this correct?
+     * @return float fitness value of rule
      */
     public float fitnessOf(Rule rule)
     {
-        // get rule to do burpees until it pukes
-        return 0; // rule apparently is out of shape
+        //Basic version of fitness function:
+        float coverage = rule.getCoverage();
+        float accuracy = rule.getAccuracy();
+        int sizeOfTheDatabase = theDatabase.getNumDataItems();
+
+
+        float fitnessBase = (((coverage/sizeOfTheDatabase) + accuracy)/2) * 100;
+        return fitnessBase;
     }
 
     // private functions

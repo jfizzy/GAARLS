@@ -12,6 +12,10 @@ import java.util.Scanner;
 public class Database
 {
     // public functions
+    public int getNumDataItems(){
+        return mNumTableEntries;
+    }
+
 
     /**
      * Static util function to parse a file and return a new database object
