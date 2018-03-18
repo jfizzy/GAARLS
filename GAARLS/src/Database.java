@@ -191,7 +191,7 @@ public class Database
         for (int i = 0; i < 20; ++i)
         {
 
-            rule = ruleManager.GenerateRule();
+            rule = ruleManager.generateRule();
             System.out.println(table.TranslateRule(rule));
             if (rule.getCoverage() > 0 || rule.getAccuracy() > 0)
             {

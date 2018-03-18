@@ -704,7 +704,7 @@ public class LookupTable
 
         }
         RuleManager ruleManager = new RuleManager(lookupTable);
-        Rule testRule = ruleManager.GenerateRule();
+        Rule testRule = ruleManager.generateRule();
         System.out.println(lookupTable.TranslateRule(testRule));
     }
 }
