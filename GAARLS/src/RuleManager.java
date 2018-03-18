@@ -24,11 +24,8 @@ public class RuleManager
      */
     public Rule mutate(Rule parent)
     {
-<<<<<<< HEAD
         Rule mutatedRule = parent;
-=======
-        Rule mutatedRule = mutationTemplate.copy();
->>>>>>> 8d08cb9e662ca52a48cf4778790080ed4f32b5a0
+
 
         // mutate
 
@@ -43,6 +40,17 @@ public class RuleManager
      */
     public Rule crossover(Rule parent1, Rule parent2)
     {
+        // choose parent to form as first part of child
+
+
+        //Rule head = ;
+        //Rule tail = ;
+        // choose crossover point randomly between index 0 and index size - 2
+        // (so that any crossover will include index from both parents
+
+        // create array for call to merge: should have 0 in elements belonging to head parent and 1s for taill
+
+
         ArrayList<Boolean> whoGetsWhatList = null; // do some calculations
         return parent1.Merge(parent2, whoGetsWhatList);
     }
