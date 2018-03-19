@@ -15,6 +15,7 @@ public class RuleManager
 {
     
     private final int num_features = 23; // TODO set this to LookupTable.NUM_FEATURES
+    private static Random rand = new Random();
     
     // public methods
     public RuleManager(LookupTable lookupTable)
@@ -31,11 +32,22 @@ public class RuleManager
      */
     public Rule mutate(Rule parent)
     {
-        Rule mutatedRule = parent;
+        // copy the rule
+        Rule mutatedRule = parent.copy();
 
+        // choose a random feature
+        int featureId = rand.nextInt(num_features);
+        // ensure that we are selecting a new participation value
+        int participation = (rand.nextInt(2) + 1 + mutatedRule.getFeatureReq(featureId).getParticipation()) % 3;
+        // we only care if this feature is now, or is still participating in the rule
+        if (participation != 0) {
+            // get a random feature value
+            mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId));
+        }
+        // set the participation
+        mutatedRule.getFeatureReq(featureId).setParticipation(participation);
 
-        // mutate
-
+        // return the rule
         return mutatedRule;
     }
 
@@ -51,7 +63,7 @@ public class RuleManager
 
 		// This needs to be tested!
 
-	    Random rand = new Random();
+
         int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
 		
 		FeatureRequirement parent1FeatReqs[] = parent1.getFeatureReqs();
