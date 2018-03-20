@@ -126,6 +126,7 @@ public class EvolutionManager
             FIT += nextState.get(i).getKey();
         }
         System.out.println("Population Fitness: " + FIT);
+        System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
         // Associate to each individual, an portion of fitnessInterval according to their fitness
         // Note: As spots are determined with floor function, there may be an extra index available at the end
         // of fitness interval. This will hold 0 (null) and thus be allocated to the most fit individual.
