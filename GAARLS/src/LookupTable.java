@@ -394,7 +394,7 @@ public class LookupTable
 
         // Feature 15: Vehicle Year
         {
-            int numValues = 116; // 1960-2015
+            int numValues = 117; // 1960-2015
             int symbolSize = 4;
             String featureName = "V_YEAR";
 
