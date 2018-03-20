@@ -195,6 +195,34 @@ public class Database
         System.out.println(table.TranslateRule(rule));
         System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
 
+
+        Rule rule2 = new Rule();
+        FeatureRequirement[] featureRequirements2 = rule2.getFeatureReqs();
+        featureRequirements2[16].setBoundRange(0, 0, 0);
+        featureRequirements2[16].setParticipation(1);
+        featureRequirements2[0].setBoundRange(2000, 2015, 2 / 12.f);
+        featureRequirements2[0].setParticipation(2);
+        database.EvaluateRule(rule2);
+        System.out.println(table.TranslateRule(rule2));
+        System.out.println("Accuracy: " + rule2.getAccuracy() + ". Coverage: " + rule2.getCoverage());
+
+
+        Rule rule3 = new Rule();
+        FeatureRequirement[] featureRequirements3 = rule3.getFeatureReqs();
+        featureRequirements3[16].setBoundRange(0, 0, 0);
+        featureRequirements3[16].setParticipation(1);
+        featureRequirements3[0].setBoundRange(2000, 2001, 2 / 12.f);
+        featureRequirements3[0].setParticipation(2);
+        database.EvaluateRule(rule3);
+        System.out.println(table.TranslateRule(rule3));
+        System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
+
+        //TODO: move this to a JUnit test
+        System.out.println("rule equals rule2? " + rule.equals(rule2)); //Should eval to true
+        System.out.println("rule equals rule3? " + rule.equals(rule3)); //Should eval to false
+
+
+
 /*        for (int i = 0; i < 20; ++i)
         {
 

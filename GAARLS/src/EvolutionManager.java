@@ -1,8 +1,6 @@
 import Rule.Rule;
 import javafx.util.Pair;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Random;
+import java.util.*;
 
 /**
  * EvolutionManager.java
@@ -61,14 +59,15 @@ public class EvolutionManager
                 potentialRule = theRuleManager.generateRule();
 
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
-               // System.out.println("Bad Rule: " + theRuleManager.TranslateRule(potentialRule));
-               // System.out.println("Bad Rule's coverage: " + potentialRule.getCoverage());
-            } while (ruleFitness == 0);                                         // may need generateRule to give rules with less clauses in them just to achieve coverage
+
+            } while (ruleFitness == 0);
         //  while(knownRules.contains(potentialRule)
         //      potentialRule = new Rule();
-            //System.out.println("Fitness of initial pop rule " + i + " :" + ruleFitness);
-            if(i%100 == 0)
+
+            if((i > 0) && (i%100 == 0)) {
                 System.out.println(i + " rules added to initial population");
+
+            }
             state.add(new Pair<>(ruleFitness, potentialRule));
         }
         return state;
@@ -85,23 +84,35 @@ public class EvolutionManager
     public void evolve(int startSize, int forGenerations, int maxPop) {
         int numGenerations = 0;
         int cullToSize = maxPop - 100;
+
+        System.out.println("Generating initial population...");
         ArrayList<Pair<Float,Rule>> state = this.initializePopulation(startSize);
 
-
-
-        System.out.println("Size of initial pop: " + state.size());
-        System.out.println("First individual: " + state.get(0));
+        Scanner input = new Scanner(System.in);
+        System.out.println("Initial population generated. Press RETURN to begin evolution of rules.");
+        System.out.print(input.nextLine());
 
         while (numGenerations < forGenerations) {
             state = fSelect(state);
 
             if(state.size() > maxPop) {
+                System.out.println("\nPopulation size: " + state.size());
+                System.out.println("Max population size exceeded. Trimming 100 individuals...");
                 while(state.size() > cullToSize) {
                     state.remove(state.size() - 1);
                 }
+                System.out.println("\nPopulation size: " + state.size());
+                System.out.println("Press RETURN to continue.");
+                System.out.print(input.nextLine());
             }
             numGenerations++;
         }
+
+        //TODO: move this functionality to toFile method
+        // Print the top 5 rules to stdout - for debugging
+        for(int i = 0; i < 5; i++)
+            System.out.println(theRuleManager.TranslateRule(state.get(i).getValue()));
+
     }
 
     /**
@@ -109,6 +120,7 @@ public class EvolutionManager
      */
     private ArrayList<Pair<Float, Rule>> fSelect(ArrayList<Pair<Float, Rule>> aState){
         ArrayList<Pair<Float, Rule>> nextState = aState;
+        Scanner input = new Scanner(System.in);
 
         // Order population by decreasing order of fitness
         nextState.sort(new Comparator<Pair<Float, Rule>>()
@@ -116,46 +128,71 @@ public class EvolutionManager
             @Override
             public int compare(Pair<Float, Rule> o1, Pair<Float, Rule> o2)
             {
-                return o1.getKey().compareTo(o2.getKey());
+                return o2.getKey().compareTo(o1.getKey());
             }
         });
+        System.out.println("Fitness of fittest: " + nextState.get(0).getKey());
+        System.out.println("Fitness of weakest: " + nextState.get(nextState.size()-1).getKey());
 
-        // Determine overall fitness score of population, FIT
+
         Float FIT = 0.0f;
         for(int i = 0; i < nextState.size(); i++){
             FIT += nextState.get(i).getKey();
         }
-        System.out.println("Population Fitness: " + FIT);
+
         System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
+
+
+
         // Associate to each individual, an portion of fitnessInterval according to their fitness
         // Note: As spots are determined with floor function, there may be an extra index available at the end
         // of fitness interval. This will hold 0 (null) and thus be allocated to the most fit individual.
         int[] fitnessInterval = new int[(int) Math.ceil(FIT)];
         int spotsAllocated = 0;
         for(int i = 0; i < nextState.size(); i++){
-            int spots = (int) Math.floor(nextState.get(i).getKey());
-            for(int j = spotsAllocated; j < spots; j++){
+            int spots = (int) Math.ceil(nextState.get(i).getKey());
+      //      System.out.println("i: " + i + " , spots: " + spots + " , fitness: " + nextState.get(i).getKey());
+        //    System.out.print(input.nextLine());
+
+            int lastSpot = spots + spotsAllocated - 1;
+            for(int j = spotsAllocated; j < lastSpot; j++){
                 fitnessInterval[j] = i;
                 spotsAllocated++;
             }
-
         }
+
+
         // Select individual(s) for genetic operation and call
         Random rand = new Random();
 
         if(crossoversDone == crossToMut){                   // Do mutation
+
             crossoversDone = 0;
-            int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
-            Rule parent = nextState.get(parentIndex).getValue();
-            Rule child = theRuleManager.mutate(parent);
+            Rule child;
+            boolean duplicate = false;
+            do {
+                if(duplicate) {
+                    System.out.println("duplicate child produced");
+                    duplicate = false;
+                    System.out.print(input.nextLine());
+
+                }
+                int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
+                Rule parent = nextState.get(parentIndex).getValue();
+                child = theRuleManager.mutate(parent);
+                duplicate = true;
+            } while (nextState.contains(child));
             Float childFitness = theFitnessManager.fitnessOf(child);
             nextState.add(new Pair<>(childFitness, child));
         }
         else{                                               // Do crossover
+
             int parent1Index, parent2Index;
             do {
+
                 parent1Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 parent2Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
+
             } while (parent1Index == parent2Index);
             Rule parent1 = nextState.get(parent1Index).getValue();
             Rule parent2 = nextState.get(parent2Index).getValue();
@@ -171,13 +208,13 @@ public class EvolutionManager
      * Prints population to output file as rules
      * @param filePath
      */
-/*    public void toFile(String filePath)
+  /*  public void toFile(String filePath)
     {
         // output to file
         // example for getting a line in the file
         String lineInFile = theRuleManager.TranslateRule(state.get(0).getValue());
-    }
+    }*/
 
-*/
+
 
 }

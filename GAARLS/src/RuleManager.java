@@ -1,6 +1,5 @@
 import Rule.Rule;
 import Rule.FeatureRequirement;
-import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -15,7 +14,8 @@ public class RuleManager
 {
     
     private final int num_features;
-    
+    private static Random rand = new Random();
+
     // public methods
     public RuleManager(LookupTable lookupTable)
     {
@@ -32,11 +32,22 @@ public class RuleManager
      */
     public Rule mutate(Rule parent)
     {
-        Rule mutatedRule = parent;
+        // copy the rule
+        Rule mutatedRule = parent.copy();
 
+        // choose a random feature
+        int featureId = rand.nextInt(num_features);
+        // ensure that we are selecting a new participation value
+        int participation = (rand.nextInt(2) + 1 + mutatedRule.getFeatureReq(featureId).getParticipation()) % 3;
+        // we only care if this feature is now, or is still participating in the rule
+        if (participation != 0) {
+            // get a random feature value
+            mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId));
+        }
+        // set the participation
+        mutatedRule.getFeatureReq(featureId).setParticipation(participation);
 
-        // mutate
-
+        // return the rule
         return mutatedRule;
     }
 
@@ -48,15 +59,12 @@ public class RuleManager
      */
     public Rule crossover(Rule parent1, Rule parent2)
     {
-
-
 		// This needs to be tested!
 
 	    Random rand = new Random();
         int pivot = rand.nextInt(num_features-2) + 1; // Randomly selected pivot point (index of where the crossover will occur)
-		
-		FeatureRequirement parent1FeatReqs[] = parent1.getFeatureReqs();
-		FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
+
+        FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
 		FeatureRequirement childFeatReqs[] = parent1.getFeatureReqs();
         
         for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
@@ -65,7 +73,6 @@ public class RuleManager
         Rule child = new Rule(childFeatReqs);
 
         return child;
-
     }
 
     /**
@@ -77,10 +84,8 @@ public class RuleManager
     {
         Random rand = new Random();
 
-        // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
-        // -Peter
         Rule newRule = new Rule();
-        Random random = new Random();
+
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
         int size = featureRequirements.length;
 
@@ -95,11 +100,13 @@ public class RuleManager
         while(consequent == antecedent1 || consequent == antecedent2)
             consequent = rand.nextInt(size);
 
+
+        //TODO: add
         mLookupTable.GenerateRandomValue(antecedent1, featureRequirements[antecedent1]);
         featureRequirements[antecedent1].setParticipation(1);
 
-//        mLookupTable.GenerateRandomValue(antecedent2, featureRequirements[antecedent2]);
-//        featureRequirements[antecedent2].setParticipation(1);
+        mLookupTable.GenerateRandomValue(antecedent2, featureRequirements[antecedent2]);
+        featureRequirements[antecedent2].setParticipation(1);
 
         mLookupTable.GenerateRandomValue(consequent, featureRequirements[consequent]);
         featureRequirements[consequent].setParticipation(2);
