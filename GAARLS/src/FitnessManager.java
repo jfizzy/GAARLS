@@ -9,6 +9,8 @@ import Rule.Rule;
 
 
 public class FitnessManager {
+
+    // private members
     private Database theDatabase;
 
     // public functions
@@ -26,19 +28,14 @@ public class FitnessManager {
      */
     public float fitnessOf(Rule rule)
     {
-        theDatabase.EvaluateRule(rule);
+        theDatabase.EvaluateRule(rule);                       // Initializes coverage and accuracy values in rule
         //Basic version of fitness function:
         float coverage = rule.getCoverage()*100;
         float accuracy = rule.getAccuracy()*100;
 
         int sizeOfTheDatabase = theDatabase.getNumDataItems();
 
-        float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy)/2.0f) * 100;
+        float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy)/2.0f) * 100.0f;
         return fitnessBase;
     }
-
-    // private functions
-
-    // private members
-    private Database mDatabase;
 }
