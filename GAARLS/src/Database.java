@@ -63,16 +63,19 @@ public class Database
             int itemIndex = 0; // offset of the item in the 1-d array
             scanner.nextLine(); // skip the header line
             int numLinesRead = 0;
+            ArrayList<Integer> desiredFeatureIndices = databaseCodex.GetFileParsingIndices();
             while (scanner.hasNextLine() && /*for debug functionality*/ numLinesRead < numItemsInFile )
             {
                 String item = scanner.nextLine();
                 String[] itemFeatures = item.split(",");
 
                 // iterate through each feature symbol in the item and translate to a float value for the database
-                for (int featureId = 0; featureId < numFeatures; ++featureId)
+                int featureCount = 0;
+                for (int desiredFeature : desiredFeatureIndices)
                 {
-                    float symbolValue = databaseCodex.TranslateFeatureSymbol(featureId, itemFeatures[featureId]);
-                    dataSet[itemIndex + featureId] = symbolValue;
+                    float symbolValue = databaseCodex.TranslateFeatureSymbol(desiredFeature, itemFeatures[desiredFeature]);
+                    dataSet[itemIndex + featureCount] = symbolValue;
+                    featureCount++;
                 }
 
                 itemIndex += numFeatures;

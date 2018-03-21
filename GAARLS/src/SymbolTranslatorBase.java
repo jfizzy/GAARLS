@@ -56,13 +56,16 @@ public abstract class SymbolTranslatorBase
         }
     }
 
+    public int GetFileFeatureIndex() {return mFileFeatureId;}
+
     public abstract String FeatureRequirementToDescription(FeatureRequirement featureRequirement);
 
     public abstract void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize);
 
     // protected methods
-    protected SymbolTranslatorBase(String featureName, int symbolSize, int[] values, String[] symbols, String[] translations)
+    protected SymbolTranslatorBase(int fileFeatureId, String featureName, int symbolSize, int[] values, String[] symbols, String[] translations)
     {
+        mFileFeatureId = fileFeatureId;
         mFeatureName = featureName;
         mValueLookupTable = new HashMap<>();
         mSymbolLookupTable = new HashMap<>();
@@ -123,6 +126,7 @@ public abstract class SymbolTranslatorBase
     // private members
     private HashMap<Integer, String> mSymbolLookupTable;
     private HashMap<String, Integer> mValueLookupTable;
+    private int mFileFeatureId;
 
 
 }
