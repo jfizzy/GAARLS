@@ -28,12 +28,17 @@ public class FitnessManager {
      */
     public float fitnessOf(Rule rule)
     {
+        //TODO: Remove when Mutate, Crossover and Generate rule ensure that a rule is valid at creation time
+        if (!RuleManager.IsValidRule(rule))
+            return 0;
+
         theDatabase.EvaluateRule(rule);                       // Initializes coverage and accuracy values in rule
         //Basic version of fitness function:
         float coverage = rule.getCoverage()*100;
         float accuracy = rule.getAccuracy()*100;
 
-        float rangeFitness = calculateRangeFitness(rule); // TODO: Hook up to fitness equation
+        float rangeFitness = rule.getRangeCoverage(); // TODO: Hook up to fitness equation
+        float completeness = rule.getCompleteness();// TODO: Hook up to fitness equation
 
         int sizeOfTheDatabase = theDatabase.getNumDataItems();
 
@@ -41,22 +46,4 @@ public class FitnessManager {
         return fitnessBase;
     }
 
-    /**
-     * Range fitness is the product of normalized feature values in the rule. ie featureRange1 * featureRange2 * featureRange3
-     * @param rule
-     * @return
-     */
-    private float calculateRangeFitness(Rule rule)
-    {
-        float cumRangeFitness = 1.0f;
-        for (FeatureRequirement feature : rule.getFeatureReqs())
-        {
-            if (feature.getParticipation() != FeatureRequirement.pFlag.IGNORE.getValue())
-            {
-                float rangeFitness = 1 - feature.getRangeCoverage();
-                cumRangeFitness *= rangeFitness;
-            }
-        }
-        return cumRangeFitness;
-    }
 }

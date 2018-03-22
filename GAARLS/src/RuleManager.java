@@ -116,6 +116,19 @@ public class RuleManager
         return newRule;
     }
 
+    public static boolean IsValidRule(Rule rule)
+    {
+        final int antecedentParticipationValue = FeatureRequirement.pFlag.ANTECEDENT.getValue();
+        final int consequentParticipationValue = FeatureRequirement.pFlag.CONSEQUENT.getValue();
+        boolean antecedentPresent = false, consequentPresent = false;
+        for (FeatureRequirement featureRequirement : rule.getFeatureReqs())
+        {
+            antecedentPresent |= featureRequirement.getParticipation() == antecedentParticipationValue;
+            consequentPresent |= featureRequirement.getParticipation() == consequentParticipationValue;
+        }
+        return antecedentPresent && consequentPresent;
+    }
+
     public String TranslateRule(Rule rule)
     {
         return mLookupTable.TranslateRule(rule);

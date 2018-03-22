@@ -16,7 +16,25 @@ public class Rule {
     private static int features;
     private float coverage;
     private float accuracy;
+    private float rangeCoverage;
+    private float completeness;
 
+    public float getRangeCoverage()
+    {
+        return rangeCoverage;
+    }
+    public void setRangeCoverage(float rangeCoverage)
+    {
+        this.rangeCoverage = rangeCoverage;
+    }
+    public float getCompleteness()
+    {
+        return completeness;
+    }
+    public void setCompleteness(float completeness)
+    {
+        this.completeness = completeness;
+    }
     public void setCoverage(float coverage) { this.coverage = coverage; }
     public void setAccuracy(float accuracy) { this.accuracy = accuracy; }
     public float getCoverage() { return coverage; }

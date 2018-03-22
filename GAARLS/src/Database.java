@@ -116,7 +116,8 @@ public class Database
     {
         int correctPredictions = 0;
         int occurancesOfAnticedent = 0;
-
+        int occurancesOfConsequent = 0;
+        float ruleRange = 1f;
 
         // extract antecedent and consequent indices to cut down on table queries
         ArrayList<Integer> antecedent = new ArrayList<>();
@@ -128,10 +129,12 @@ public class Database
             if (participation == FeatureRequirement.pFlag.ANTECEDENT.getValue())
             {
                 antecedent.add(i);
+                ruleRange *= 1 - featureRequirements[i].getRangeCoverage();
             }
             else if (participation == FeatureRequirement.pFlag.CONSEQUENT.getValue())
             {
                 consequent.add(i);
+                ruleRange *= 1 - featureRequirements[i].getRangeCoverage();
             }
         }
 
@@ -159,11 +162,19 @@ public class Database
                     correctPredictions++;
                 }
             }
+            if (consequentIsPresent)
+            {
+                occurancesOfConsequent++;
+            }
         }
         float normalizedCoverage = occurancesOfAnticedent / (float)mNumTableEntries;
         float normalizeAccuracy = occurancesOfAnticedent > 0 ? (correctPredictions / (float)occurancesOfAnticedent) : 0;
+        float normalizedCompleteness = occurancesOfConsequent > 0 ? correctPredictions / (float)occurancesOfConsequent : 0;
+
         rule.setAccuracy(normalizeAccuracy);
         rule.setCoverage(normalizedCoverage);
+        rule.setRangeCoverage(ruleRange);
+        rule.setCompleteness(normalizedCompleteness);
     }
 
     public float[] GetDatabase() {return mDatatable;}
