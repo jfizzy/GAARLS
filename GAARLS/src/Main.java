@@ -1,26 +1,30 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import Rule.Rule;
 
 /*
     Main driver for the program
  */
 public class Main
 {
-    private static String lookupFile = "NCDB_Data_Dictionary.doc";
-    private static String dataFile = "NCDB_1999_to_2015.csv";
-    private static String ruleFile = "rules.txt";
-    private static String wekaFile = "weka.txt";
+    private static String lookupFilePath = "NCDB_Data_Dictionary.doc";
+    private static String dataFilePath = "NCDB_1999_to_2015.csv";
+    private static String ruleFilePath = "rules.txt";
+    private static String wekaFilePath = "weka.txt";
 
     public static void main(String args[])
     {
         parseArgs(args);
         // get file paths for codex and database
         System.out.println("\nParsing Data Dictionary...");
-        LookupTable lookupTable = LookupTable.ParseFile(lookupFile);// parse lookup table file
+        LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath);// parse lookup table file
         System.out.println("Complete.\nParsing data set...");
-        Database database = Database.ParseFile(dataFile, lookupTable, -1); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
         System.out.println("Complete.");
+        Parser parser = new Parser();
+        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath);
         // TODO: evolution manager will need access to the ruleFile and wekaFile when we're ready for them
-        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, 10);
+        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, 10);
         evolutionManager.evolve(1000, 1000, 1300);
         //evolutionManager.ToFile("");
     }
@@ -38,13 +42,13 @@ public class Main
         try {
             for (int i = 0; i < args.length; ++i) {
                 if (args[i].equals("-d")) {
-                    dataFile = args[++i];
+                    dataFilePath = args[++i];
                 } else if (args[i].equals("-r")) {
-                    ruleFile = args[++i];
+                    ruleFilePath = args[++i];
                 } else if (args[i].equals("-w")) {
-                    wekaFile = args[++i];
+                    wekaFilePath = args[++i];
                 } else if (args[i].equals("-l")) {
-                    lookupFile = args[++i];
+                    lookupFilePath = args[++i];
                 }
             }
         } catch (ArrayIndexOutOfBoundsException e) {

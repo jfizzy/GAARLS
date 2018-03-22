@@ -1,8 +1,9 @@
 
 import Rule.FeatureRequirement;
 import Rule.Rule;
+import javafx.util.Pair;
 
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Class: LookupTable
@@ -562,6 +563,12 @@ public class LookupTable
 
         assert (NUM_FEATURES == translatorIdx); // Surface level check to make sure no one's fucking around with features or at least fucking around correctly
 
+        featureValueMaps = new HashMap[symbolTranslatorBases.length];
+        for (int i = 0; i < symbolTranslatorBases.length; ++i) {
+            featureMap.put(symbolTranslatorBases[i].mFeatureName, i);
+            featureValueMaps[i] = symbolTranslatorBases[i].getmValueReverseLookupTable();
+        }
+
         return new LookupTable(symbolTranslatorBases);
     }
 
@@ -677,6 +684,10 @@ public class LookupTable
         mFeatureLookupTable = featureLookupTable;
         NumFeatures = mFeatureLookupTable.length;
     }
+
+    // public members
+    public static HashMap<String, Integer> featureMap = new HashMap<>();
+    public static HashMap<String, Float>[] featureValueMaps;
 
     // private members
     private SymbolTranslatorBase[] mFeatureLookupTable;

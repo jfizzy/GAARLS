@@ -24,7 +24,7 @@ public class EvolutionManager
     //private ArrayList<Pair<Float, Rule>> state;
     private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
-//  private ArrayList<Rule> knownRules;                                                   // TODO: need this to be passed in from main
+    private ArrayList<Rule> knownRules;                                                   // TODO: need this to be passed in from main
     private int crossToMut;
     private int crossoversDone;
 
@@ -36,9 +36,10 @@ public class EvolutionManager
      * @param lookupTable: table of allowable feature values
      * @param crossToMut: number of crossover operations to perform between each mutation
      */
-    public EvolutionManager(Database database, LookupTable lookupTable, int crossToMut) {
+    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, int crossToMut) {
         theFitnessManager = new FitnessManager(database);
         theRuleManager = new RuleManager(lookupTable);
+        this.knownRules = knownRules;
         this.crossToMut = crossToMut;
         crossoversDone = 0;
 
@@ -60,9 +61,7 @@ public class EvolutionManager
 
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
 
-            } while (ruleFitness == 0);
-        //  while(knownRules.contains(potentialRule)
-        //      potentialRule = new Rule();
+            } while (ruleFitness == 0 || knownRules.contains(potentialRule));
 
             if((i > 0) && (i%100 == 0)) {
                 System.out.println(i + " rules added to initial population");
@@ -181,7 +180,8 @@ public class EvolutionManager
                 Rule parent = nextState.get(parentIndex).getValue();
                 child = theRuleManager.mutate(parent);
                 duplicate = true;
-            } while (nextState.contains(child));
+            // TODO: We may want to store these in a hash table for efficiency
+            } while (nextState.contains(child) || knownRules.contains(child));
             Float childFitness = theFitnessManager.fitnessOf(child);
             nextState.add(new Pair<>(childFitness, child));
         }
