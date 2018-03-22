@@ -73,7 +73,7 @@ public class Database
                 int featureCount = 0;
                 for (int desiredFeature : desiredFeatureIndices)
                 {
-                    float symbolValue = databaseCodex.TranslateFeatureSymbol(desiredFeature, itemFeatures[desiredFeature]);
+                    float symbolValue = databaseCodex.TranslateFeatureSymbol(featureCount, itemFeatures[desiredFeature]);
                     dataSet[itemIndex + featureCount] = symbolValue;
                     featureCount++;
                 }
