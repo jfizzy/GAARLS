@@ -89,31 +89,30 @@ public class RuleManager
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
         int size = featureRequirements.length;
 
-        // choose 3 features randomly for generating a random rule
+        // TODO: When no longer hard coding rules, ensure that there is always a valid number of antecedents and consequents
+        { // TODO: Remove hard coded rule generation
+            // choose 3 features randomly for generating a random rule
+            int antecedent1 = rand.nextInt(size);
+            int antecedent2 = rand.nextInt(size);
+            while(antecedent1 == antecedent2)
+                antecedent2 = rand.nextInt(size);
 
-        int antecedent1 = rand.nextInt(size);
-        int antecedent2 = rand.nextInt(size);
-        while(antecedent1 == antecedent2)
-            antecedent2 = rand.nextInt(size);
-
-        int consequent = rand.nextInt(size);
-        while(consequent == antecedent1 || consequent == antecedent2)
-            consequent = rand.nextInt(size);
-
-
-        //TODO: add
-        mLookupTable.GenerateRandomValue(antecedent1, featureRequirements[antecedent1]);
-        featureRequirements[antecedent1].setParticipation(1);
-
-        mLookupTable.GenerateRandomValue(antecedent2, featureRequirements[antecedent2]);
-        featureRequirements[antecedent2].setParticipation(1);
-
-        mLookupTable.GenerateRandomValue(consequent, featureRequirements[consequent]);
-        featureRequirements[consequent].setParticipation(2);
+            int consequent = rand.nextInt(size);
+            while(consequent == antecedent1 || consequent == antecedent2)
+                consequent = rand.nextInt(size);
 
 
+            //TODO: add
+            mLookupTable.GenerateRandomValue(antecedent1, featureRequirements[antecedent1]);
+            featureRequirements[antecedent1].setParticipation(1);
 
+            mLookupTable.GenerateRandomValue(antecedent2, featureRequirements[antecedent2]);
+            featureRequirements[antecedent2].setParticipation(1);
 
+            mLookupTable.GenerateRandomValue(consequent, featureRequirements[consequent]);
+            featureRequirements[consequent].setParticipation(2);
+
+        }
         return newRule;
     }
 

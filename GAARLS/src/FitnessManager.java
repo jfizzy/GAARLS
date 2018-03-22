@@ -29,31 +29,34 @@ public class FitnessManager {
     public float fitnessOf(Rule rule)
     {
         theDatabase.EvaluateRule(rule);                       // Initializes coverage and accuracy values in rule
-
-        // check that there is at least one clause in the antecedent and one in the consequent
-        boolean a = false;
-        boolean c = false;
-
-        FeatureRequirement[] rulesFRs = rule.getFeatureReqs();
-        for(int i = 0; i < rulesFRs.length; i++){
-            if(!a && rulesFRs[i].getParticipation() == 1)
-                a = true;
-
-            if(!c && rulesFRs[i].getParticipation() == 2)
-                c = true;
-        }
-
-        if(!a || !c)
-            return 0;
-
-
         //Basic version of fitness function:
         float coverage = rule.getCoverage()*100;
         float accuracy = rule.getAccuracy()*100;
+
+        float rangeFitness = calculateRangeFitness(rule); // TODO: Hook up to fitness equation
 
         int sizeOfTheDatabase = theDatabase.getNumDataItems();
 
         float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy)/2.0f);
         return fitnessBase;
+    }
+
+    /**
+     * Range fitness is the product of normalized feature values in the rule. ie featureRange1 * featureRange2 * featureRange3
+     * @param rule
+     * @return
+     */
+    private float calculateRangeFitness(Rule rule)
+    {
+        float cumRangeFitness = 1.0f;
+        for (FeatureRequirement feature : rule.getFeatureReqs())
+        {
+            if (feature.getParticipation() != FeatureRequirement.pFlag.IGNORE.getValue())
+            {
+                float rangeFitness = 1 - feature.getRangeCoverage();
+                cumRangeFitness *= rangeFitness;
+            }
+        }
+        return cumRangeFitness;
     }
 }
