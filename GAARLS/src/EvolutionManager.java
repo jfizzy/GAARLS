@@ -26,7 +26,7 @@ public class EvolutionManager
     //private ArrayList<Pair<Float, Rule>> state;
     private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
-    private ArrayList<Rule> knownRules;                                                   // TODO: need this to be passed in from main
+    private ArrayList<Rule> knownRules;
     private int crossToMut;
     private int crossoversDone;
     private ArrayList<Pair<Float,Rule>> state;
@@ -40,7 +40,7 @@ public class EvolutionManager
      * @param crossToMut: number of crossover operations to perform between each mutation
      */
     public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, int crossToMut) {
-        theFitnessManager = new FitnessManager(database);
+        theFitnessManager = new FitnessManager(database, knownRules);
         theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
         this.crossToMut = crossToMut;

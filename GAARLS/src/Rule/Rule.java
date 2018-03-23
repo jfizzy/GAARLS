@@ -66,7 +66,7 @@ public class Rule {
         }
     }
 
-    //public constructor that accepts featureReqs
+    //public constructor that accepts pre-defined featureReqs
     public Rule(FeatureRequirement[] featureReqs) {
         this.featureReqs = new FeatureRequirement[this.features];
         for (int i = 0; i < this.featureReqs.length; i++) {
