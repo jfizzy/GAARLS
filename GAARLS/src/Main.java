@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import Rule.Rule;
 
 /*
     Main driver for the program
@@ -27,7 +28,10 @@ public class Main
         Database database = Database.ParseFile(dataFilePath, lookupTable, 100000); // parse database file
         System.out.println("Complete.");
 
-        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, 10);
+        Parser parser = new Parser();
+        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath);
+
+        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, 10);
         evolutionManager.evolve(100, 1000, 1300);
         //evolutionManager.ToFile("");
     }

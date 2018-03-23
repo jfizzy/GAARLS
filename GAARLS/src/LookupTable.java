@@ -1,6 +1,7 @@
 import Rule.FeatureRequirement;
 import Rule.Rule;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Class: LookupTable
@@ -680,6 +681,12 @@ public class LookupTable
             translatorIdx++;
         }
 
+        featureValueMaps = new HashMap[symbolTranslatorBases.size()];
+        for (int i = 0; i < symbolTranslatorBases.size(); ++i) {
+            featureMap.put(symbolTranslatorBases.get(i).mFeatureName, i);
+            featureValueMaps[i] = symbolTranslatorBases.get(i).getmValueReverseLookupTable();
+        }
+
         return new LookupTable(symbolTranslatorBases.toArray(new SymbolTranslatorBase[symbolTranslatorBases.size()]));
     }
 
@@ -806,6 +813,10 @@ public class LookupTable
         mFeatureLookupTable = featureLookupTable;
         NumFeatures = mFeatureLookupTable.length;
     }
+
+    // public members
+    public static HashMap<String, Integer> featureMap = new HashMap<>();
+    public static HashMap<String, Float>[] featureValueMaps;
 
     // private members
     private SymbolTranslatorBase[] mFeatureLookupTable;
