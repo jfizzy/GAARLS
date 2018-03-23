@@ -2,6 +2,7 @@
 import Rule.*;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Class: FitnessManager
@@ -15,13 +16,13 @@ public class FitnessManager {
 
     // private members
     private Database theDatabase;
-    private ArrayList<Rule> theKnownRules;
+    private ArrayList<Rule> theWekaRules;
 
     // public functions
-    public FitnessManager(Database database, ArrayList<Rule> knownRules)
+    public FitnessManager(Database database, ArrayList<Rule> wekaRules)
     {
         theDatabase = database;
-        theKnownRules = knownRules;
+        theWekaRules = wekaRules;
     }
 
     /**
@@ -37,11 +38,11 @@ public class FitnessManager {
             return 0;
 
 
-        if(theKnownRules.size() == 0) {
+        if(theWekaRules.size() == 0) {
             return fitnessBasic(rule);
         }
         else{
-            float fitness = fitnessBasic(rule) + ext1(rule);
+            float fitness = fitnessBasic(rule) + ext1(rule) + ext2(rule);
             return fitness;
         }
     }
@@ -68,7 +69,7 @@ public class FitnessManager {
      * @return  the number of elements of the featureRequirement vector 'participation' values that are different between the two rules
      */
 
-    private static int hammingDistance(Rule r1, Rule r2){
+    private int hammingDistance(Rule r1, Rule r2){
         int distance = 0;
 
         FeatureRequirement[] r1FeatureVector = r1.getFeatureReqs();
@@ -82,10 +83,11 @@ public class FitnessManager {
 
     private float ext1(Rule rule){
         int smallestDistance = 23;   // holds the smallest Hamming distance found to exist between rule and anu rule in known rules
-        for(Rule knownRule : theKnownRules){
-            int dist = hammingDistance(rule, knownRule);
-            if(dist < smallestDistance)
+        for(Rule wekaRule : theWekaRules){
+            int dist = hammingDistance(rule, wekaRule);
+            if(dist < smallestDistance) {
                 smallestDistance = dist;
+            }
         }
 
         return smallestDistance;
@@ -94,7 +96,7 @@ public class FitnessManager {
     private float ext2(Rule rule){
         float rangeFitness = rule.getRangeCoverage(); // TODO: Hook up to fitness equation
         float completeness = rule.getCompleteness();// TODO: Hook up to fitness equation
-        return 0.0f;
+        return rangeFitness * completeness;
     }
 
     public static void main(String[] args){
@@ -118,7 +120,7 @@ public class FitnessManager {
 
         Rule rule1 = new Rule(r1FeatureVector);
         Rule rule2 = new Rule(r2FeatureVector);
-        System.out.println("Hamming distance is: " + hammingDistance(rule1,rule2)); // distance should be 1
+        //System.out.println("Hamming distance is: " + hammingDistance(rule1,rule2)); // distance should be 1
 
     }
 }
