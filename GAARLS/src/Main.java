@@ -21,7 +21,7 @@ public class Main
         System.out.println("Complete.");
 
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, 10);
-        evolutionManager.evolve(100, 1000, 1300);
-        //evolutionManager.ToFile("");
+        evolutionManager.evolve(1000, 1000, 1300);
+        evolutionManager.toFile("outputRules.txt");
     }
 }

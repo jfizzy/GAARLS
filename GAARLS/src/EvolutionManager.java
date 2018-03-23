@@ -1,5 +1,7 @@
 import Rule.Rule;
 import javafx.util.Pair;
+
+import java.io.*;
 import java.util.*;
 
 /**
@@ -27,6 +29,7 @@ public class EvolutionManager
 //  private ArrayList<Rule> knownRules;                                                   // TODO: need this to be passed in from main
     private int crossToMut;
     private int crossoversDone;
+    private ArrayList<Pair<Float,Rule>> state;
 
     // public methods
 
@@ -60,9 +63,8 @@ public class EvolutionManager
 
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
 
-            } while (ruleFitness == 0);
-        //  while(knownRules.contains(potentialRule)
-        //      potentialRule = new Rule();
+            } while (ruleFitness == 0 || state.contains(potentialRule));
+
 
             if((i > 0) && (i%100 == 0)) {
                 System.out.println(i + " rules added to initial population");
@@ -86,7 +88,7 @@ public class EvolutionManager
         int cullToSize = maxPop - 100;
 
         System.out.println("Generating initial population...");
-        ArrayList<Pair<Float,Rule>> state = this.initializePopulation(startSize);
+        state = this.initializePopulation(startSize);
 
         Scanner input = new Scanner(System.in);
         System.out.println("Initial population generated. Press RETURN to begin evolution of rules.");
@@ -102,16 +104,11 @@ public class EvolutionManager
                     state.remove(state.size() - 1);
                 }
                 System.out.println("\nPopulation size: " + state.size());
-                System.out.println("Press RETURN to continue.");
-                System.out.print(input.nextLine());
+                //System.out.println("Press RETURN to continue.");
+                //System.out.print(input.nextLine());
             }
             numGenerations++;
         }
-
-        //TODO: move this functionality to toFile method
-        // Print the top 5 rules to stdout - for debugging
-        for(int i = 0; i < 5; i++)
-            System.out.println(theRuleManager.TranslateRule(state.get(i).getValue()));
 
     }
 
@@ -208,13 +205,42 @@ public class EvolutionManager
      * Prints population to output file as rules
      * @param filePath
      */
-  /*  public void toFile(String filePath)
-    {
-        // output to file
-        // example for getting a line in the file
-        String lineInFile = theRuleManager.TranslateRule(state.get(0).getValue());
-    }*/
+    public void toFile(String filePath) {
+        float minAccuracy = 0.9f;           // TODO: make this a global parameter, entered at runtime
+        File f = new File(filePath);
+
+        if(f.exists() && !f.isDirectory()) {
+
+        }
+        else{
+            try {
+               // f.getParentFile().mkdirs();
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
 
+        try(FileWriter fw = new FileWriter(filePath, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
+
+
+            for(int i = 0; i < state.size(); i++) {
+                Pair individual = state.get(i);
+                float individualsAccuracy = (float) individual.getKey();
+                if (Float.compare(individualsAccuracy, minAccuracy) >= 0) {
+                    String lineInFile = theRuleManager.TranslateRule(state.get(i).getValue());
+                    out.println("Rule Accuracy: " + individualsAccuracy + "; " + lineInFile);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
 }
