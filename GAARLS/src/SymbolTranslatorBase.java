@@ -57,6 +57,9 @@ public abstract class SymbolTranslatorBase
     }
 
     public int GetFileFeatureIndex() {return mFileFeatureId;}
+    public HashMap<String, Float> getmValueReverseLookupTable() {
+        return mValueReverseLookupTable;
+    }
 
     public abstract String FeatureRequirementToDescription(FeatureRequirement featureRequirement);
 
@@ -70,6 +73,7 @@ public abstract class SymbolTranslatorBase
         mValueLookupTable = new HashMap<>();
         mSymbolLookupTable = new HashMap<>();
         mTranslationLookupTable = new HashMap<>();
+        mValueReverseLookupTable = new HashMap<>();
 
         // assert keys.length == values.length == translations.length
         for (int featureValueIdx = 0; featureValueIdx < values.length; ++featureValueIdx)
@@ -77,6 +81,7 @@ public abstract class SymbolTranslatorBase
             mSymbolLookupTable.put(values[featureValueIdx], symbols[featureValueIdx]);
             mValueLookupTable.put(symbols[featureValueIdx], values[featureValueIdx]);
             mTranslationLookupTable.put(values[featureValueIdx], translations[featureValueIdx]);
+            mValueReverseLookupTable.put(translations[featureValueIdx], (float)values[featureValueIdx]);
         }
 
         String unknownSymbol = "";
@@ -126,6 +131,7 @@ public abstract class SymbolTranslatorBase
     // private members
     private HashMap<Integer, String> mSymbolLookupTable;
     private HashMap<String, Integer> mValueLookupTable;
+    private HashMap<String, Float> mValueReverseLookupTable;
     private int mFileFeatureId;
 
 
