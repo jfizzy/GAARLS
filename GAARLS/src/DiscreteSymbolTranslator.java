@@ -12,9 +12,9 @@ import Rule.FeatureRequirement;
 public class DiscreteSymbolTranslator extends SymbolTranslatorBase
 {
     // public methods
-    public DiscreteSymbolTranslator(String featureName, int symbolSize, int[] values, String[] symbols,  String[] descriptions)
+    public DiscreteSymbolTranslator(int fileFeatureId, String featureName, int symbolSize, int[] values, String[] symbols,  String[] descriptions)
     {
-        super(featureName, symbolSize, values, symbols, descriptions);
+        super(fileFeatureId, featureName, symbolSize, values, symbols, descriptions);
         mSymbolValues = values;
     }
 

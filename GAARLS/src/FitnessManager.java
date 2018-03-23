@@ -1,6 +1,5 @@
 
-import Rule.Rule;
-
+import Rule.*;
 /**
  * Class: FitnessManager
  * Intended functionality: Util class that is in charge of all fitness function calculations, using the feature database
@@ -9,12 +8,15 @@ import Rule.Rule;
  */
 
 
-public class FitnessManager
-{
+public class FitnessManager {
+
+    // private members
+    private Database theDatabase;
+
     // public functions
     public FitnessManager(Database database)
     {
-        mDatabase = database;
+        theDatabase = database;
     }
 
     /**
@@ -22,16 +24,26 @@ public class FitnessManager
      * @param rule to evaluate
      *             NOTE: information relevant to rule will be cached inside rule at the same time
  *                       will not change functionality of rule
-     * @return normalized value between 0-1 TODO: Shane is this correct?
+     * @return float fitness value of rule
      */
-    public float FitnessOf(Rule rule)
+    public float fitnessOf(Rule rule)
     {
-        // get rule to do burpees until it pukes
-        return 0; // rule apparently is out of shape
+        //TODO: Remove when Mutate, Crossover and Generate rule ensure that a rule is valid at creation time
+        if (!RuleManager.IsValidRule(rule))
+            return 0;
+
+        theDatabase.EvaluateRule(rule);                       // Initializes coverage and accuracy values in rule
+        //Basic version of fitness function:
+        float coverage = rule.getCoverage()*100;
+        float accuracy = rule.getAccuracy()*100;
+
+        float rangeFitness = rule.getRangeCoverage(); // TODO: Hook up to fitness equation
+        float completeness = rule.getCompleteness();// TODO: Hook up to fitness equation
+
+        int sizeOfTheDatabase = theDatabase.getNumDataItems();
+
+        float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy)/2.0f);
+        return fitnessBase;
     }
 
-    // private functions
-
-    // private members
-    private Database mDatabase;
 }

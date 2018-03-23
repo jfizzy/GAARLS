@@ -1,12 +1,11 @@
 import Rule.Rule;
 import Rule.FeatureRequirement;
-import java.util.ArrayList;
 import java.util.Random;
 
 
 /**
  * Class: RuleManager
- * Intended functionality: Util class that is in charge of mutations, cross overs and rule generation
+ * Intended functionality: Util class that is in charge of mutations, cross-overs and rule generation
  * Feature Owner: Shane, David
  */
 
@@ -14,27 +13,41 @@ import java.util.Random;
 public class RuleManager
 {
     
-    private final int num_features = 23; // TODO set this to LookupTable.NUM_FEATURES
-    
+    private final int num_features;
+    private static Random rand = new Random();
+
     // public methods
     public RuleManager(LookupTable lookupTable)
     {
         mLookupTable = lookupTable;
+        num_features = lookupTable.NumFeatures;
         Rule.setNumFeatures(lookupTable.NumFeatures);
     }
 
     /**
      * Creates a new rule with @mutationTemplate as the base rule
      * NOTE: Does not modify the state of @mutationTemplate
-     * @param mutationTemplate
+     * @param parent
      * @return a mutated rule
      */
-    public Rule Mutate(Rule mutationTemplate)
+    public Rule mutate(Rule parent)
     {
-        Rule mutatedRule = mutationTemplate.copy();
+        // copy the rule
+        Rule mutatedRule = parent.copy();
 
-        // mutate
+        // choose a random feature
+        int featureId = rand.nextInt(num_features);
+        // ensure that we are selecting a new participation value
+        int participation = (rand.nextInt(2) + 1 + mutatedRule.getFeatureReq(featureId).getParticipation()) % 3;
+        // we only care if this feature is now, or is still participating in the rule
+        if (participation != 0) {
+            // get a random feature value
+            mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId));
+        }
+        // set the participation
+        mutatedRule.getFeatureReq(featureId).setParticipation(participation);
 
+        // return the rule
         return mutatedRule;
     }
 
@@ -44,17 +57,15 @@ public class RuleManager
      * @param parent2 
      * @return merged rule (child) of @parent1 and @parent2
      */
-    public Rule Crossover(Rule parent1, Rule parent2)
+    public Rule crossover(Rule parent1, Rule parent2)
     {
-
 		// This needs to be tested!
 
 	    Random rand = new Random();
-        int pivot = rand.nextInt(num_features-1); // Randomly selected pivot point (index of where the crossover will occur)
-		
-		FeatureRequirements parent1FeatReqs[] = parent1.getFeatureReqs();
-		FeatureRequirements parent2FeatReqs[] = parent2.getFeatureReqs();
-		FeatureRequirements childFeatReqs[] = parent1.getFeatureReqs();
+        int pivot = rand.nextInt(num_features-2) + 1; // Randomly selected pivot point (index of where the crossover will occur)
+
+        FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
+		FeatureRequirement childFeatReqs[] = parent1.getFeatureReqs();
         
         for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
 				childFeatReqs[i] = parent2FeatReqs[i];
@@ -62,7 +73,6 @@ public class RuleManager
         Rule child = new Rule(childFeatReqs);
 
         return child;
-
     }
 
     /**
@@ -70,19 +80,53 @@ public class RuleManager
      * Creates a new rule with randomized requirements found from LookupTable
      * @return random new rule
      */
-    public Rule GenerateRule()
+    public Rule generateRule()
     {
-        // NOTE: Current implementation was created as a proof of concept. Needs to be revisited
-        // -Peter
+        Random rand = new Random();
+
         Rule newRule = new Rule();
-        Random random = new Random();
+
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
-        for (int i = 0; i < featureRequirements.length; ++i)
-        {
-            mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
-            featureRequirements[i].setParticipation(random.nextInt(3));
+        int size = featureRequirements.length;
+
+        // TODO: When no longer hard coding rules, ensure that there is always a valid number of antecedents and consequents
+        { // TODO: Remove hard coded rule generation
+            // choose 3 features randomly for generating a random rule
+            int antecedent1 = rand.nextInt(size);
+            int antecedent2 = rand.nextInt(size);
+            while(antecedent1 == antecedent2)
+                antecedent2 = rand.nextInt(size);
+
+            int consequent = rand.nextInt(size);
+            while(consequent == antecedent1 || consequent == antecedent2)
+                consequent = rand.nextInt(size);
+
+
+            //TODO: add
+            mLookupTable.GenerateRandomValue(antecedent1, featureRequirements[antecedent1]);
+            featureRequirements[antecedent1].setParticipation(1);
+
+            mLookupTable.GenerateRandomValue(antecedent2, featureRequirements[antecedent2]);
+            featureRequirements[antecedent2].setParticipation(1);
+
+            mLookupTable.GenerateRandomValue(consequent, featureRequirements[consequent]);
+            featureRequirements[consequent].setParticipation(2);
+
         }
         return newRule;
+    }
+
+    public static boolean IsValidRule(Rule rule)
+    {
+        final int antecedentParticipationValue = FeatureRequirement.pFlag.ANTECEDENT.getValue();
+        final int consequentParticipationValue = FeatureRequirement.pFlag.CONSEQUENT.getValue();
+        boolean antecedentPresent = false, consequentPresent = false;
+        for (FeatureRequirement featureRequirement : rule.getFeatureReqs())
+        {
+            antecedentPresent |= featureRequirement.getParticipation() == antecedentParticipationValue;
+            consequentPresent |= featureRequirement.getParticipation() == consequentParticipationValue;
+        }
+        return antecedentPresent && consequentPresent;
     }
 
     public String TranslateRule(Rule rule)

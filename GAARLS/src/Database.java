@@ -12,6 +12,10 @@ import java.util.Scanner;
 public class Database
 {
     // public functions
+    public int getNumDataItems(){
+        return mNumTableEntries;
+    }
+
 
     /**
      * Static util function to parse a file and return a new database object
@@ -59,16 +63,19 @@ public class Database
             int itemIndex = 0; // offset of the item in the 1-d array
             scanner.nextLine(); // skip the header line
             int numLinesRead = 0;
+            ArrayList<Integer> desiredFeatureIndices = databaseCodex.GetFileParsingIndices();
             while (scanner.hasNextLine() && /*for debug functionality*/ numLinesRead < numItemsInFile )
             {
                 String item = scanner.nextLine();
                 String[] itemFeatures = item.split(",");
 
                 // iterate through each feature symbol in the item and translate to a float value for the database
-                for (int featureId = 0; featureId < numFeatures; ++featureId)
+                int featureCount = 0;
+                for (int desiredFeature : desiredFeatureIndices)
                 {
-                    float symbolValue = databaseCodex.TranslateFeatureSymbol(featureId, itemFeatures[featureId]);
-                    dataSet[itemIndex + featureId] = symbolValue;
+                    float symbolValue = databaseCodex.TranslateFeatureSymbol(featureCount, itemFeatures[desiredFeature]);
+                    dataSet[itemIndex + featureCount] = symbolValue;
+                    featureCount++;
                 }
 
                 itemIndex += numFeatures;
@@ -109,7 +116,8 @@ public class Database
     {
         int correctPredictions = 0;
         int occurancesOfAnticedent = 0;
-
+        int occurancesOfConsequent = 0;
+        float ruleRange = 1f;
 
         // extract antecedent and consequent indices to cut down on table queries
         ArrayList<Integer> antecedent = new ArrayList<>();
@@ -121,10 +129,12 @@ public class Database
             if (participation == FeatureRequirement.pFlag.ANTECEDENT.getValue())
             {
                 antecedent.add(i);
+                ruleRange *= 1 - featureRequirements[i].getRangeCoverage();
             }
             else if (participation == FeatureRequirement.pFlag.CONSEQUENT.getValue())
             {
                 consequent.add(i);
+                ruleRange *= 1 - featureRequirements[i].getRangeCoverage();
             }
         }
 
@@ -152,11 +162,19 @@ public class Database
                     correctPredictions++;
                 }
             }
+            if (consequentIsPresent)
+            {
+                occurancesOfConsequent++;
+            }
         }
         float normalizedCoverage = occurancesOfAnticedent / (float)mNumTableEntries;
         float normalizeAccuracy = occurancesOfAnticedent > 0 ? (correctPredictions / (float)occurancesOfAnticedent) : 0;
+        float normalizedCompleteness = occurancesOfConsequent > 0 ? correctPredictions / (float)occurancesOfConsequent : 0;
+
         rule.setAccuracy(normalizeAccuracy);
         rule.setCoverage(normalizedCoverage);
+        rule.setRangeCoverage(ruleRange);
+        rule.setCompleteness(normalizedCompleteness);
     }
 
     public float[] GetDatabase() {return mDatatable;}
@@ -178,26 +196,57 @@ public class Database
     {
         LookupTable table = LookupTable.ParseFile("");
 
-        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, 500000);
+        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, -1);
         RuleManager ruleManager = new RuleManager(table);
 
         Rule rule = new Rule();
         FeatureRequirement[] featureRequirements = rule.getFeatureReqs();
-        featureRequirements[0].setBoundRange(1999, 1999, 2 / 16.f);
-        featureRequirements[0].setParticipation(1);
-        featureRequirements[1].setBoundRange(2, 1, 2 / 12.f);
-        featureRequirements[1].setParticipation(2);
+        featureRequirements[16].setBoundRange(0, 0, 0);
+        featureRequirements[16].setParticipation(1);
+        featureRequirements[0].setBoundRange(2000, 2015, 2 / 12.f);
+        featureRequirements[0].setParticipation(2);
         database.EvaluateRule(rule);
-        for (int i = 0; i < 20; ++i)
+        System.out.println(table.TranslateRule(rule));
+        System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
+
+
+        Rule rule2 = new Rule();
+        FeatureRequirement[] featureRequirements2 = rule2.getFeatureReqs();
+        featureRequirements2[16].setBoundRange(0, 0, 0);
+        featureRequirements2[16].setParticipation(1);
+        featureRequirements2[0].setBoundRange(2000, 2015, 2 / 12.f);
+        featureRequirements2[0].setParticipation(2);
+        database.EvaluateRule(rule2);
+        System.out.println(table.TranslateRule(rule2));
+        System.out.println("Accuracy: " + rule2.getAccuracy() + ". Coverage: " + rule2.getCoverage());
+
+
+        Rule rule3 = new Rule();
+        FeatureRequirement[] featureRequirements3 = rule3.getFeatureReqs();
+        featureRequirements3[16].setBoundRange(0, 0, 0);
+        featureRequirements3[16].setParticipation(1);
+        featureRequirements3[0].setBoundRange(2000, 2001, 2 / 12.f);
+        featureRequirements3[0].setParticipation(2);
+        database.EvaluateRule(rule3);
+        System.out.println(table.TranslateRule(rule3));
+        System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
+
+        //TODO: move this to a JUnit test
+        System.out.println("rule equals rule2? " + rule.equals(rule2)); //Should eval to true
+        System.out.println("rule equals rule3? " + rule.equals(rule3)); //Should eval to false
+
+
+
+/*        for (int i = 0; i < 20; ++i)
         {
 
-            rule = ruleManager.GenerateRule();
+            rule = ruleManager.generateRule();
             System.out.println(table.TranslateRule(rule));
             if (rule.getCoverage() > 0 || rule.getAccuracy() > 0)
             {
                 System.out.println(table.TranslateRule(rule));
                 System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
             }
-        }
+        }*/
     }
 }

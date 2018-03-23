@@ -1,8 +1,7 @@
-
 import Rule.FeatureRequirement;
 import Rule.Rule;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Class: LookupTable
@@ -15,12 +14,19 @@ import java.util.ArrayList;
 
 public class LookupTable
 {
-    //public functions
+    public static final int NUM_FEATURES_IN_FILE = 23;
     public static LookupTable ParseFile(String filePath)
     {
-        final int NUM_FEATURES = 22;
+        return ParseFile(filePath, new ArrayList<>());
+    }
+    //public functions
+    public static LookupTable ParseFile(String filePath, ArrayList<Integer> featuresToOmit)
+    {
+        ArrayList<Boolean> desiredFeaturesList = new ArrayList<>(NUM_FEATURES_IN_FILE);
+        for (int i = 0; i < NUM_FEATURES_IN_FILE; ++i) desiredFeaturesList.add(true);
+        for (int i = 0; i < featuresToOmit.size(); ++i) desiredFeaturesList.set(featuresToOmit.get(i), false);
 
-        SymbolTranslatorBase[] symbolTranslatorBases = new SymbolTranslatorBase[NUM_FEATURES];
+        ArrayList<SymbolTranslatorBase> symbolTranslatorBases = new ArrayList<>();
         int translatorIdx = 0;
 
         // Feature 1: Collision Year
@@ -38,7 +44,11 @@ public class LookupTable
                 symbols[i] = Integer.toString(year);
                 translations[i] = Integer.toString(year);
             }
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+            }
+            translatorIdx++;
         }
 
         // Feature 2: Collision Month
@@ -69,7 +79,11 @@ public class LookupTable
                     , "November"
                     , "December"
             };
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, true);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
+            }
+            translatorIdx++;
         }
 
         // Feature 3: Collision Day of the Week
@@ -95,7 +109,11 @@ public class LookupTable
                     , "Saturday"
                     , "Sunday"
             };
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, true);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
+            }
+            translatorIdx++;
         }
 
         // Feature 4: Collision Hour
@@ -113,7 +131,11 @@ public class LookupTable
                 String hour = Integer.toString(i);
                 translations[i] = hour + ":00 to " + hour + ":59";
             }
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, true);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
+            }
+            translatorIdx++;
         }
 
         // Feature 5: Collision Severity
@@ -124,7 +146,11 @@ public class LookupTable
             int[] values = new int[]{1, 2};
             String[] symbols = new String[]{"1", "2"};
             String[] translations = new String[]{"Collision producing at least one fatality", "Collision producing non-fatal injury"};
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 6: Num Vehicles in Collision
@@ -145,7 +171,11 @@ public class LookupTable
             values[numValues - 1] = numValues - 1;
             symbols[numValues - 1] = Integer.toString(numValues - 1);
             translations[numValues - 1] = symbols[numValues - 1] + " or more vehicles involved";
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+            }
+            translatorIdx++;
         }
 
         // Feature 7: accident configuration
@@ -180,7 +210,11 @@ public class LookupTable
 
             values[counter] = 41; translations[counter] = "Two Vehicle (Parked): Hit a parked motor vehicle"; symbols[counter] = (values[counter] < 10 ? "0" : "") + Integer.toString(values[counter]); counter++;
 
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 8: Road configuration
@@ -211,7 +245,11 @@ public class LookupTable
                     , "Collector lane of a freeway system"
                     , "Transfer lane of a freeway system"
             };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 9: Weather
@@ -237,7 +275,11 @@ public class LookupTable
                     , "Visibility limitation"
                     , "Strong Wind"
             };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 10: Road surface
@@ -265,7 +307,11 @@ public class LookupTable
                     , "Oil"
                     , "Flooded"
             };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 11: Road allignment
@@ -290,7 +336,11 @@ public class LookupTable
                     , "Top of hill or gradient"
                     , "Bottom of hill or gradient"
             };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 12: Traffic conditions
@@ -327,7 +377,11 @@ public class LookupTable
                     , "Control device not specified"
                     , "No control present"
             };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 13: Vehicle Id
@@ -347,7 +401,11 @@ public class LookupTable
             symbols[numValues - 1] = symbols[numValues - 1] = (values[numValues - 1] < 10 ? "0" : "") + Integer.toString(values[numValues - 1]);
             translations[numValues - 1] = "Vehicle sequence number assigned to pedestrians";
 
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 14: Vehicle type
@@ -389,12 +447,16 @@ public class LookupTable
                     , "Snowmobile"
                     , "Street car"
             };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 15: Vehicle Year
         {
-            int numValues = 116; // 1960-2015
+            int numValues = 117; // 1960-2015
             int symbolSize = 4;
             String featureName = "V_YEAR";
 
@@ -407,7 +469,11 @@ public class LookupTable
                 symbols[i] = Integer.toString(year);
                 translations[i] = Integer.toString(year);
             }
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+            }
+            translatorIdx++;
         }
 
         // Feature 16: Passenger id
@@ -425,7 +491,11 @@ public class LookupTable
                 symbols[i] = (values[i] < 10 ? "0" : "") + Integer.toString(values[i]);
                 translations[i] = Integer.toString(id);
             }
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 17: Passenger Sex yeah buddy
@@ -437,7 +507,11 @@ public class LookupTable
             int[] values = {0,1};
             String[] symbols = {"F", "M"};
             String[] translations = {"Female", "Male"};
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 18: Passenger age
@@ -460,8 +534,12 @@ public class LookupTable
             values[numValues-1] = numValues - 1;
             symbols[numValues - 1] = (values[numValues - 1] < 10 ? "0" : "") + Integer.toString(values[numValues - 1]);
             translations[numValues - 1] = Integer.toString(values[numValues - 1]) + " Years or older";
-            
-            symbolTranslatorBases[translatorIdx++] = new RangeSymbolTranslator(featureName, symbolSize, values, symbols, translations, false);
+
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+            }
+            translatorIdx++;
         }
 
         // Feature 19: Passenger Position
@@ -502,7 +580,11 @@ public class LookupTable
             values[counter] = 98; translations[counter] = "Outside passenger compartment"; symbols[counter] = Integer.toString(values[counter]);counter++;
             values[counter] = 99; translations[counter] = "Pedestrian"; symbols[counter] = Integer.toString(values[counter]);counter++;
 
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations); // TODO: Range?
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 20: Injury Severity
@@ -514,7 +596,11 @@ public class LookupTable
             int[] values = {1,2,3};
             String[] symbols = {"1", "2", "3"};
             String[] translations = {"No Injury", "Injury", "Fatality"};
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 21: Pasenger Safety
@@ -534,7 +620,11 @@ public class LookupTable
                     , "Other safety device used"
                     , "No safety device equipped"
             };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
         // Feature 22: Passenger type
@@ -557,12 +647,47 @@ public class LookupTable
                     , "Bicyclist"
                     , "Motorcyclist"
                     };
-            symbolTranslatorBases[translatorIdx++] = new DiscreteSymbolTranslator(featureName, symbolSize, values, symbols, translations);
+            if (desiredFeaturesList.get(translatorIdx) )
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
-        assert (NUM_FEATURES == translatorIdx); // Surface level check to make sure no one's fucking around with features or at least fucking around correctly
+        // Feature 23: Collision id
+        {
+            int numValues = 2400000;
+            int symbolSize = 15;
+            String featureName = "C_CASE";
 
-        return new LookupTable(symbolTranslatorBases);
+            int[] values = new int[numValues];
+            String[] symbols = new String[numValues];
+            String[] translations = new String[numValues];
+            for (int i = 0; i < numValues; i++) {
+                int id = i+1;
+                values[i] = id;
+                String symbol = Integer.toString(values[i]);
+                for (int j = symbol.length(); j < symbolSize; ++j)
+                {
+                    symbol = "0" + symbol;
+                }
+                symbols[i] = symbol;
+                translations[i] = Integer.toString(id);
+            }
+            if (desiredFeaturesList.get(translatorIdx))
+            {
+                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
+        }
+
+        featureValueMaps = new HashMap[symbolTranslatorBases.size()];
+        for (int i = 0; i < symbolTranslatorBases.size(); ++i) {
+            featureMap.put(symbolTranslatorBases.get(i).mFeatureName, i);
+            featureValueMaps[i] = symbolTranslatorBases.get(i).getmValueReverseLookupTable();
+        }
+
+        return new LookupTable(symbolTranslatorBases.toArray(new SymbolTranslatorBase[symbolTranslatorBases.size()]));
     }
 
     /**
@@ -671,6 +796,17 @@ public class LookupTable
         }
     }
 
+    public ArrayList<Integer> GetFileParsingIndices()
+    {
+        ArrayList<Integer> fileIndices = new ArrayList<>();
+        for (int i = 0; i < mFeatureLookupTable.length; ++i)
+        {
+            fileIndices.add(mFeatureLookupTable[i].GetFileFeatureIndex());
+        }
+        return fileIndices;
+    }
+
+
     // private functions
     private LookupTable(SymbolTranslatorBase[] featureLookupTable)
     {
@@ -678,13 +814,28 @@ public class LookupTable
         NumFeatures = mFeatureLookupTable.length;
     }
 
+    // public members
+    public static HashMap<String, Integer> featureMap = new HashMap<>();
+    public static HashMap<String, Float>[] featureValueMaps;
+
     // private members
     private SymbolTranslatorBase[] mFeatureLookupTable;
     public int NumFeatures;
 
     public static void main(String args[])
     {
-        LookupTable lookupTable = LookupTable.ParseFile(""); // parse lookup table file
+        ArrayList<Integer> test = new ArrayList<>();
+        for (int i = 0; i < NUM_FEATURES_IN_FILE;++i)
+        {
+            test.add(i);
+        }
+
+        LookupTable lookupTable = LookupTable.ParseFile("", test); // parse lookup table file
+        System.out.println("Empty lookup table: " + (lookupTable.mFeatureLookupTable.length == 0));
+        test.clear();
+        lookupTable = LookupTable.ParseFile("", test); // parse lookup table file
+        System.out.println("Full lookup table: " + (lookupTable.mFeatureLookupTable.length == NUM_FEATURES_IN_FILE));
+
         Database database = Database.ParseFile("NCDB_1999_to_2015.csv", lookupTable, 10); // parse database file
         float[] datatable = database.GetDatabase();
         for (int i = 0; i < lookupTable.NumFeatures; ++i)
@@ -704,7 +855,7 @@ public class LookupTable
 
         }
         RuleManager ruleManager = new RuleManager(lookupTable);
-        Rule testRule = ruleManager.GenerateRule();
+        Rule testRule = ruleManager.generateRule();
         System.out.println(lookupTable.TranslateRule(testRule));
     }
 }

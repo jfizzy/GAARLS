@@ -1,5 +1,6 @@
 package Rule;
 
+
 import java.util.ArrayList;
 
 /**
@@ -12,10 +13,28 @@ public class Rule {
 
     // private members
     private FeatureRequirement featureReqs[]; 
-    private static int features;
+    private static int features = 22;
     private float coverage;
     private float accuracy;
+    private float rangeCoverage;
+    private float completeness;
 
+    public float getRangeCoverage()
+    {
+        return rangeCoverage;
+    }
+    public void setRangeCoverage(float rangeCoverage)
+    {
+        this.rangeCoverage = rangeCoverage;
+    }
+    public float getCompleteness()
+    {
+        return completeness;
+    }
+    public void setCompleteness(float completeness)
+    {
+        this.completeness = completeness;
+    }
     public void setCoverage(float coverage) { this.coverage = coverage; }
     public void setAccuracy(float accuracy) { this.accuracy = accuracy; }
     public float getCoverage() { return coverage; }
@@ -56,6 +75,41 @@ public class Rule {
     }
     
     // public methods
+
+    /**
+     * New comparison operator for Rule objects. We define two rules as equal if they have identical clauses.
+     *
+     * @param obj: the rule being compared to this instance of Rule for equality
+     * @return True if other and this have same FeatureRequirement for each element of the Rule; else false.
+     */
+    @Override
+    public boolean equals(Object obj){
+
+        if(obj == null)                                         // check if obj is null
+            return false;
+        if (!Rule.class.isAssignableFrom(obj.getClass())) {     // check if obj is a Rule object
+            return false;
+        }
+        final Rule other = (Rule) obj;
+        final FeatureRequirement[] othersFR = other.getFeatureReqs();
+
+        // Look for any difference in feature requirement values
+        for(int i = 0; i < othersFR.length; i++){
+            if(othersFR[i].getParticipation() != this.featureReqs[i].getParticipation()){
+                return false;
+            }
+            if(othersFR[i].getUpperBound() != this.featureReqs[i].getUpperBound()){
+                return false;
+            }
+            if(othersFR[i].getLowerBound() != this.featureReqs[i].getLowerBound()){
+                return false;
+            }
+        }
+
+        // If here, all values were identical, meeting our definition for equality
+        return true;
+    }
+
     /**
      * Basic function to allow us to update the feature requirements as needed
      *

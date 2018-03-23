@@ -1,93 +1,218 @@
 import Rule.Rule;
 import javafx.util.Pair;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 
 /**
- * Class: EvolutionManager
+ * EvolutionManager.java
+ *
  * Intended functionality: Main work horse class for the evolutionary process of rule learning.
  *
  * External Usage:
  * 1. InitializePopulation()
- * 2. Evolve()
+ * 2. searchControl()
  * 3. PrintToFile()
  *
- * Feature Owner: Shane, David, Evan
+ * @author shane.sims.ss@gmail.com
+ * @version 9 March 2018
  */
 
 
 public class EvolutionManager
 {
-    // publid methods
-    public EvolutionManager(Database database, LookupTable lookupTable)
-    {
-        mFitnessManager = new FitnessManager(database);
-        mRuleManager = new RuleManager(lookupTable);
-        mSortedPopulation = new ArrayList<>();
+
+    // private members
+    //private ArrayList<Pair<Float, Rule>> state;
+    private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
+    private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
+    private ArrayList<Rule> knownRules;                                                   // TODO: need this to be passed in from main
+    private int crossToMut;
+    private int crossoversDone;
+
+    // public methods
+
+    /**
+     * 
+     * @param database: the dataset file converted to Database structure
+     * @param lookupTable: table of allowable feature values
+     * @param crossToMut: number of crossover operations to perform between each mutation
+     */
+    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, int crossToMut) {
+        theFitnessManager = new FitnessManager(database);
+        theRuleManager = new RuleManager(lookupTable);
+        this.knownRules = knownRules;
+        this.crossToMut = crossToMut;
+        crossoversDone = 0;
+
     }
 
     /**
      *  Initialization function creating an initial population
      *  @param populationSize: initial population size
      */
-    public void IntializePopulation(int populationSize)
-    {
-        // create @populationSize rules
-        // calculate fitness of rule and add to population
-    }
+    private ArrayList<Pair<Float, Rule>> initializePopulation(int populationSize) {
 
-    public void Evolve(int forGenerations)
-    {
-        int numGenerations = 0;
-        while (numGenerations < forGenerations)
-        {
-            // NOTE: Example Flow
-            // pick some rules to mutate and crossover
-            Rule mutateRule = new Rule(),
-                    parent1 = new Rule(),
-                    parent2 = new Rule();
-            ArrayList<Rule> newRules = new ArrayList<>();
-            newRules.add(mRuleManager.Mutate(mutateRule));
-            newRules.add(mRuleManager.Crossover(parent1, parent2));
+        ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
 
-            // evaluate the fitness of the new rules and add to population
-            for (int i = 0; i < newRules.size(); ++i)
-            {
+        Rule potentialRule;
+        float ruleFitness;
+        for(int i = 0; i < populationSize; i++){
+            do {
+                potentialRule = theRuleManager.generateRule();
 
-                mSortedPopulation.add(new Pair<Float, Rule>(mFitnessManager.FitnessOf(newRules.get(i)), newRules.get(i)));
+                ruleFitness = theFitnessManager.fitnessOf(potentialRule);
+            } while (ruleFitness == 0 || state.contains(potentialRule) || knownRules.contains(potentialRule));
+
+            if((i > 0) && (i%100 == 0)) {
+                System.out.println(i + " rules added to initial population");
+
             }
-            // sort new population
-            mSortedPopulation.sort(new Comparator<Pair<Float, Rule>>()
-            {
-                @Override
-                public int compare(Pair<Float, Rule> o1, Pair<Float, Rule> o2)
-                {
-                    return o1.getKey().compareTo(o2.getKey());
-                }
-            });
-
-            // remove some rules
-            // ...
-            ++numGenerations;
+            state.add(new Pair<>(ruleFitness, potentialRule));
         }
+        return state;
     }
 
     /**
-     * Outputs the evolved populate to file
+     *
+     * All parameters are tunable
+     *
+     * @param startSize: size of initial population
+     * @param forGenerations: stop condition
+     * @param maxPop: max state size
+     */
+    public void evolve(int startSize, int forGenerations, int maxPop) {
+        int numGenerations = 0;
+        int cullToSize = maxPop - 100;
+
+        System.out.println("Generating initial population...");
+        ArrayList<Pair<Float,Rule>> state = this.initializePopulation(startSize);
+
+        Scanner input = new Scanner(System.in);
+        System.out.println("Initial population generated. Press RETURN to begin evolution of rules.");
+        System.out.print(input.nextLine());
+
+        while (numGenerations < forGenerations) {
+            state = fSelect(state);
+
+            if(state.size() > maxPop) {
+                System.out.println("\nPopulation size: " + state.size());
+                System.out.println("Max population size exceeded. Trimming 100 individuals...");
+                while(state.size() > cullToSize) {
+                    state.remove(state.size() - 1);
+                }
+                System.out.println("\nPopulation size: " + state.size());
+                System.out.println("Press RETURN to continue.");
+                System.out.print(input.nextLine());
+            }
+            numGenerations++;
+        }
+
+        //TODO: move this functionality to toFile method
+        // Print the top 5 rules to stdout - for debugging
+        for(int i = 0; i < 5; i++)
+            System.out.println(theRuleManager.TranslateRule(state.get(i).getValue()));
+
+    }
+
+    /**
+     * Create new state from current one by application of genetic operations
+     */
+    private ArrayList<Pair<Float, Rule>> fSelect(ArrayList<Pair<Float, Rule>> aState){
+        ArrayList<Pair<Float, Rule>> nextState = aState;
+        Scanner input = new Scanner(System.in);
+
+        // Order population by decreasing order of fitness
+        nextState.sort(new Comparator<Pair<Float, Rule>>()
+        {
+            @Override
+            public int compare(Pair<Float, Rule> o1, Pair<Float, Rule> o2)
+            {
+                return o2.getKey().compareTo(o1.getKey());
+            }
+        });
+        System.out.println("Fitness of fittest: " + nextState.get(0).getKey());
+        System.out.println("Fitness of weakest: " + nextState.get(nextState.size()-1).getKey());
+
+
+        Float FIT = 0.0f;
+        for(int i = 0; i < nextState.size(); i++){
+            FIT += nextState.get(i).getKey();
+        }
+
+        System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
+
+
+
+        // Associate to each individual, an portion of fitnessInterval according to their fitness
+        // Note: As spots are determined with floor function, there may be an extra index available at the end
+        // of fitness interval. This will hold 0 (null) and thus be allocated to the most fit individual.
+        int[] fitnessInterval = new int[(int) Math.ceil(FIT)];
+        int spotsAllocated = 0;
+        for(int i = 0; i < nextState.size(); i++){
+            int spots = (int) Math.ceil(nextState.get(i).getKey());
+      //      System.out.println("i: " + i + " , spots: " + spots + " , fitness: " + nextState.get(i).getKey());
+        //    System.out.print(input.nextLine());
+
+            int lastSpot = spots + spotsAllocated - 1;
+            for(int j = spotsAllocated; j < lastSpot; j++){
+                fitnessInterval[j] = i;
+                spotsAllocated++;
+            }
+        }
+
+
+        // Select individual(s) for genetic operation and call
+        Random rand = new Random();
+
+        if(crossoversDone == crossToMut){                   // Do mutation
+
+            crossoversDone = 0;
+            Rule child;
+            boolean duplicate = false;
+            do {
+                if(duplicate) {
+                    System.out.println("duplicate child produced");
+                    duplicate = false;
+                    System.out.print(input.nextLine());
+
+                }
+                int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
+                Rule parent = nextState.get(parentIndex).getValue();
+                child = theRuleManager.mutate(parent);
+                duplicate = true;
+            } while (nextState.contains(child) || knownRules.contains(child));
+            Float childFitness = theFitnessManager.fitnessOf(child);
+            nextState.add(new Pair<>(childFitness, child));
+        }
+        else{                                               // Do crossover
+
+            int parent1Index, parent2Index;
+            do {
+
+                parent1Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
+                parent2Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
+
+            } while (parent1Index == parent2Index);
+            Rule parent1 = nextState.get(parent1Index).getValue();
+            Rule parent2 = nextState.get(parent2Index).getValue();
+            Rule child = theRuleManager.crossover(parent1,parent2);
+            Float childFitness = theFitnessManager.fitnessOf(child);
+            nextState.add(new Pair<>(childFitness, child));
+            crossoversDone++;
+        }
+        return nextState;
+    }
+
+    /**
+     * Prints population to output file as rules
      * @param filePath
      */
-    public void ToFile(String filePath)
+  /*  public void toFile(String filePath)
     {
         // output to file
         // example for getting a line in the file
-        String lineInFile = mRuleManager.TranslateRule(mSortedPopulation.get(0).getValue());
-    }
+        String lineInFile = theRuleManager.TranslateRule(state.get(0).getValue());
+    }*/
 
-    // private methods
 
-    // private members
-    ArrayList<Pair<Float, Rule>> mSortedPopulation; // Pair.key = fitness value Pair.value = rule. NOTE: Data structure is completely open for suggestions
 
-    FitnessManager mFitnessManager;
-    RuleManager mRuleManager;
 }

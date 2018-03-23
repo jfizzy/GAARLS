@@ -12,9 +12,9 @@ import Rule.FeatureRequirement;
 public class RangeSymbolTranslator extends SymbolTranslatorBase
 {
     // public methods
-    public RangeSymbolTranslator(String featureName, int symbolSize, int[] values, String[] symbols,  String[] descriptions, boolean canFlipRange)
+    public RangeSymbolTranslator(int fileFeatureid, String featureName, int symbolSize, int[] values, String[] symbols,  String[] descriptions, boolean canFlipRange)
     {
-        super(featureName, symbolSize, values, symbols, descriptions);
+        super(fileFeatureid, featureName, symbolSize, values, symbols, descriptions);
         mSymbolValues = values;
         mCanFlipRange = canFlipRange;
     }
