@@ -32,8 +32,9 @@ public class Main
         ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath);
 
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, 10);
-        evolutionManager.evolve(100, 1000, 1300);
-        //evolutionManager.ToFile("");
+        evolutionManager.evolve(1000, 1000, 1300);
+        evolutionManager.toFile("outputRules.txt"); //Keep in mind that as is, this will just keep appending rules to this file after each run
+        System.out.println("Evolution complete. \n Learned rules output to outputRules.txt");
     }
 
     /* parse the arguments
