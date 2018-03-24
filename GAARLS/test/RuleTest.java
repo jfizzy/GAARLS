@@ -27,7 +27,6 @@ public class RuleTest {
     
     public RuleTest() {
         // set up some testable FeatureRequirements
-        try {
             Database db;
             fr1 = new FeatureRequirement(0, 0, 10.5f, 4.5f, 0f); //IGNORE
             fr2 = new FeatureRequirement(1, 1, 3.738f, -2.5f, 0f); //ANTECEDENT
@@ -48,9 +47,6 @@ public class RuleTest {
             for(int i=4;i<22;i++){
                 whos.add(i, Boolean.FALSE); // fill it up to the right size
             }
-        } catch (FeatureRequirement.InvalidFeatReqException ifre) {
-            System.out.println(ifre.getMessage());
-        }
     }
 
     @BeforeClass
@@ -333,9 +329,16 @@ public class RuleTest {
         r10.replaceFeatureRequirement(9, fr10);
         
         assertEquals(r9.generateID(), r10.generateID()); // same
+        assertTrue(r9.equals(r10.generateID())); // another way of doing this
+        assertTrue(r10.equals(r9.generateID()));
+        
         assertFalse(r9.hashCode() == r10.hashCode()); // tried this to no avail
+        
         r10.updateFeatureRequirement(11, 1, 3.738f, -2.5f);
+        
         assertFalse(r9.generateID() == r10.generateID()); // different
+        assertFalse(r9.equals(r10.generateID()));
+        assertFalse(r10.equals(r9.generateID()));
         
     }
 }
