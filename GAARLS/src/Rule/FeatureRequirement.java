@@ -49,16 +49,8 @@ public class FeatureRequirement {
         return upperBound;
     }
 
-    public void setUpperBound(float upperBound) throws InvalidFeatReqException {
-        this.upperBound = upperBound;
-    }
-
     public float getLowerBound() {
         return lowerBound;
-    }
-
-    public void setLowerBound(float lowerBound) throws InvalidFeatReqException {
-        this.lowerBound = lowerBound;
     }
 
     /**
@@ -89,9 +81,8 @@ public class FeatureRequirement {
      * @param upper
      * @param lower
      * @param rangeCoverage
-     * @throws FeatureRequirement.InvalidFeatReqException
      */
-    public FeatureRequirement(int featureID, int pInt, float upper, float lower, float rangeCoverage) throws InvalidFeatReqException {
+    public FeatureRequirement(int featureID, int pInt, float upper, float lower, float rangeCoverage){
         this.featureID = featureID;
         switch (pInt) {
             case 0:
@@ -176,13 +167,5 @@ public class FeatureRequirement {
         // I am choosing not to include the rangeCOverage in this as it should not be a factor in determining the
         // inherent similarity between Rules
         return "$"+this.featureID + "$" + this.participation + "$" + this.lowerBound + "$" + this.upperBound + "$";
-    }
-
-    // custom exceptions
-    public class InvalidFeatReqException extends Exception {
-
-        public InvalidFeatReqException(String message) {
-            super(message);
-        }
     }
 }
