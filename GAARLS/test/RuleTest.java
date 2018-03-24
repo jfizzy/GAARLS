@@ -332,13 +332,8 @@ public class RuleTest {
         r10.replaceFeatureRequirement(8, fr9);
         r10.replaceFeatureRequirement(9, fr10);
         
-        System.out.println(fr1.toString());
-        System.out.println(fr2.toString());
-        System.out.println(r9.generateID());
-        
-        System.out.println(r10.generateID());
-        
         assertEquals(r9.generateID(), r10.generateID()); // same
+        assertFalse(r9.hashCode() == r10.hashCode()); // tried this to no avail
         r10.updateFeatureRequirement(11, 1, 3.738f, -2.5f);
         assertFalse(r9.generateID() == r10.generateID()); // different
         

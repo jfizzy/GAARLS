@@ -232,7 +232,6 @@ public class Rule {
         for (FeatureRequirement fr : this.featureReqs){
             returnVal += fr.toString()+"?";
         }
-        System.out.println(returnVal);
         return returnVal.hashCode();
     }
 
