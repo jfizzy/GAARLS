@@ -2,6 +2,7 @@ package Rule;
 
 
 import java.util.ArrayList;
+import java.security.MessageDigest;
 
 /**
  * Class: Rule Intended functionality: Container class of FeatureRequirements.
@@ -224,6 +225,14 @@ public class Rule {
             }
         }
         return new Rule(newFeatureReqs); // make a new Rule using the merged frs
+    }
+    
+    public int generateID(){
+        String returnVal = "?";
+        for (FeatureRequirement fr : this.featureReqs){
+            returnVal += fr.toString()+"?";
+        }
+        return returnVal.hashCode();
     }
 
     // private methods
