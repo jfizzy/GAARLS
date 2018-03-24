@@ -305,4 +305,42 @@ public class RuleTest {
         assertFalse(r8.getFeatureReq(3).evaluate(-8.9f)); //TOO LOW
         assertEquals(r8.getFeatureReq(3).getParticipation(), 2);
     }
+    
+    @Test
+    public void testGenerateIDMethod(){
+        Rule r9 = new Rule();
+        r9.replaceFeatureRequirement(0, fr1);
+        r9.replaceFeatureRequirement(1, fr2);
+        r9.replaceFeatureRequirement(2, fr3);
+        r9.replaceFeatureRequirement(3, fr4);
+        r9.replaceFeatureRequirement(4, fr5);
+        r9.replaceFeatureRequirement(5, fr6);
+        r9.replaceFeatureRequirement(6, fr7);
+        r9.replaceFeatureRequirement(7, fr8);
+        r9.replaceFeatureRequirement(8, fr9);
+        r9.replaceFeatureRequirement(9, fr10);
+        
+        Rule r10 = new Rule();
+        r10.replaceFeatureRequirement(0, fr1);
+        r10.replaceFeatureRequirement(1, fr2);
+        r10.replaceFeatureRequirement(2, fr3);
+        r10.replaceFeatureRequirement(3, fr4);
+        r10.replaceFeatureRequirement(4, fr5);
+        r10.replaceFeatureRequirement(5, fr6);
+        r10.replaceFeatureRequirement(6, fr7);
+        r10.replaceFeatureRequirement(7, fr8);
+        r10.replaceFeatureRequirement(8, fr9);
+        r10.replaceFeatureRequirement(9, fr10);
+        
+        System.out.println(fr1.toString());
+        System.out.println(fr2.toString());
+        System.out.println(r9.generateID());
+        
+        System.out.println(r10.generateID());
+        
+        assertEquals(r9.generateID(), r10.generateID()); // same
+        r10.updateFeatureRequirement(11, 1, 3.738f, -2.5f);
+        assertFalse(r9.generateID() == r10.generateID()); // different
+        
+    }
 }

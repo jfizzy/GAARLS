@@ -5,11 +5,10 @@ package Rule;
  * for a given data set. Encodes a value range that a feature is expected to
  * exist in and an evaluation function that determines if a feature value is
  * within that range.
- * 
- * Key Methods: evaluate -> is a given float acceptable for the requirements of 
- *                          this feature?
- *              copy -> make a exact copy of this FeatureRequirement object.
- * 
+ *
+ * Key Methods: evaluate -> is a given float acceptable for the requirements of
+ * this feature? copy -> make a exact copy of this FeatureRequirement object.
+ *
  * Feature Owner: James
  */
 public class FeatureRequirement {
@@ -22,10 +21,10 @@ public class FeatureRequirement {
     private float rangeCoverage;
 
     // Getters and Setters
-    public int getFeatureID(){
+    public int getFeatureID() {
         return this.featureID;
     }
-    
+
     public int getParticipation() { // return the numeric value
         return participation.getValue();
     }
@@ -58,14 +57,15 @@ public class FeatureRequirement {
         return lowerBound;
     }
 
-    public void setLowerBound(float lowerBound) throws InvalidFeatReqException{
+    public void setLowerBound(float lowerBound) throws InvalidFeatReqException {
         this.lowerBound = lowerBound;
     }
 
     /**
-     * Note: Assumes lowerBound and upperBound are valid values.
-     * "Chose not to throw from this function because I don't want Rule package imported into lookupTable
-     * -Peter
+     * Note: Assumes lowerBound and upperBound are valid values. "Chose not to
+     * throw from this function because I don't want Rule package imported into
+     * lookupTable -Peter
+     *
      * @param lowerBound
      * @param upperBound
      * @param rangeCoverage
@@ -83,7 +83,7 @@ public class FeatureRequirement {
     // public constructor
     /**
      * Creates a FeatureRequirement (probably for usage in a Rule)
-     * 
+     *
      * @param featureID
      * @param pInt
      * @param upper
@@ -124,23 +124,23 @@ public class FeatureRequirement {
     /**
      * Checks if a value is within the range required
      *
-     * @param value value for feature. 
-     * TODO ASSUMPTION: Does not check if the value
-     * is valid for a feature set or comes from a feature that this requirement
-     * is associated with
-     * @return true if the value is in the range required
-     *         false otherwise
+     * @param value value for feature. TODO ASSUMPTION: Does not check if the
+     * value is valid for a feature set or comes from a feature that this
+     * requirement is associated with
+     * @return true if the value is in the range required false otherwise
      */
     public boolean evaluate(float value) {
         // value on the edge. Always true
-        if (value == this.lowerBound || value == this.upperBound)
+        if (value == this.lowerBound || value == this.upperBound) {
             return true;
+        }
         // discrete bounds check
-        if (this.lowerBound == this.upperBound)
+        if (this.lowerBound == this.upperBound) {
             return false; // value didn't equal either the upper or lower in the previous case
-        // normal bounds check
-        if (this.lowerBound < this.upperBound)
+        }        // normal bounds check
+        if (this.lowerBound < this.upperBound) {
             return value > this.lowerBound && value < this.upperBound;
+        }
 
         // flipped bounds check. ie minFeatureValue <= value < (lowerBound,UpperBound) < value <= maxFeatureValue
         return value < this.lowerBound || value > this.upperBound;
@@ -169,6 +169,13 @@ public class FeatureRequirement {
         public int getValue() {
             return this.value;
         }
+    }
+
+    @Override
+    public String toString() {
+        // I am choosing not to include the rangeCOverage in this as it should not be a factor in determining the
+        // inherent similarity between Rules
+        return "$"+this.featureID + "$" + this.participation + "$" + this.lowerBound + "$" + this.upperBound + "$";
     }
 
     // custom exceptions
