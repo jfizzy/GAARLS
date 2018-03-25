@@ -29,10 +29,15 @@ public class FitnessManager {
      * @param rule to evaluate
      *             NOTE: information relevant to rule will be cached inside rule at the same time
  *                       will not change functionality of rule
-     * @return float fitness value of rule
+     * @return fitness value of rule
      */
     public float fitnessOf(Rule rule) {
         //TODO: Remove when Mutate, Crossover and Generate rule ensure that a rule is valid at creation time
+        // TODO: assign weights
+        float w1 = 1.0f;
+        float w2 = 1.0f;
+        float w3 = 1.0f;
+
         if (!RuleManager.IsValidRule(rule))
             return 0;
 
@@ -40,21 +45,25 @@ public class FitnessManager {
             return fitnessBasic(rule);
         }
         else{
-            float fitness = fitnessBasic(rule) + ext1(rule) + ext2(rule);
+            float fitness = (w1*fitnessBasic(rule) + w2*ext1(rule) + w3*ext2(rule));
             return fitness;
         }
     }
 
     //Basic version of fitness function:
+
+    /**
+     *
+     * @param rule
+     * @return fitness value between 0.0 and 1.0
+     */
     private float fitnessBasic(Rule rule){
         theDatabase.EvaluateRule(rule);                       // Initializes coverage and accuracy values in rule
-        float coverage = rule.getCoverage()*100;
-        float accuracy = rule.getAccuracy()*100;
-        float rangeFitness = rule.getRangeCoverage()*100;
+        float coverage = rule.getCoverage();
+        float accuracy = rule.getAccuracy();
+        float rangeFitness = rule.getRangeCoverage();
 
-        int sizeOfTheDatabase = theDatabase.getNumDataItems();
-
-        float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy + rangeFitness)/3.0f);
+        float fitnessBase = ((coverage + accuracy + rangeFitness)/3.0f);
         return fitnessBase;
     }
 
@@ -66,10 +75,11 @@ public class FitnessManager {
      *
      * @param r1: first rule
      * @param r2: second rule
-     * @return  the number of elements of the featureRequirement vector 'participation' values that are different between the two rules
+     * @return  the number of elements of the featureRequirement vector 'participation' values that are different between the two rules, normalized
+     * to value between 0.0 and 1.0
      */
 
-    protected static int hammingDistance(Rule r1, Rule r2){
+    protected static float hammingDistance(Rule r1, Rule r2){
         int distance = 0;
 
         FeatureRequirement[] r1FeatureVector = r1.getFeatureReqs();
@@ -78,13 +88,13 @@ public class FitnessManager {
             if(r1FeatureVector[i].getParticipation() != r2FeatureVector[i].getParticipation())
                 distance++;
         }
-        return distance;
+        return (distance/r1.getFeatureReqs().length);
     }
 
     private float ext1(Rule rule){
-        int smallestDistance = 23;   // holds the smallest Hamming distance found to exist between rule and anu rule in known rules
+        float smallestDistance = rule.getFeatureReqs().length;   // holds the smallest Hamming distance found to exist between rule and anu rule in known rules
         for(Rule wekaRule : theWekaRules){
-            int dist = hammingDistance(rule, wekaRule);
+            float dist = hammingDistance(rule, wekaRule);
             if(dist < smallestDistance) {
                 smallestDistance = dist;
             }
@@ -93,6 +103,11 @@ public class FitnessManager {
         return smallestDistance;
     }
 
+    /**
+     *
+     * @param rule
+     * @return value between 0.0 and 1.0
+     */
     private float ext2(Rule rule){
         return rule.getCompleteness();
     }

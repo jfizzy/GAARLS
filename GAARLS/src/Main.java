@@ -25,7 +25,7 @@ public class Main
         LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, featuresToOmit); // parse lookup table file
 
         System.out.println("Complete.\nParsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, 100000); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
         System.out.println("Complete.");
 
         System.out.println("Parsing known rules...");
