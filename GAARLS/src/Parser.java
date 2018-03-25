@@ -1,10 +1,9 @@
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import Rule.Rule;
@@ -48,11 +47,11 @@ public class Parser {
                             // range
                             if (bounds.length == 2) {
                                 max = LookupTable.featureValueMaps[featureId].get(bounds[1].trim());
-                            // discrete
+                                // discrete
                             } else {
                                 max = min;
                             }
-                            if (!temp.updateFeatureRequirement(featureId, i+1, max, min)) {
+                            if (!temp.updateFeatureRequirement(featureId, i + 1, max, min)) {
                                 System.out.println("WARNING: Error updating feature requirement: " + matcher.group(1) + "=" + matcher.group(2));
                             }
                         }
@@ -67,49 +66,121 @@ public class Parser {
         System.out.println("Complete. Parsed " + knownRules.size() + " rules.");
         return knownRules;
     }
-    
-    /**
-     * ConfigParameters: Wrapper class for the configuration parameters to keep 
-     * them central and accessible to everyone/thing
-     */
-    public static class ConfigParameters {
-        // TODO: this class is definitely ready to be adapted for additional 
-        //  variables that we may need or want
-        // Basic Setup parameters
-        public final int initialPopSize;
-        public final int numGenerations;
-        public final int populationMax;
-        
-        //Thresholds
-        public final float minCoverage;
-        public final float minAccuracy;
-        
-        //Evolutionary Method proc chances
-        public final float chanceOfCrossover;
-        public final float chanceOfMutation;
-        
-        //Weights for all the things
-        public final float baseFitnessWeight;
-        public final float ext1FitnessWeight;
-        public final float ext2FitnessWeight;
-        // definitely will need others...
-        
-        public ConfigParameters(int popSz, int numGens, int popMax, float minCov, 
-                float minAcc, float cOfXover, float cOfMut, float baseFW, 
-                float ext1FW, float ext2FW){
-            this.initialPopSize = popSz;
-            this.numGenerations = numGens;
-            this.populationMax = popMax;
-            
-            this.minCoverage = minCov;
-            this.minAccuracy = minAcc;
-            
-            this.chanceOfCrossover = cOfXover;
-            this.chanceOfMutation = cOfMut;
-            
-            this.baseFitnessWeight = baseFW;
-            this.ext1FitnessWeight = ext1FW;
-            this.ext2FitnessWeight = ext2FW;
+
+    public ConfigParameters parseConfigParameters(String configFilePath) {
+        File configFile = new File(configFilePath);
+        if (configFile.exists()) {
+            System.out.println("Found config file '" + configFilePath + "'. Parsing configuration parameters...");
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(configFile));
+                String paramLine;
+                // pull out the relevant portions of the rule
+
+                Pattern emptyLinePatt = Pattern.compile("^\\s*$");
+                Pattern initPopPatt = Pattern.compile("^INITIAL_POP_SIZE\\s*=\\s*\\d*$");
+                Pattern numGenPatt = Pattern.compile("^NUM_GENERATIONS\\s*=\\s*\\d*$");
+                Pattern popMaxPatt = Pattern.compile("^MAX_POPULATION\\s*=\\s*\\d*$");
+
+                Pattern minCovPatt = Pattern.compile("^MIN_COVERAGE\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern minAccPatt = Pattern.compile("^MIN_ACCURACY\\s*=\\s*\\d*(.\\d*)?$");
+
+                Pattern pXPatt = Pattern.compile("^P_OF_CROSSOVER\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern pMPatt = Pattern.compile("^P_OF_MUTATION\\s*=\\s*\\d*(.\\d*)?$");
+
+                Pattern bFWPatt = Pattern.compile("^BASE_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern e1FWPatt = Pattern.compile("^EXT1_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern e2FWPatt = Pattern.compile("^EXT2_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
+
+                Pattern numFAPatt = Pattern.compile("^NUM_FEATURES_ANTE\\s*=\\s*\\d*$");
+                Pattern numFCPatt = Pattern.compile("^NUM_FEATURES_CONS\\s*=\\s*\\d*$");
+                Pattern featTIPatt = Pattern.compile("^FEATURES_TO_IGNORE\\s*=\\s*\\d(\\s*,\\s*\\d)*$");
+
+                Integer initialPopSize = null, numGenerations = null, populationMax = null;
+                Float minCoverage = null, minAccuracy = null;
+                Float probOfCrossover = null, probOfMutation = null;
+                Float baseFitnessWeight = null, ext1FitnessWeight = null, ext2FitnessWeight = null;
+                Integer numFeatAntecedent = null, numFeatConsequent = null;
+                ArrayList<Integer> featuresToIgnore = null;
+
+                while ((paramLine = br.readLine()) != null) {
+                    if (paramLine.contains("//")) {
+                        paramLine = paramLine.split("//")[0]; // remove comments from line
+                    }
+                    paramLine = paramLine.trim();
+                    paramLine = paramLine.toUpperCase();
+                    try {
+                        if (emptyLinePatt.matcher(paramLine).find()) {
+                            continue; // nothing to due for empties
+                        } else if (initPopPatt.matcher(paramLine).find()) {
+                            initialPopSize = Integer.parseInt(paramLine.split("=")[1].trim());
+                            continue;
+                        } else if (numGenPatt.matcher(paramLine).find()) {
+                            numGenerations = Integer.parseInt(paramLine.split("=")[1].trim());
+                            continue;
+                        } else if (popMaxPatt.matcher(paramLine).find()) {
+                            populationMax = Integer.parseInt(paramLine.split("=")[1].trim());
+                            continue;
+                        } else if (minCovPatt.matcher(paramLine).find()) {
+                            minCoverage = Float.parseFloat(paramLine.split("=")[1].trim());
+                            continue;
+                        } else if (minAccPatt.matcher(paramLine).find()) {
+                            minAccuracy = Float.parseFloat(paramLine.split("=")[1].trim());
+                            continue;
+                        } else if (pXPatt.matcher(paramLine).find()) {
+                            probOfCrossover = Float.parseFloat(paramLine.split("=")[1].trim());
+                            continue;
+                        } else if (pMPatt.matcher(paramLine).find()) {
+                            probOfMutation = Float.parseFloat(paramLine.split("=")[1].trim());
+                        } else if (bFWPatt.matcher(paramLine).find()) {
+                            baseFitnessWeight = Float.parseFloat(paramLine.split("=")[1].trim());
+                        } else if (e1FWPatt.matcher(paramLine).find()) {
+                            ext1FitnessWeight = Float.parseFloat(paramLine.split("=")[1].trim());
+                        } else if (e2FWPatt.matcher(paramLine).find()) {
+                            ext2FitnessWeight = Float.parseFloat(paramLine.split("=")[1].trim());
+                        } else if (numFAPatt.matcher(paramLine).find()) {
+                            numFeatAntecedent = Integer.parseInt(paramLine.split("=")[1].trim());
+                        } else if (numFCPatt.matcher(paramLine).find()) {
+                            numFeatConsequent = Integer.parseInt(paramLine.split("=")[1].trim());
+                        } else if (featTIPatt.matcher(paramLine).find()) {
+                            String[] feats = paramLine.split("=")[1].trim().split(",");
+                            ArrayList<Integer> featList = new ArrayList<>();
+                            for (String feat : feats) {
+                                featList.add(Integer.parseInt(feat.trim()));
+                            }
+                            if (!featList.isEmpty()) {
+                                featuresToIgnore = featList;
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.out.println("ERROR: There was an issue parsing [" + paramLine + "]");
+                    }
+
+                }
+                //TODO: lets talk about these default parameters and set them appropriately
+                ConfigParameters cp = new ConfigParameters(
+                        initialPopSize != null ? initialPopSize : 100, 
+                        numGenerations != null ? numGenerations : 1000,
+                        populationMax != null ? populationMax : 1000, 
+                        minCoverage != null ? minCoverage : 0.01f, 
+                        minAccuracy != null ? minAccuracy : 0.01f, 
+                        probOfCrossover != null ? probOfCrossover : 0.85f, 
+                        probOfMutation != null ? probOfMutation : 0.15f, 
+                        baseFitnessWeight != null ? baseFitnessWeight : 1.0f,
+                        ext1FitnessWeight != null ? ext1FitnessWeight : 1.0f, 
+                        ext2FitnessWeight != null ? ext2FitnessWeight : 1.0f,
+                        numFeatAntecedent != null ? numFeatAntecedent : 2, 
+                        numFeatConsequent != null ? numFeatConsequent : 2,
+                        featuresToIgnore != null ? featuresToIgnore : null
+                );
+                return cp; // return the new obj
+            } catch (IOException io) {
+                System.out.println("ERROR: I/O error when parsing rule file '" + configFilePath + "'");
+                System.out.println(io.getMessage());
+                return null; // had an issue
+            }
         }
+        return null; // couldnt find file
     }
+
+    
 }
