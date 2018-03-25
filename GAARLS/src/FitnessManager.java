@@ -50,9 +50,11 @@ public class FitnessManager {
         theDatabase.EvaluateRule(rule);                       // Initializes coverage and accuracy values in rule
         float coverage = rule.getCoverage()*100;
         float accuracy = rule.getAccuracy()*100;
+        float rangeFitness = rule.getRangeCoverage()*100;
+
         int sizeOfTheDatabase = theDatabase.getNumDataItems();
 
-        float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy)/2.0f);
+        float fitnessBase = (((coverage/(float)sizeOfTheDatabase) + accuracy + rangeFitness)/3.0f);
         return fitnessBase;
     }
 
@@ -92,9 +94,7 @@ public class FitnessManager {
     }
 
     private float ext2(Rule rule){
-        float rangeFitness = rule.getRangeCoverage();
-        float completeness = rule.getCompleteness();
-        return rangeFitness * completeness;
+        return rule.getCompleteness();
     }
 
     public static void main(String[] args){
