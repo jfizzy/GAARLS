@@ -2,7 +2,6 @@
 import Rule.*;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Class: FitnessManager
@@ -37,7 +36,6 @@ public class FitnessManager {
         if (!RuleManager.IsValidRule(rule))
             return 0;
 
-
         if(theWekaRules.size() == 0) {
             return fitnessBasic(rule);
         }
@@ -69,7 +67,7 @@ public class FitnessManager {
      * @return  the number of elements of the featureRequirement vector 'participation' values that are different between the two rules
      */
 
-    private int hammingDistance(Rule r1, Rule r2){
+    protected static int hammingDistance(Rule r1, Rule r2){
         int distance = 0;
 
         FeatureRequirement[] r1FeatureVector = r1.getFeatureReqs();
@@ -94,33 +92,12 @@ public class FitnessManager {
     }
 
     private float ext2(Rule rule){
-        float rangeFitness = rule.getRangeCoverage(); // TODO: Hook up to fitness equation
-        float completeness = rule.getCompleteness();// TODO: Hook up to fitness equation
+        float rangeFitness = rule.getRangeCoverage();
+        float completeness = rule.getCompleteness();
         return rangeFitness * completeness;
     }
 
     public static void main(String[] args){
-        //testing ext1
-        // TODO: moving this testing to JUnit test
-
-        FeatureRequirement[] r1FeatureVector = new FeatureRequirement[23];
-        FeatureRequirement[] r2FeatureVector = new FeatureRequirement[23];
-        try {
-           for (int i = 0; i < 23; i++) {
-               r1FeatureVector[i] = new FeatureRequirement(i, 0, 0f, 0f, 0f); // default initial value
-               r2FeatureVector[i] = new FeatureRequirement(i, 0, 0f, 0f, 0f); // default initial value
-
-           }
-            r1FeatureVector[3] = new FeatureRequirement(1, 1, 0f, 0f, 0f); // default initial value
-            r2FeatureVector[1] = new FeatureRequirement(1, 1, 0f, 0f, 0f); // default initial value
-        } catch (FeatureRequirement.InvalidFeatReqException ifre) {
-            System.out.println(ifre.getMessage());
-        }
-
-
-        Rule rule1 = new Rule(r1FeatureVector);
-        Rule rule2 = new Rule(r2FeatureVector);
-        //System.out.println("Hamming distance is: " + hammingDistance(rule1,rule2)); // distance should be 1
 
     }
 }

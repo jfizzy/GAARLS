@@ -34,7 +34,6 @@ public class Main
         System.out.println("Complete.");
 
         System.out.println("Parsing WEKA rules...");
-        parser = new Parser();
         ArrayList<Rule> wekaRules = parser.parseKnownRules(wekaFilePath);
         System.out.println("Complete.");
 
