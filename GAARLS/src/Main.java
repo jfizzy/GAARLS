@@ -12,6 +12,7 @@ public class Main
     private static String dataFilePath = "NCDB_1999_to_2015.csv";
     private static String ruleFilePath = "rules.txt";
     private static String wekaFilePath = "weka.txt";
+    private static String configFilePath = "config.txt";
 
     public static void main(String args[])
     {
@@ -31,6 +32,8 @@ public class Main
 
         Parser parser = new Parser();
         ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath);
+        
+        
 
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, 10);
         evolutionManager.evolve(1000, 1000, 1300);
@@ -42,7 +45,8 @@ public class Main
      *     -d <datafile>
      *     -r <rulefile>
      *     -w <wekafile>
-     * ex: java main.java -d data.csv -w weka.txt -r rules.txt
+     *     -c <configfile>
+     * ex: java main.java -d data.csv -w weka.txt -r rules.txt -c config.txt
      * use these switches so we don't rely on ordering
      * in case we want any combination of these files for our personal tests
      * e.g. I don't forsee myself always using a rulefile and wekafile
@@ -50,14 +54,24 @@ public class Main
     private static void parseArgs(String args[]) {
         try {
             for (int i = 0; i < args.length; ++i) {
-                if (args[i].equals("-d")) {
-                    dataFilePath = args[++i];
-                } else if (args[i].equals("-r")) {
-                    ruleFilePath = args[++i];
-                } else if (args[i].equals("-w")) {
-                    wekaFilePath = args[++i];
-                } else if (args[i].equals("-l")) {
-                    lookupFilePath = args[++i];
+                switch (args[i]) {
+                    case "-d":
+                        dataFilePath = args[++i];
+                        break;
+                    case "-r":
+                        ruleFilePath = args[++i];
+                        break;
+                    case "-w":
+                        wekaFilePath = args[++i];
+                        break;
+                    case "-l":
+                        lookupFilePath = args[++i];
+                        break;
+                    case "-c":
+                        configFilePath = args[++i];
+                        break;
+                    default:
+                        break;
                 }
             }
         } catch (ArrayIndexOutOfBoundsException e) {

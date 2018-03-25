@@ -67,4 +67,49 @@ public class Parser {
         System.out.println("Complete. Parsed " + knownRules.size() + " rules.");
         return knownRules;
     }
+    
+    /**
+     * ConfigParameters: Wrapper class for the configuration parameters to keep 
+     * them central and accessible to everyone/thing
+     */
+    public static class ConfigParameters {
+        // TODO: this class is definitely ready to be adapted for additional 
+        //  variables that we may need or want
+        // Basic Setup parameters
+        public final int initialPopSize;
+        public final int numGenerations;
+        public final int populationMax;
+        
+        //Thresholds
+        public final float minCoverage;
+        public final float minAccuracy;
+        
+        //Evolutionary Method proc chances
+        public final float chanceOfCrossover;
+        public final float chanceOfMutation;
+        
+        //Weights for all the things
+        public final float baseFitnessWeight;
+        public final float ext1FitnessWeight;
+        public final float ext2FitnessWeight;
+        // definitely will need others...
+        
+        public ConfigParameters(int popSz, int numGens, int popMax, float minCov, 
+                float minAcc, float cOfXover, float cOfMut, float baseFW, 
+                float ext1FW, float ext2FW){
+            this.initialPopSize = popSz;
+            this.numGenerations = numGens;
+            this.populationMax = popMax;
+            
+            this.minCoverage = minCov;
+            this.minAccuracy = minAcc;
+            
+            this.chanceOfCrossover = cOfXover;
+            this.chanceOfMutation = cOfMut;
+            
+            this.baseFitnessWeight = baseFW;
+            this.ext1FitnessWeight = ext1FW;
+            this.ext2FitnessWeight = ext2FW;
+        }
+    }
 }
