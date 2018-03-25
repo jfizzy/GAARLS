@@ -1,5 +1,6 @@
 import Rule.Rule;
 import Rule.FeatureRequirement;
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -81,7 +82,7 @@ public class RuleManager
      */
     public Rule crossoverUniform(Rule parent1, Rule parent2)
     {
-        ArrayList<Boolean> randomBools;
+        ArrayList<Boolean> randomBools = new ArrayList<>();
 
         // Generate random boolean array list.
         for(int i = 0; i < num_features; i++)
