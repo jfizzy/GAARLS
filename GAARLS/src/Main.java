@@ -30,7 +30,8 @@ public class Main
         System.out.println("Complete.");
 
         Parser parser = new Parser();
-        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath);
+        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, featuresToOmit);
+        ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, featuresToOmit);
 
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, 10);
         evolutionManager.evolve(1000, 1000, 1300);
