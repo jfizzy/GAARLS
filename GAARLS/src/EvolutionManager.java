@@ -52,17 +52,17 @@ public class EvolutionManager
 
     /**
      *  Initialization function creating an initial population
-     *  @param populationSize: initial population size
+     *  @param cp: Set of config parameters
      */
-    private ArrayList<Pair<Float, Rule>> initializePopulation(int populationSize) {
+    private ArrayList<Pair<Float, Rule>> initializePopulation(ConfigParameters cp) {
 
         ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
 
         Rule potentialRule;
         float ruleFitness;
-        for(int i = 0; i < populationSize; i++){
+        for(int i = 0; i < cp.initialPopSize; i++){
             do {
-                potentialRule = theRuleManager.generateRule();
+                potentialRule = theRuleManager.generateRule(cp);
 
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
 
@@ -81,25 +81,23 @@ public class EvolutionManager
      *
      * All parameters are tunable
      *
-     * @param startSize: size of initial population
-     * @param forGenerations: stop condition
-     * @param maxPop: max state size
+     * @param cp: set of config parameters
      */
-    public void evolve(int startSize, int forGenerations, int maxPop) {
+    public void evolve(ConfigParameters cp) {
         int numGenerations = 0;
-        int cullToSize = maxPop - 100;
+        int cullToSize = cp.populationMax - 100;
 
         System.out.println("Generating initial population...");
-        state = this.initializePopulation(startSize);
+        state = this.initializePopulation(cp);
 
         Scanner input = new Scanner(System.in);
         System.out.println("Initial population generated. Press RETURN to begin evolution of rules.");
         System.out.print(input.nextLine());
 
-        while (numGenerations < forGenerations) {
+        while (numGenerations < cp.numGenerations) {
             state = fSelect(state);
 
-            if(state.size() > maxPop) {
+            if(state.size() > cp.populationMax) {
                 System.out.println("\nPopulation size: " + state.size());
                 System.out.println("Max population size exceeded. Trimming 100 individuals...");
                 while(state.size() > cullToSize) {

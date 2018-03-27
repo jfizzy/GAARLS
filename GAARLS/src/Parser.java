@@ -152,6 +152,7 @@ public class Parser {
 
                 Pattern pXPatt = Pattern.compile("^P_OF_CROSSOVER\\s*=\\s*\\d*(.\\d*)?$");
                 Pattern pMPatt = Pattern.compile("^P_OF_MUTATION\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern crossToMutePatt = Pattern.compile("^CROSS_TO_MUTE\\s*=\\s*\\d*$");
 
                 Pattern bFWPatt = Pattern.compile("^BASE_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
                 Pattern e1FWPatt = Pattern.compile("^EXT1_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
@@ -159,9 +160,9 @@ public class Parser {
 
                 Pattern numFAPatt = Pattern.compile("^NUM_FEATURES_ANTE\\s*=\\s*\\d*$");
                 Pattern numFCPatt = Pattern.compile("^NUM_FEATURES_CONS\\s*=\\s*\\d*$");
-                Pattern featTIPatt = Pattern.compile("^FEATURES_TO_IGNORE\\s*=\\s*\\d(\\s*,\\s*\\d)*$");
+                Pattern featTIPatt = Pattern.compile("^FEATURES_TO_IGNORE\\s*=\\s*\\d*(\\s*,\\s*\\d*)*$");
 
-                Integer initialPopSize = null, numGenerations = null, populationMax = null;
+                Integer initialPopSize = null, numGenerations = null, populationMax = null, crossToMute = null;
                 Float minCoverage = null, minAccuracy = null;
                 Float probOfCrossover = null, probOfMutation = null;
                 Float baseFitnessWeight = null, ext1FitnessWeight = null, ext2FitnessWeight = null;
@@ -216,6 +217,8 @@ public class Parser {
                             if (!featList.isEmpty()) {
                                 featuresToIgnore = featList;
                             }
+                        } else if (crossToMutePatt.matcher(paramLine).find()){
+                            crossToMute = Integer.parseInt(paramLine.split("=")[1].trim());
                         }
                     } catch (Exception e) {
                         System.out.println("ERROR: There was an issue parsing [" + paramLine + "]");
@@ -224,9 +227,9 @@ public class Parser {
                 }
                 //TODO: lets talk about these default parameters and set them appropriately
                 ConfigParameters cp = new ConfigParameters(
-                        initialPopSize != null ? initialPopSize : 100, 
+                        initialPopSize != null ? initialPopSize : 1000,
                         numGenerations != null ? numGenerations : 1000,
-                        populationMax != null ? populationMax : 1000, 
+                        populationMax != null ? populationMax : 1300,
                         minCoverage != null ? minCoverage : 0.01f, 
                         minAccuracy != null ? minAccuracy : 0.01f, 
                         probOfCrossover != null ? probOfCrossover : 0.85f, 
@@ -235,8 +238,9 @@ public class Parser {
                         ext1FitnessWeight != null ? ext1FitnessWeight : 1.0f, 
                         ext2FitnessWeight != null ? ext2FitnessWeight : 1.0f,
                         numFeatAntecedent != null ? numFeatAntecedent : 2, 
-                        numFeatConsequent != null ? numFeatConsequent : 2,
-                        featuresToIgnore != null ? featuresToIgnore : null
+                        numFeatConsequent != null ? numFeatConsequent : 1,
+                        featuresToIgnore != null ? featuresToIgnore : null,
+                        crossToMute != null ? crossToMute : 10
                 );
                 return cp; // return the new obj
             } catch (IOException io) {
@@ -247,5 +251,5 @@ public class Parser {
         }
         return null; // couldnt find file
     }
-    
+
 }
