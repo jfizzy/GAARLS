@@ -36,7 +36,9 @@ public class Main
         
         //new wrapper class containing the config parameter values read from file
         ConfigParameters cp = parser.parseConfigParameters(configFilePath);
-        printConfigDetails(cp); // I assume this will help a lot
+        if (cp != null) {
+            printConfigDetails(cp); // I assume this will help a lot
+        }
         //TODO: need to decide who is going to link these options up to the proper locations
 
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, 10);
