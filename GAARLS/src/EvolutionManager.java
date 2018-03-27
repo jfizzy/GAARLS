@@ -209,7 +209,7 @@ public class EvolutionManager
      * @param filePath
      */
     public void toFile(String filePath) {
-        float minAccuracy = 0.9f;           // TODO: make this a global parameter, entered at runtime
+        float minAccuracy = 0.9f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
         File f = new File(filePath);
 
         if(f.exists() && !f.isDirectory()) {
@@ -230,7 +230,7 @@ public class EvolutionManager
             PrintWriter out = new PrintWriter(bw))
         {
 
-
+            out.println("BEGINNING OF RULE OUTPUT FOR GIVEN RUN");
             for(int i = 0; i < state.size(); i++) {
                 Pair individual = state.get(i);
                 float individualsAccuracy = (float) individual.getKey();
@@ -239,6 +239,8 @@ public class EvolutionManager
                     out.println("Rule Accuracy: " + individualsAccuracy + "; " + lineInFile);
                 }
             }
+            out.println("END OF RULE OUTPUT FOR GIVEN RUN");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
