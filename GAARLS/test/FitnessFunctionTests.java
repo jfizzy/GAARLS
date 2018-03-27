@@ -2,6 +2,8 @@ import Rule.FeatureRequirement;
 import Rule.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.junit.Assert.*;
 
 
@@ -24,8 +26,8 @@ public class FitnessFunctionTests {
             }
             r1FeatureVector[3] = new FeatureRequirement(1, 1, 0f, 0f, 0f); // default initial value
             r2FeatureVector[1] = new FeatureRequirement(1, 1, 0f, 0f, 0f); // default initial value
-        } catch (FeatureRequirement.InvalidFeatReqException ifre) {
-            System.out.println(ifre.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
 
 

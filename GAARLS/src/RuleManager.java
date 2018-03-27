@@ -1,5 +1,6 @@
 import Rule.Rule;
 import Rule.FeatureRequirement;
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -12,7 +13,8 @@ import java.util.Random;
 
 public class RuleManager
 {
-    
+    // private members
+    private LookupTable mLookupTable;
     private final int num_features;
     private static Random rand = new Random();
 
@@ -51,27 +53,41 @@ public class RuleManager
         return mutatedRule;
     }
 
-    /**
+    /** Crossover Pivot: Completes a Crossover using traditional pivot point method.
      * Creates a new rule with @parent1 and @parent2 as the base rules
-     * @param parent1 
-     * @param parent2 
+     * @param parent1
+     * @param parent2
      * @return merged rule (child) of @parent1 and @parent2
      */
     public Rule crossover(Rule parent1, Rule parent2)
     {
-		// This needs to be tested!
-
-	    Random rand = new Random();
         int pivot = rand.nextInt(num_features-2) + 1; // Randomly selected pivot point (index of where the crossover will occur)
 
         FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
-		FeatureRequirement childFeatReqs[] = parent1.getFeatureReqs();
-        
-        for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
-				childFeatReqs[i] = parent2FeatReqs[i];
-			
-        Rule child = new Rule(childFeatReqs);
+		Rule child = parent1.copy();
+        FeatureRequirement childFeatReqs[] = child.getFeatureReqs();
 
+        for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
+				childFeatReqs[i] = parent2FeatReqs[i].copy();
+
+        return child;
+    }
+
+    /** Crossover Uniform: Completes a crossover using a boolean array, each with 50% chance of being 1 or 0.
+     *  Creates a new rule with @parent1 and @parent2 as the base rules
+     * @param parent1
+     * @param parent2
+     * @return merged rule (child) of @parent1 and @parent2
+     */
+    public Rule crossoverUniform(Rule parent1, Rule parent2)
+    {
+        ArrayList<Boolean> randomBools = new ArrayList<>();
+
+        // Generate random boolean array list.
+        for(int i = 0; i < num_features; i++)
+          randomBools.add(rand.nextBoolean());
+
+        Rule child = parent1.merge(parent2, randomBools);
         return child;
     }
 
@@ -82,8 +98,6 @@ public class RuleManager
      */
     public Rule generateRule()
     {
-        Random rand = new Random();
-
         Rule newRule = new Rule();
 
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
@@ -134,6 +148,5 @@ public class RuleManager
         return mLookupTable.TranslateRule(rule);
     }
 
-    // private members
-    private LookupTable mLookupTable;
+
 }

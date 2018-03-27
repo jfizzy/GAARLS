@@ -22,6 +22,8 @@ import java.util.*;
 public class EvolutionManager
 {
 
+    private static Random rand = new Random();
+
     // private members
     //private ArrayList<Pair<Float, Rule>> state;
     private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
@@ -31,7 +33,7 @@ public class EvolutionManager
 
     private int crossToMut;
     private int crossoversDone;
-    private ArrayList<Pair<Float,Rule>> state;
+    private ArrayList<Pair<Float,Rule>> state;                                            // All the current Fitness/Rule pairs.
 
     // public methods
 
@@ -163,8 +165,6 @@ public class EvolutionManager
 
 
         // Select individual(s) for genetic operation and call
-        Random rand = new Random();
-
         if(crossoversDone == crossToMut){                   // Do mutation
 
             crossoversDone = 0;

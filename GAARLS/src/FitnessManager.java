@@ -33,7 +33,7 @@ public class FitnessManager {
      */
     public float fitnessOf(Rule rule) {
         //TODO: Remove when Mutate, Crossover and Generate rule ensure that a rule is valid at creation time
-        // TODO: assign weights
+        //TODO: assign weights
         float w1 = 1.0f;
         float w2 = 1.0f;
         float w3 = 1.0f;
