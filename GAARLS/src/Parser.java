@@ -147,15 +147,15 @@ public class Parser {
                 Pattern numGenPatt = Pattern.compile("^NUM_GENERATIONS\\s*=\\s*\\d*$");
                 Pattern popMaxPatt = Pattern.compile("^MAX_POPULATION\\s*=\\s*\\d*$");
 
-                Pattern minCovPatt = Pattern.compile("^MIN_COVERAGE\\s*=\\s*\\d*(.\\d*)?$");
-                Pattern minAccPatt = Pattern.compile("^MIN_ACCURACY\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern minCovPatt = Pattern.compile("^MIN_COVERAGE\\s*=\\s*\\d*(\\.\\d*)?$");
+                Pattern minAccPatt = Pattern.compile("^MIN_ACCURACY\\s*=\\s*\\d*(\\.\\d*)?$");
 
-                Pattern pXPatt = Pattern.compile("^P_OF_CROSSOVER\\s*=\\s*\\d*(.\\d*)?$");
-                Pattern pMPatt = Pattern.compile("^P_OF_MUTATION\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern pXPatt = Pattern.compile("^P_OF_CROSSOVER\\s*=\\s*\\d*(\\.\\d*)?$");
+                Pattern pMPatt = Pattern.compile("^P_OF_MUTATION\\s*=\\s*\\d*(\\.\\d*)?$");
 
-                Pattern bFWPatt = Pattern.compile("^BASE_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
-                Pattern e1FWPatt = Pattern.compile("^EXT1_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
-                Pattern e2FWPatt = Pattern.compile("^EXT2_FITNESS_WEIGHT\\s*=\\s*\\d*(.\\d*)?$");
+                Pattern bFWPatt = Pattern.compile("^BASE_FITNESS_WEIGHT\\s*=\\s*\\d*(\\.\\d*)?$");
+                Pattern e1FWPatt = Pattern.compile("^EXT1_FITNESS_WEIGHT\\s*=\\s*\\d*(\\.\\d*)?$");
+                Pattern e2FWPatt = Pattern.compile("^EXT2_FITNESS_WEIGHT\\s*=\\s*\\d*(\\.\\d*)?$");
 
                 Pattern numFAPatt = Pattern.compile("^NUM_FEATURES_ANTE\\s*=\\s*\\d*$");
                 Pattern numFCPatt = Pattern.compile("^NUM_FEATURES_CONS\\s*=\\s*\\d*$");
