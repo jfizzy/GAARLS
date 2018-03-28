@@ -28,8 +28,10 @@ public class EvolutionManager
     //private ArrayList<Pair<Float, Rule>> state;
     private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
-    private ArrayList<Rule> knownRules;                                                   // TODO: need this to be passed in from main
-    private int crossToMut;                                                               // Crossover : Mutation ratio
+    private ArrayList<Rule> knownRules;
+    private ArrayList<Rule> wekaRules;
+
+    private int crossToMut;
     private int crossoversDone;
     private ArrayList<Pair<Float,Rule>> state;                                            // All the current Fitness/Rule pairs.
 
@@ -41,11 +43,12 @@ public class EvolutionManager
      * @param lookupTable: table of allowable feature values
      * @param crossToMut: number of crossover operations to perform between each mutation
      */
-    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, int crossToMut) {
-        theFitnessManager = new FitnessManager(database);
+    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<Rule> wekaRules, int crossToMut) {
+        theFitnessManager = new FitnessManager(database, wekaRules);
         theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
         this.crossToMut = crossToMut;
+        this.wekaRules = wekaRules;
         crossoversDone = 0;
 
     }
@@ -206,7 +209,7 @@ public class EvolutionManager
      * @param filePath
      */
     public void toFile(String filePath) {
-        float minAccuracy = 0.9f;           // TODO: make this a global parameter, entered at runtime
+        float minAccuracy = 0.9f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
         File f = new File(filePath);
 
         if(f.exists() && !f.isDirectory()) {
@@ -227,7 +230,7 @@ public class EvolutionManager
             PrintWriter out = new PrintWriter(bw))
         {
 
-
+            out.println("BEGINNING OF RULE OUTPUT FOR GIVEN RUN");
             for(int i = 0; i < state.size(); i++) {
                 Pair individual = state.get(i);
                 float individualsAccuracy = (float) individual.getKey();
@@ -236,6 +239,8 @@ public class EvolutionManager
                     out.println("Rule Accuracy: " + individualsAccuracy + "; " + lineInFile);
                 }
             }
+            out.println("END OF RULE OUTPUT FOR GIVEN RUN");
+
         } catch (IOException e) {
             e.printStackTrace();
         }

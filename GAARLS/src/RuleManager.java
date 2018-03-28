@@ -64,12 +64,11 @@ public class RuleManager
         int pivot = rand.nextInt(num_features-2) + 1; // Randomly selected pivot point (index of where the crossover will occur)
 
         FeatureRequirement parent2FeatReqs[] = parent2.getFeatureReqs();
-		FeatureRequirement childFeatReqs[] = parent1.getFeatureReqs();
+		Rule child = parent1.copy();
+        FeatureRequirement childFeatReqs[] = child.getFeatureReqs();
 
         for(int i = pivot; i < num_features; i++) // Replace all elements after the pivot with parent 2's genes
-				childFeatReqs[i] = parent2FeatReqs[i];
-
-        Rule child = new Rule(childFeatReqs);
+				childFeatReqs[i] = parent2FeatReqs[i].copy();
 
         return child;
     }

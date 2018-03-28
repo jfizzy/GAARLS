@@ -27,13 +27,19 @@ public class Main
         LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, featuresToOmit); // parse lookup table file
 
         System.out.println("Complete.\nParsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, 100000); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
         System.out.println("Complete.");
 
+        System.out.println("Parsing known rules...");
         Parser parser = new Parser();
+
         ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, featuresToOmit);
+        System.out.println("Complete.");
+
+        System.out.println("Parsing WEKA rules...");
         ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, featuresToOmit);
-        
+        System.out.println("Complete.");
+
         //new wrapper class containing the config parameter values read from file
         ConfigParameters cp = parser.parseConfigParameters(configFilePath);
         if (cp != null) {
@@ -41,7 +47,8 @@ public class Main
         }
         //TODO: need to decide who is going to link these options up to the proper locations
 
-        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, 10);
+
+        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, 10);
         evolutionManager.evolve(1000, 1000, 1300);
         evolutionManager.toFile("outputRules.txt"); //Keep in mind that as is, this will just keep appending rules to this file after each run
         System.out.println("Evolution complete. \n Learned rules output to outputRules.txt");
