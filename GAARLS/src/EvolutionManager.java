@@ -179,7 +179,11 @@ public class EvolutionManager
                 }
                 int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 Rule parent = nextState.get(parentIndex).getValue();
+                
                 child = theRuleManager.mutate(parent);
+                while(!RuleManager.IsValidRule(child)) //keep going until Mutation is Valid
+                    child = theRuleManager.mutate(parent);
+                
                 duplicate = true;
             } while (nextState.contains(child) || knownRules.contains(child));
             Float childFitness = theFitnessManager.fitnessOf(child);
@@ -196,7 +200,11 @@ public class EvolutionManager
             } while (parent1Index == parent2Index);
             Rule parent1 = nextState.get(parent1Index).getValue();
             Rule parent2 = nextState.get(parent2Index).getValue();
+            
             Rule child = theRuleManager.crossover(parent1,parent2);
+            while(!RuleManager.IsValidRule(child)) //keep going until pivot point produces valid Rule
+                child = theRuleManager.crossover(parent1,parent2);
+            
             Float childFitness = theFitnessManager.fitnessOf(child);
             nextState.add(new Pair<>(childFitness, child));
             crossoversDone++;
