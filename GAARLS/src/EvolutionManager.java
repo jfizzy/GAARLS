@@ -57,23 +57,23 @@ public class EvolutionManager
     private ArrayList<Pair<Float, Rule>> initializePopulation(int populationSize) {
 
         ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
-
         Rule potentialRule;
         float ruleFitness;
+
         for(int i = 0; i < populationSize; i++){
             do {
                 potentialRule = theRuleManager.generateRule();
-
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
-
             } while (ruleFitness == 0 || state.contains(potentialRule) || knownRules.contains(potentialRule));
 
             if((i > 0) && (i%100 == 0)) {
-                System.out.println(i + " rules added to initial population");
-
+                System.out.println(i + " total rules added to initial population");
             }
+
             state.add(new Pair<>(ruleFitness, potentialRule));
         }
+        System.out.println(populationSize + " rules added to initial population");
+
         return state;
     }
 
@@ -116,8 +116,8 @@ public class EvolutionManager
      * Create new state from current one by application of genetic operations
      */
     private ArrayList<Pair<Float, Rule>> fSelect(ArrayList<Pair<Float, Rule>> aState){
+
         ArrayList<Pair<Float, Rule>> nextState = aState;
-        Scanner input = new Scanner(System.in);
 
         // Order population by decreasing order of fitness
         nextState.sort(new Comparator<Pair<Float, Rule>>() {
@@ -173,15 +173,14 @@ public class EvolutionManager
 
             int parent1Index, parent2Index;
             do {
-
                 parent1Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 parent2Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
-
             } while (parent1Index == parent2Index);
+
             Rule parent1 = nextState.get(parent1Index).getValue();
             Rule parent2 = nextState.get(parent2Index).getValue();
-            
             Rule child = theRuleManager.crossover(parent1,parent2);
+            
             int crossOverAttempts = 0;
             while(!RuleManager.IsValidRule(child) || nextState.contains(child) || knownRules.contains(child)) { //keep going until pivot point produces valid Rule
                 child = theRuleManager.crossover(parent1, parent2);
@@ -235,6 +234,7 @@ public class EvolutionManager
                     out.println("Rule Accuracy: " + individualsAccuracy + "; " + lineInFile);
                 }
             }
+            System.out.println("Are first and second rule equal? : " + (state.get(0)).equals(state.get(1)));
             out.println("END OF RULE OUTPUT FOR GIVEN RUN");
 
         } catch (IOException e) {

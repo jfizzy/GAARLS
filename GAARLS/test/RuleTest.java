@@ -355,6 +355,9 @@ public class RuleTest {
         assertFalse(rule2.equals(rule1));
         assertTrue(rule3.equals(rule4));
 
+        rule3.replaceFeatureRequirement(0,fr1);
+        assertTrue(rule3.equals(rule4)); //check that inactive clauses aren't counted towards equality
+
 
     }
 }
