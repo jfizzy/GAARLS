@@ -125,8 +125,7 @@ public class EvolutionManager
         Scanner input = new Scanner(System.in);
 
         // Order population by decreasing order of fitness
-        nextState.sort(new Comparator<Pair<Float, Rule>>()
-        {
+        nextState.sort(new Comparator<Pair<Float, Rule>>() {
             @Override
             public int compare(Pair<Float, Rule> o1, Pair<Float, Rule> o2)
             {

@@ -32,8 +32,7 @@ public class FitnessManager {
      * @return fitness value of rule
      */
     public float fitnessOf(Rule rule) {
-        //TODO: Remove when Mutate, Crossover and Generate rule ensure that a rule is valid at creation time
-        //TODO: assign weights
+
         float w1 = 1.0f;
         float w2 = 1.0f;
         float w3 = 1.0f;
@@ -71,6 +70,7 @@ public class FitnessManager {
      * This method computes a Hamming distance like measure between two given Rules. In this version
      * we define 'distance' as number of non-identical clauses in the two rules.
      * TODO: extend this by determining % overlap of a given feature domain for each matching participation
+     * TODO: @shane will do this for individual report
      * value, and add this to the distance value.
      *
      * @param r1: first rule
@@ -79,7 +79,7 @@ public class FitnessManager {
      * to value between 0.0 and 1.0
      */
 
-    protected static float hammingDistance(Rule r1, Rule r2){
+    protected float hammingDistance(Rule r1, Rule r2){
         int distance = 0;
 
         FeatureRequirement[] r1FeatureVector = r1.getFeatureReqs();
@@ -91,7 +91,7 @@ public class FitnessManager {
         return (distance/r1.getFeatureReqs().length);
     }
 
-    private float ext1(Rule rule){
+    protected float ext1(Rule rule){
         float smallestDistance = rule.getFeatureReqs().length;   // holds the smallest Hamming distance found to exist between rule and anu rule in known rules
         for(Rule wekaRule : theWekaRules){
             float dist = hammingDistance(rule, wekaRule);
