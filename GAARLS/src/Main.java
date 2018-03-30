@@ -28,7 +28,7 @@ public class Main
 
         System.out.println("Complete.\nParsing data set...");
         Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
-        System.out.println("Complete.");
+        System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
 
         System.out.println("Parsing known rules...");
         Parser parser = new Parser();

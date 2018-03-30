@@ -38,7 +38,7 @@ public class RuleTest {
             fr8 = new FeatureRequirement(7, 2, 10.367f, -5.62f, 0f); //CONSEQUENT
             fr9 = new FeatureRequirement(8, 0, 0f, 0f, 0f); //IGNORE
             fr10 = new FeatureRequirement(9, 0, 0f, 0f, 0f); //IGNORE
-            
+
             whos = new ArrayList<>();
             whos.add(0, Boolean.FALSE);
             whos.add(1, Boolean.FALSE);
@@ -340,5 +340,21 @@ public class RuleTest {
         assertFalse(r9.equals(r10.generateID()));
         assertFalse(r10.equals(r9.generateID()));
         
+    }
+
+    @Test
+    public void testEqualsOverride(){
+        Rule rule1 = new Rule();
+        Rule rule2 = new Rule();
+        Rule rule3 = new Rule();
+        Rule rule4 = new Rule();
+
+        rule1.replaceFeatureRequirement(1,fr2);
+        rule2.replaceFeatureRequirement(7,fr8);
+        assertFalse(rule1.equals(rule2));
+        assertFalse(rule2.equals(rule1));
+        assertTrue(rule3.equals(rule4));
+
+
     }
 }

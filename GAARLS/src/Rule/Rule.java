@@ -91,6 +91,7 @@ public class Rule {
      * @return True if other and this have same FeatureRequirement for each
      * element of the Rule; else false.
      */
+
     @Override
     public boolean equals(Object obj) {
 
@@ -120,6 +121,7 @@ public class Rule {
         // If here, all values were identical, meeting our definition for equality
         return true;
     }
+
     
     /**
      * Another comparison operator for Rule objects. Checks a given hash against

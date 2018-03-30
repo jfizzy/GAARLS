@@ -29,8 +29,6 @@ public class EvolutionManager
     private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
     private ArrayList<Rule> knownRules;
-    private ArrayList<Rule> wekaRules;
-
     private int crossToMut;
     private int crossoversDone;
     private ArrayList<Pair<Float,Rule>> state;                                            // All the current Fitness/Rule pairs.
@@ -48,7 +46,6 @@ public class EvolutionManager
         theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
         this.crossToMut = crossToMut;
-        this.wekaRules = wekaRules;
         crossoversDone = 0;
 
     }
@@ -109,8 +106,6 @@ public class EvolutionManager
                     state.remove(state.size() - 1);
                 }
                 System.out.println("\nPopulation size: " + state.size());
-                //System.out.println("Press RETURN to continue.");
-                //System.out.print(input.nextLine());
             }
             numGenerations++;
         }
@@ -152,9 +147,6 @@ public class EvolutionManager
         int spotsAllocated = 0;
         for(int i = 0; i < nextState.size(); i++){
             int spots = (int) Math.ceil(nextState.get(i).getKey());
-      //      System.out.println("i: " + i + " , spots: " + spots + " , fitness: " + nextState.get(i).getKey());
-        //    System.out.print(input.nextLine());
-
             int lastSpot = spots + spotsAllocated - 1;
             for(int j = spotsAllocated; j < lastSpot; j++){
                 fitnessInterval[j] = i;
@@ -168,23 +160,12 @@ public class EvolutionManager
 
             crossoversDone = 0;
             Rule child;
-            boolean duplicate = false;
             do {
-                if(duplicate) {
-                    System.out.println("duplicate child produced");
-                    duplicate = false;
-                    System.out.print(input.nextLine());
-
-                }
                 int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 Rule parent = nextState.get(parentIndex).getValue();
-                
                 child = theRuleManager.mutate(parent);
-                while(!RuleManager.IsValidRule(child)) //keep going until Mutation is Valid
-                    child = theRuleManager.mutate(parent);
-                
-                duplicate = true;
-            } while (nextState.contains(child) || knownRules.contains(child));
+            } while (!RuleManager.IsValidRule(child) || nextState.contains(child) || knownRules.contains(child));
+
             Float childFitness = theFitnessManager.fitnessOf(child);
             nextState.add(new Pair<>(childFitness, child));
         }
@@ -201,8 +182,17 @@ public class EvolutionManager
             Rule parent2 = nextState.get(parent2Index).getValue();
             
             Rule child = theRuleManager.crossover(parent1,parent2);
-            while(!RuleManager.IsValidRule(child)) //keep going until pivot point produces valid Rule
-                child = theRuleManager.crossover(parent1,parent2);
+            int crossOverAttempts = 0;
+            while(!RuleManager.IsValidRule(child) || nextState.contains(child) || knownRules.contains(child)) { //keep going until pivot point produces valid Rule
+                child = theRuleManager.crossover(parent1, parent2);
+                crossOverAttempts += 1;
+                //This will prevent hanging in the event where a unique child cant be made given the state and the parents
+                if(crossOverAttempts == 100){
+                    crossOverAttempts = 0;
+                    System.out.println("Unable to generate unique child from crossover operation. Mutating child.\nConsider increasing mutation rate.");
+                    child = theRuleManager.mutate(child);
+                }
+            }
             
             Float childFitness = theFitnessManager.fitnessOf(child);
             nextState.add(new Pair<>(childFitness, child));
@@ -224,7 +214,6 @@ public class EvolutionManager
         }
         else{
             try {
-               // f.getParentFile().mkdirs();
                 f.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
