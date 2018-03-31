@@ -344,6 +344,9 @@ public class RuleTest {
 
     @Test
     public void testEqualsOverride(){
+
+        ArrayList<Rule> testState = new ArrayList<Rule>();
+
         Rule rule1 = new Rule();
         Rule rule2 = new Rule();
         Rule rule3 = new Rule();
@@ -355,8 +358,14 @@ public class RuleTest {
         assertFalse(rule2.equals(rule1));
         assertTrue(rule3.equals(rule4));
 
+        testState.add(rule1);
+        testState.add(rule2);
+        testState.add(rule3);
+        assertTrue(testState.contains(rule4));
+
         rule3.replaceFeatureRequirement(0,fr1);
         assertTrue(rule3.equals(rule4)); //check that inactive clauses aren't counted towards equality
+
 
 
     }

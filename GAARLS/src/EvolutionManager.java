@@ -59,18 +59,19 @@ public class EvolutionManager
         ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
         Rule potentialRule;
         float ruleFitness;
-
+        Pair ruleAndFit;
         for(int i = 0; i < populationSize; i++){
             do {
-                potentialRule = theRuleManager.generateRule();
+                potentialRule = theRuleManager.generateRuleRandomSize();
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
-            } while (ruleFitness == 0 || state.contains(potentialRule) || knownRules.contains(potentialRule));
+                ruleAndFit = new Pair<>(ruleFitness,potentialRule);
+            } while (!RuleManager.IsValidRule(potentialRule) || state.contains(ruleAndFit) || knownRules.contains(potentialRule));
 
             if((i > 0) && (i%100 == 0)) {
                 System.out.println(i + " total rules added to initial population");
             }
 
-            state.add(new Pair<>(ruleFitness, potentialRule));
+            state.add(ruleAndFit);
         }
         System.out.println(populationSize + " rules added to initial population");
 
@@ -135,8 +136,8 @@ public class EvolutionManager
         for(int i = 0; i < nextState.size(); i++){
             FIT += nextState.get(i).getKey();
         }
-
         System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
+
 
 
 
@@ -160,14 +161,16 @@ public class EvolutionManager
 
             crossoversDone = 0;
             Rule child;
+            Pair childAndFit;
             do {
                 int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 Rule parent = nextState.get(parentIndex).getValue();
                 child = theRuleManager.mutate(parent);
-            } while (!RuleManager.IsValidRule(child) || nextState.contains(child) || knownRules.contains(child));
+                Float childFitness = theFitnessManager.fitnessOf(child);
+                childAndFit = new Pair<>(childFitness, child);
+            } while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child));
 
-            Float childFitness = theFitnessManager.fitnessOf(child);
-            nextState.add(new Pair<>(childFitness, child));
+            nextState.add(childAndFit);
         }
         else{                                               // Do crossover
 
@@ -175,26 +178,33 @@ public class EvolutionManager
             do {
                 parent1Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 parent2Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
+ //               System.out.println("index 1: " + parent1Index + "\nindex 2: " + parent2Index);
             } while (parent1Index == parent2Index);
 
             Rule parent1 = nextState.get(parent1Index).getValue();
             Rule parent2 = nextState.get(parent2Index).getValue();
             Rule child = theRuleManager.crossover(parent1,parent2);
-            
-            int crossOverAttempts = 0;
-            while(!RuleManager.IsValidRule(child) || nextState.contains(child) || knownRules.contains(child)) { //keep going until pivot point produces valid Rule
-                child = theRuleManager.crossover(parent1, parent2);
-                crossOverAttempts += 1;
-                //This will prevent hanging in the event where a unique child cant be made given the state and the parents
-                if(crossOverAttempts == 100){
-                    crossOverAttempts = 0;
-                    System.out.println("Unable to generate unique child from crossover operation. Mutating child.\nConsider increasing mutation rate.");
-                    child = theRuleManager.mutate(child);
-                }
-            }
-            
             Float childFitness = theFitnessManager.fitnessOf(child);
-            nextState.add(new Pair<>(childFitness, child));
+            Pair childAndFit = new Pair<>(childFitness, child);
+
+            int crossOverAttempts = 0;
+            while(crossOverAttempts < 20 && (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child))) { //keep going until pivot point produces valid Rule
+                child = theRuleManager.crossover(parent1, parent2);
+                childFitness = theFitnessManager.fitnessOf(child);
+                childAndFit = new Pair<>(childFitness, child);
+                crossOverAttempts += 1;
+            }
+
+            if(crossOverAttempts == 20) { // unable to produce unique child from 100 crossover attempts. Switching to mutation
+                do {
+                    child = theRuleManager.mutate(child); // keep mutating child until it meets constraints
+                    childFitness = theFitnessManager.fitnessOf(child);
+                    childAndFit = new Pair<>(childFitness, child);
+                }
+                while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child));//keep going until pivot point produces valid Rule
+            }
+
+            nextState.add(childAndFit);
             crossoversDone++;
         }
         return nextState;
@@ -205,7 +215,7 @@ public class EvolutionManager
      * @param filePath
      */
     public void toFile(String filePath) {
-        float minAccuracy = 0.9f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
+        float minAccuracy = 0.1f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
         File f = new File(filePath);
 
         if(f.exists() && !f.isDirectory()) {
@@ -228,13 +238,15 @@ public class EvolutionManager
             out.println("BEGINNING OF RULE OUTPUT FOR GIVEN RUN");
             for(int i = 0; i < state.size(); i++) {
                 Pair individual = state.get(i);
-                float individualsAccuracy = (float) individual.getKey();
+                Rule ind = (Rule) individual.getValue();
+                float individualsAccuracy = ind.getAccuracy()*100;
+                float indCov = ind.getCoverage()*100;
+
                 if (Float.compare(individualsAccuracy, minAccuracy) >= 0) {
-                    String lineInFile = theRuleManager.TranslateRule(state.get(i).getValue());
-                    out.println("Rule Accuracy: " + individualsAccuracy + "; " + lineInFile);
+                    String lineInFile = theRuleManager.TranslateRule(ind);
+                    out.println("Rule Accuracy: " + individualsAccuracy + "; Rule Coverage: " + indCov + "\n" + lineInFile);
                 }
             }
-            System.out.println("Are first and second rule equal? : " + (state.get(0)).equals(state.get(1)));
             out.println("END OF RULE OUTPUT FOR GIVEN RUN");
 
         } catch (IOException e) {

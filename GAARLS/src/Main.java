@@ -48,8 +48,8 @@ public class Main
         //TODO: need to decide who is going to link these options up to the proper locations
 
 
-        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, 10);
-        evolutionManager.evolve(1000, 1000, 1300);
+        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, 1);
+        evolutionManager.evolve(500, 1000, 700);
         evolutionManager.toFile("outputRules.txt"); //Keep in mind that as is, this will just keep appending rules to this file after each run
         System.out.println("Evolution complete. \n Learned rules output to outputRules.txt");
     }
