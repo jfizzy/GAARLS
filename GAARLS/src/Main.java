@@ -52,7 +52,7 @@ public class Main
         //evolutionManager.evolve(500, 1000, 700);
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, cp);
         evolutionManager.evolve();
-        evolutionManager.toFile("outputRules.txt"); //Keep in mind that as is, this will just keep appending rules to this file after each run
+        evolutionManager.toFile("outputRules.txt", cp); //Keep in mind that as is, this will just keep appending rules to this file after each run
         System.out.println("Evolution complete. \nLearned rules output to outputRules.txt");
     }
 

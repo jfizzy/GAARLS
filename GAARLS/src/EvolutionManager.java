@@ -223,7 +223,7 @@ public class EvolutionManager
      * Prints population to output file as rules
      * @param filePath
      */
-    public void toFile(String filePath) {
+    public void toFile(String filePath, ConfigParameters cp) {
         float minAccuracy = 0.1f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
         File f = new File(filePath);
 
@@ -237,14 +237,28 @@ public class EvolutionManager
                 e.printStackTrace();
             }
         }
-
+        String configString = "---Configuration parameters---\n" +
+        "Initial Population Size: \t\t"+cp.initialPopSize+"\n" +
+        "Number Of Generations: \t\t\t"+cp.numGenerations+"\n" +
+        "Maximum Population Size: \t\t"+cp.populationMax+"\n" +
+        "Min Coverage: \t\t\t\t"+cp.minCoverage+"\n" +
+        "Min Accuracy: \t\t\t\t"+cp.minAccuracy+"\n" +
+        "Probability of Crossover: \t\t"+cp.probOfCrossover+"\n" +
+        "Probability of Mutation: \t\t"+cp.probOfMutation +"\n" +
+        "Crossover to Mutation Ratio: \t\t"+cp.crossToMute +"\n" +
+        "Base Fitness Weighting: \t\t"+cp.baseFitnessWeight +"\n" +
+        "Ext1 Fitness Weighting: \t\t"+cp.ext1FitnessWeight +"\n" +
+        "Ext2 Fitness Weighting: \t\t"+cp.ext2FitnessWeight +"\n" +
+        "Num Antecedent Features: \t\t"+cp.numFeatAntecedent +"\n" +
+        "Num Consequent Features: \t\t"+cp.numFeatConsequent +"\n" +
+        "------------------------------";
 
         try(FileWriter fw = new FileWriter(filePath, true);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
 
-            out.println("BEGINNING OF RULE OUTPUT FOR GIVEN RUN");
+            out.println(configString);
             for(int i = 0; i < state.size(); i++) {
                 Pair individual = state.get(i);
                 Rule ind = (Rule) individual.getValue();
@@ -256,7 +270,7 @@ public class EvolutionManager
                     out.println("Rule Accuracy: " + individualsAccuracy + "; Rule Coverage: " + indCov + "\n" + lineInFile);
                 }
             }
-            out.println("END OF RULE OUTPUT FOR GIVEN RUN");
+            out.println("------------------------- RULES END");
 
         } catch (IOException e) {
             e.printStackTrace();
