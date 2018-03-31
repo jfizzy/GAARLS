@@ -1,5 +1,6 @@
 import Rule.Rule;
 import javafx.util.Pair;
+import sun.security.krb5.Config;
 
 import java.io.*;
 import java.util.*;
@@ -30,8 +31,15 @@ public class EvolutionManager
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
     private ArrayList<Rule> knownRules;
     private ArrayList<Rule> wekaRules;
+    private ConfigParameters cp;
 
-    private int crossToMut;
+    private int maxPopulation;
+    private int crossToMute;
+    private int initialSize;
+    private int maxGenerations;
+    private int numFeatAntecedent;
+    private int numFeatConsequent;
+
     private int crossoversDone;
     private ArrayList<Pair<Float,Rule>> state;                                            // All the current Fitness/Rule pairs.
 
@@ -41,31 +49,35 @@ public class EvolutionManager
      * 
      * @param database: the dataset file converted to Database structure
      * @param lookupTable: table of allowable feature values
-     * @param crossToMut: number of crossover operations to perform between each mutation
+     * @param cp: set of config parameters
      */
-    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<Rule> wekaRules, int crossToMut) {
+    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<Rule> wekaRules, ConfigParameters cp) {
         theFitnessManager = new FitnessManager(database, wekaRules);
         theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
-        this.crossToMut = crossToMut;
         this.wekaRules = wekaRules;
+        this.maxPopulation = cp.populationMax;
+        this.crossToMute = cp.crossToMute;
+        this.initialSize = cp.initialPopSize;
+        this.maxGenerations = cp.numGenerations;
+        this.numFeatAntecedent = cp.numFeatAntecedent;
+        this.numFeatConsequent = cp.numFeatConsequent;
         crossoversDone = 0;
 
     }
 
     /**
      *  Initialization function creating an initial population
-     *  @param populationSize: initial population size
      */
-    private ArrayList<Pair<Float, Rule>> initializePopulation(int populationSize) {
+    private ArrayList<Pair<Float, Rule>> initializePopulation() {
 
         ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
 
         Rule potentialRule;
         float ruleFitness;
-        for(int i = 0; i < populationSize; i++){
+        for(int i = 0; i < initialSize; i++){
             do {
-                potentialRule = theRuleManager.generateRule();
+                potentialRule = theRuleManager.generateRule(numFeatAntecedent, numFeatConsequent);
 
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
 
@@ -80,29 +92,21 @@ public class EvolutionManager
         return state;
     }
 
-    /**
-     *
-     * All parameters are tunable
-     *
-     * @param startSize: size of initial population
-     * @param forGenerations: stop condition
-     * @param maxPop: max state size
-     */
-    public void evolve(int startSize, int forGenerations, int maxPop) {
+    public void evolve() {
         int numGenerations = 0;
-        int cullToSize = maxPop - 100;
+        int cullToSize = maxPopulation - 100;
 
         System.out.println("Generating initial population...");
-        state = this.initializePopulation(startSize);
+        state = this.initializePopulation();
 
         Scanner input = new Scanner(System.in);
         System.out.println("Initial population generated. Press RETURN to begin evolution of rules.");
         System.out.print(input.nextLine());
 
-        while (numGenerations < forGenerations) {
+        while (numGenerations < maxGenerations) {
             state = fSelect(state);
 
-            if(state.size() > maxPop) {
+            if(state.size() > maxPopulation) {
                 System.out.println("\nPopulation size: " + state.size());
                 System.out.println("Max population size exceeded. Trimming 100 individuals...");
                 while(state.size() > cullToSize) {
@@ -165,7 +169,7 @@ public class EvolutionManager
 
 
         // Select individual(s) for genetic operation and call
-        if(crossoversDone == crossToMut){                   // Do mutation
+        if(crossoversDone == crossToMute){                   // Do mutation
 
             crossoversDone = 0;
             Rule child;

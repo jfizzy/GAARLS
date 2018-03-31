@@ -836,6 +836,10 @@ public class LookupTable
         lookupTable = LookupTable.ParseFile("", test); // parse lookup table file
         System.out.println("Full lookup table: " + (lookupTable.mFeatureLookupTable.length == NUM_FEATURES_IN_FILE));
 
+        Parser parser = new Parser();
+
+        ConfigParameters cp = parser.parseConfigParameters("config.txt");
+
         Database database = Database.ParseFile("NCDB_1999_to_2015.csv", lookupTable, 10); // parse database file
         float[] datatable = database.GetDatabase();
         for (int i = 0; i < lookupTable.NumFeatures; ++i)
@@ -855,7 +859,7 @@ public class LookupTable
 
         }
         RuleManager ruleManager = new RuleManager(lookupTable);
-        Rule testRule = ruleManager.generateRule();
+        Rule testRule = ruleManager.generateRule(cp.numFeatAntecedent, cp.numFeatConsequent);
         System.out.println(lookupTable.TranslateRule(testRule));
     }
 }
