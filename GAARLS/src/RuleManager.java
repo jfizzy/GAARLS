@@ -122,40 +122,47 @@ public class RuleManager
     /**
      * Helper function to generate simple new rules in the population initialization phase
      * Creates a new rule with randomized requirements found from LookupTable, such that rules have
-     * two clauses in the antecedent and one in the consequent.
+     * the specified number of clauses.
+     * @param numFeatAntecedent
+     * @param numFeatConsequent
      * @return random new rule
      */
-    public Rule generateRuleThreeFeat()
+    public Rule generateRule(int numFeatAntecedent, int numFeatConsequent)
     {
         Rule newRule = new Rule();
 
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
         int size = featureRequirements.length;
 
-        // TODO: When no longer hard coding rules, ensure that there is always a valid number of antecedents and consequents
-        { // TODO: Remove hard coded rule generation
-            // choose 3 features randomly for generating a random rule
-            int antecedent1 = rand.nextInt(size);
-            int antecedent2 = rand.nextInt(size);
-            while(antecedent1 == antecedent2)
-                antecedent2 = rand.nextInt(size);
+        ArrayList<Integer> antecedents = new ArrayList<>();
+        ArrayList<Integer> consequents = new ArrayList<>();
 
-            int consequent = rand.nextInt(size);
-            while(consequent == antecedent1 || consequent == antecedent2)
-                consequent = rand.nextInt(size);
-
-
-            //TODO: add
-            mLookupTable.GenerateRandomValue(antecedent1, featureRequirements[antecedent1]);
-            featureRequirements[antecedent1].setParticipation(1);
-
-            mLookupTable.GenerateRandomValue(antecedent2, featureRequirements[antecedent2]);
-            featureRequirements[antecedent2].setParticipation(1);
-
-            mLookupTable.GenerateRandomValue(consequent, featureRequirements[consequent]);
-            featureRequirements[consequent].setParticipation(2);
-
+        for (int i = 0; i < numFeatAntecedent; ++i) {
+            int aIndex;
+            do {
+                aIndex = rand.nextInt(size);
+            } while (antecedents.contains(aIndex));
+            antecedents.add(aIndex);
         }
+
+        for (int i = 0; i < numFeatConsequent; ++i) {
+            int cIndex;
+            do {
+                cIndex = rand.nextInt(size);
+            } while (consequents.contains(cIndex) || antecedents.contains(cIndex));
+            consequents.add(cIndex);
+        }
+
+        for (int index : antecedents) {
+            mLookupTable.GenerateRandomValue(index, featureRequirements[index]);
+            featureRequirements[index].setParticipation(1);
+        }
+
+        for (int index : consequents) {
+            mLookupTable.GenerateRandomValue(index, featureRequirements[index]);
+            featureRequirements[index].setParticipation(2);
+        }
+
         return newRule;
     }
 
