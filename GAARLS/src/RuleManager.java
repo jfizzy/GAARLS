@@ -93,7 +93,38 @@ public class RuleManager
 
     /**
      * Helper function to generate new rules in the population initialization phase
-     * Creates a new rule with randomized requirements found from LookupTable
+     * Creates a new rule with randomized requirements found from LookupTable, with a random number of
+     * clauses
+     * @return random new rule
+     */
+    //TODO: figure out why this is always returning a 0.0 fitness rule
+    public Rule generateRuleRandomSize()
+    {
+        Rule newRule = new Rule();
+        int numFeatures = 2 + rand.nextInt(num_features - 3);// -1 is to prevent setting C_CASE, +2 increases chances it is valid
+        ArrayList<Integer> featuresInRule = new ArrayList(); // will hold the index of the features already active in the rule
+        FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
+        int feature;
+
+        for(int i = 0; i < numFeatures; i ++){
+            int participation = rand.nextInt(2) + 1; //participation will be either 1 or 2
+            do{
+                feature = rand.nextInt(num_features-1);
+            } while (featuresInRule.contains(feature));
+            featuresInRule.add(feature);
+            mLookupTable.GenerateRandomValue(feature, featureRequirements[feature]);
+            featureRequirements[feature].setParticipation(participation);
+        }
+
+        return newRule;
+    }
+
+    /**
+     * Helper function to generate simple new rules in the population initialization phase
+     * Creates a new rule with randomized requirements found from LookupTable, such that rules have
+     * the specified number of clauses.
+     * @param numFeatAntecedent
+     * @param numFeatConsequent
      * @return random new rule
      */
     public Rule generateRule(int numFeatAntecedent, int numFeatConsequent)
@@ -134,6 +165,31 @@ public class RuleManager
 
         return newRule;
     }
+
+    /**
+     * Helper function to generate new rules in the population initialization phase
+     * Creates a new rule with randomized requirements found from LookupTable, with
+     * the possibility that all features are activated.
+     * @return random new rule
+     */
+    public Rule generateRuleMaxFeatures()
+    {
+        Rule newRule = new Rule();
+        FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
+
+        // TODO: When no longer hard coding rules, ensure that there is always a valid number of antecedents and consequents
+        for(int i = 0; i < num_features; i++){ // TODO: Remove hard coded rule generation
+            // choose 3 features randomly for generating a random rule
+            int participation = rand.nextInt(2); // generate random participation value of 0,1, or 2
+            featureRequirements[i].setParticipation(participation);
+            if (participation != 0){
+                mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
+
+            }
+        }
+        return newRule;
+    }
+
 
     public static boolean IsValidRule(Rule rule)
     {

@@ -91,6 +91,7 @@ public class Rule {
      * @return True if other and this have same FeatureRequirement for each
      * element of the Rule; else false.
      */
+
     @Override
     public boolean equals(Object obj) {
 
@@ -106,20 +107,23 @@ public class Rule {
 
         // Look for any difference in feature requirement values
         for (int i = 0; i < othersFR.length; i++) {
-            if (othersFR[i].getParticipation() != this.featureReqs[i].getParticipation()) {
+            if (othersFR[i].getParticipation() != this.featureReqs[i].getParticipation())
                 return false;
+            if(othersFR[i].getParticipation() != 0) { // If here, participation of both rules is the same, but only care about active clauses
+                if (othersFR[i].getUpperBound() != this.featureReqs[i].getUpperBound()) {
+                    return false;
+                }
+                if (othersFR[i].getLowerBound() != this.featureReqs[i].getLowerBound()) {
+                    return false;
+                }
             }
-            if (othersFR[i].getUpperBound() != this.featureReqs[i].getUpperBound()) {
-                return false;
-            }
-            if (othersFR[i].getLowerBound() != this.featureReqs[i].getLowerBound()) {
-                return false;
-            }
+
         }
 
         // If here, all values were identical, meeting our definition for equality
         return true;
     }
+
     
     /**
      * Another comparison operator for Rule objects. Checks a given hash against

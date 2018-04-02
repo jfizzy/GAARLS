@@ -28,7 +28,7 @@ public class Main
 
         System.out.println("Complete.\nParsing data set...");
         Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
-        System.out.println("Complete.");
+        System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
 
         System.out.println("Parsing known rules...");
         Parser parser = new Parser();
@@ -48,10 +48,12 @@ public class Main
         //TODO: need to decide who is going to link these options up to the proper locations
 
 
+        //EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, 1);
+        //evolutionManager.evolve(500, 1000, 700);
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, cp);
         evolutionManager.evolve();
-        evolutionManager.toFile("outputRules.txt"); //Keep in mind that as is, this will just keep appending rules to this file after each run
-        System.out.println("Evolution complete. \n Learned rules output to outputRules.txt");
+        evolutionManager.toFile("outputRules.txt", cp); //Keep in mind that as is, this will just keep appending rules to this file after each run
+        System.out.println("Evolution complete. \nLearned rules output to outputRules.txt");
     }
 
     /* parse the arguments

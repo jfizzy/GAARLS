@@ -30,6 +30,7 @@ public class EvolutionManager
     private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
     private ArrayList<Rule> knownRules;
+
     private ArrayList<Rule> wekaRules;
     private ConfigParameters cp;
 
@@ -63,7 +64,6 @@ public class EvolutionManager
         this.numFeatAntecedent = cp.numFeatAntecedent;
         this.numFeatConsequent = cp.numFeatConsequent;
         crossoversDone = 0;
-
     }
 
     /**
@@ -72,23 +72,26 @@ public class EvolutionManager
     private ArrayList<Pair<Float, Rule>> initializePopulation() {
 
         ArrayList<Pair<Float, Rule>> state = new ArrayList<>();
-
         Rule potentialRule;
         float ruleFitness;
+        Pair ruleAndFit;
         for(int i = 0; i < initialSize; i++){
             do {
-                potentialRule = theRuleManager.generateRule(numFeatAntecedent, numFeatConsequent);
+                potentialRule = theRuleManager.generateRuleRandomSize();
+               //potentialRule = theRuleManager.generateRule(numFeatAntecedent, numFeatConsequent);
 
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
-
-            } while (ruleFitness == 0 || state.contains(potentialRule) || knownRules.contains(potentialRule));
+                ruleAndFit = new Pair<>(ruleFitness,potentialRule);
+            } while (!RuleManager.IsValidRule(potentialRule) || state.contains(ruleAndFit) || knownRules.contains(potentialRule));
 
             if((i > 0) && (i%100 == 0)) {
-                System.out.println(i + " rules added to initial population");
-
+                System.out.println(i + " total rules added to initial population");
             }
-            state.add(new Pair<>(ruleFitness, potentialRule));
+
+            state.add(ruleAndFit);
         }
+        System.out.println(initialSize + " rules added to initial population");
+
         return state;
     }
 
@@ -113,8 +116,6 @@ public class EvolutionManager
                     state.remove(state.size() - 1);
                 }
                 System.out.println("\nPopulation size: " + state.size());
-                //System.out.println("Press RETURN to continue.");
-                //System.out.print(input.nextLine());
             }
             numGenerations++;
         }
@@ -125,12 +126,11 @@ public class EvolutionManager
      * Create new state from current one by application of genetic operations
      */
     private ArrayList<Pair<Float, Rule>> fSelect(ArrayList<Pair<Float, Rule>> aState){
+
         ArrayList<Pair<Float, Rule>> nextState = aState;
-        Scanner input = new Scanner(System.in);
 
         // Order population by decreasing order of fitness
-        nextState.sort(new Comparator<Pair<Float, Rule>>()
-        {
+        nextState.sort(new Comparator<Pair<Float, Rule>>() {
             @Override
             public int compare(Pair<Float, Rule> o1, Pair<Float, Rule> o2)
             {
@@ -145,8 +145,8 @@ public class EvolutionManager
         for(int i = 0; i < nextState.size(); i++){
             FIT += nextState.get(i).getKey();
         }
-
         System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
+
 
 
 
@@ -157,9 +157,6 @@ public class EvolutionManager
         int spotsAllocated = 0;
         for(int i = 0; i < nextState.size(); i++){
             int spots = (int) Math.ceil(nextState.get(i).getKey());
-      //      System.out.println("i: " + i + " , spots: " + spots + " , fitness: " + nextState.get(i).getKey());
-        //    System.out.print(input.nextLine());
-
             int lastSpot = spots + spotsAllocated - 1;
             for(int j = spotsAllocated; j < lastSpot; j++){
                 fitnessInterval[j] = i;
@@ -173,44 +170,50 @@ public class EvolutionManager
 
             crossoversDone = 0;
             Rule child;
-            boolean duplicate = false;
+            Pair childAndFit;
             do {
-                if(duplicate) {
-                    System.out.println("duplicate child produced");
-                    duplicate = false;
-                    System.out.print(input.nextLine());
-
-                }
                 int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 Rule parent = nextState.get(parentIndex).getValue();
-                
                 child = theRuleManager.mutate(parent);
-                while(!RuleManager.IsValidRule(child)) //keep going until Mutation is Valid
-                    child = theRuleManager.mutate(parent);
-                
-                duplicate = true;
-            } while (nextState.contains(child) || knownRules.contains(child));
-            Float childFitness = theFitnessManager.fitnessOf(child);
-            nextState.add(new Pair<>(childFitness, child));
+                Float childFitness = theFitnessManager.fitnessOf(child);
+                childAndFit = new Pair<>(childFitness, child);
+            } while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child));
+
+            nextState.add(childAndFit);
         }
         else{                                               // Do crossover
 
             int parent1Index, parent2Index;
             do {
-
                 parent1Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 parent2Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
-
+ //               System.out.println("index 1: " + parent1Index + "\nindex 2: " + parent2Index);
             } while (parent1Index == parent2Index);
+
             Rule parent1 = nextState.get(parent1Index).getValue();
             Rule parent2 = nextState.get(parent2Index).getValue();
-            
             Rule child = theRuleManager.crossover(parent1,parent2);
-            while(!RuleManager.IsValidRule(child)) //keep going until pivot point produces valid Rule
-                child = theRuleManager.crossover(parent1,parent2);
-            
             Float childFitness = theFitnessManager.fitnessOf(child);
-            nextState.add(new Pair<>(childFitness, child));
+            Pair childAndFit = new Pair<>(childFitness, child);
+
+            int crossOverAttempts = 0;
+            while(crossOverAttempts < 20 && (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child))) { //keep going until pivot point produces valid Rule
+                child = theRuleManager.crossover(parent1, parent2);
+                childFitness = theFitnessManager.fitnessOf(child);
+                childAndFit = new Pair<>(childFitness, child);
+                crossOverAttempts += 1;
+            }
+
+            if(crossOverAttempts == 20) { // unable to produce unique child from 100 crossover attempts. Switching to mutation
+                do {
+                    child = theRuleManager.mutate(child); // keep mutating child until it meets constraints
+                    childFitness = theFitnessManager.fitnessOf(child);
+                    childAndFit = new Pair<>(childFitness, child);
+                }
+                while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child));//keep going until pivot point produces valid Rule
+            }
+
+            nextState.add(childAndFit);
             crossoversDone++;
         }
         return nextState;
@@ -220,8 +223,8 @@ public class EvolutionManager
      * Prints population to output file as rules
      * @param filePath
      */
-    public void toFile(String filePath) {
-        float minAccuracy = 0.9f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
+    public void toFile(String filePath, ConfigParameters cp) {
+        float minAccuracy = 0.1f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
         File f = new File(filePath);
 
         if(f.exists() && !f.isDirectory()) {
@@ -229,29 +232,45 @@ public class EvolutionManager
         }
         else{
             try {
-               // f.getParentFile().mkdirs();
                 f.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
+        String configString = "---Configuration parameters---\n" +
+        "Initial Population Size: \t\t"+cp.initialPopSize+"\n" +
+        "Number Of Generations: \t\t\t"+cp.numGenerations+"\n" +
+        "Maximum Population Size: \t\t"+cp.populationMax+"\n" +
+        "Min Coverage: \t\t\t\t"+cp.minCoverage+"\n" +
+        "Min Accuracy: \t\t\t\t"+cp.minAccuracy+"\n" +
+        "Probability of Crossover: \t\t"+cp.probOfCrossover+"\n" +
+        "Probability of Mutation: \t\t"+cp.probOfMutation +"\n" +
+        "Crossover to Mutation Ratio: \t\t"+cp.crossToMute +"\n" +
+        "Base Fitness Weighting: \t\t"+cp.baseFitnessWeight +"\n" +
+        "Ext1 Fitness Weighting: \t\t"+cp.ext1FitnessWeight +"\n" +
+        "Ext2 Fitness Weighting: \t\t"+cp.ext2FitnessWeight +"\n" +
+        "Num Antecedent Features: \t\t"+cp.numFeatAntecedent +"\n" +
+        "Num Consequent Features: \t\t"+cp.numFeatConsequent +"\n" +
+        "------------------------------";
 
         try(FileWriter fw = new FileWriter(filePath, true);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
 
-            out.println("BEGINNING OF RULE OUTPUT FOR GIVEN RUN");
+            out.println(configString);
             for(int i = 0; i < state.size(); i++) {
                 Pair individual = state.get(i);
-                float individualsAccuracy = (float) individual.getKey();
+                Rule ind = (Rule) individual.getValue();
+                float individualsAccuracy = ind.getAccuracy()*100;
+                float indCov = ind.getCoverage()*100;
+
                 if (Float.compare(individualsAccuracy, minAccuracy) >= 0) {
-                    String lineInFile = theRuleManager.TranslateRule(state.get(i).getValue());
-                    out.println("Rule Accuracy: " + individualsAccuracy + "; " + lineInFile);
+                    String lineInFile = theRuleManager.TranslateRule(ind);
+                    out.println("Rule Accuracy: " + individualsAccuracy + "; Rule Coverage: " + indCov + "\n" + lineInFile);
                 }
             }
-            out.println("END OF RULE OUTPUT FOR GIVEN RUN");
+            out.println("------------------------- RULES END");
 
         } catch (IOException e) {
             e.printStackTrace();

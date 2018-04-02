@@ -859,7 +859,8 @@ public class LookupTable
 
         }
         RuleManager ruleManager = new RuleManager(lookupTable);
-        Rule testRule = ruleManager.generateRule(cp.numFeatAntecedent, cp.numFeatConsequent);
+        Rule testRule = ruleManager.generateRuleRandomSize();
+
         System.out.println(lookupTable.TranslateRule(testRule));
     }
 }
