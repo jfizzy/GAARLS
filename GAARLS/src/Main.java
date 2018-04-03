@@ -2,6 +2,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import Rule.Rule;
+import Rule.RuleRegex;
+import Rule.FeatureRequirement;
 
 /*
     Main driver for the program
@@ -27,13 +29,13 @@ public class Main
         LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, featuresToOmit); // parse lookup table file
 
         System.out.println("Complete.\nParsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, 10000); // parse database file
         System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
 
         System.out.println("Parsing known rules...");
         Parser parser = new Parser();
-
         ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, featuresToOmit);
+        ArrayList<RuleRegex> knownRegexs = parser.parseKnownRuleRegexs(ruleFilePath);
         System.out.println("Complete.");
 
         System.out.println("Parsing WEKA rules...");
@@ -64,7 +66,7 @@ public class Main
 
         //EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, 1);
         //evolutionManager.evolve(500, 1000, 700);
-        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, cp);
+        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, knownRegexs, wekaRules, cp);
         evolutionManager.evolve();
         evolutionManager.toFile("outputRules.txt", cp); //Keep in mind that as is, this will just keep appending rules to this file after each run
         System.out.println("Evolution complete. \nLearned rules output to outputRules.txt");

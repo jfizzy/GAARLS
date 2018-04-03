@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import Rule.FeatureRequirement;
 import Rule.Rule;
+import Rule.RuleRegex;
 
 public class Parser {
 
@@ -21,6 +24,8 @@ public class Parser {
                 Pattern pattern = Pattern.compile("([CVP]_\\w*):\\s\\[?([\\w\\-\\s:,]*)\\]?");
                 Matcher matcher;
                 while ((rule = br.readLine()) != null) {
+                    if (rule.toLowerCase().contains("regex"))
+                        continue;
                     // split the antecedents and consequents so we set participation correctly
                     String parts[] = rule.split("=>");
                     if (parts.length < 2) {
@@ -78,6 +83,76 @@ public class Parser {
         }
         System.out.println("Complete. Parsed " + knownRules.size() + " rules.");
         return knownRules;
+    }
+
+    public ArrayList<RuleRegex> parseKnownRuleRegexs(String ruleFilePath) {
+        File ruleFile = new File(ruleFilePath);
+        ArrayList<RuleRegex> knownRegexs = new ArrayList<>();
+        if (ruleFile.exists()) {
+            System.out.println("Found rule file '" + ruleFilePath + "'. Parsing rule regexs...");
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(ruleFile));
+                String rule;
+                // pull out the relevant portions of the rule
+                Pattern pattern = Pattern.compile("([CVP]_\\w*):\\s\\[?([\\w\\-\\s:,]*)\\]?");
+                Matcher matcher;
+                while ((rule = br.readLine()) != null) {
+                    if (rule.toLowerCase().contains("regex") == false)
+                        continue;
+                    // split the antecedents and consequents so we set participation correctly
+                    String parts[] = rule.split("=>");
+                    RuleRegex temp = new RuleRegex();
+                    boolean blockedRule = false;
+                    for (int i = 0; i < parts.length; ++i) {
+                        matcher = pattern.matcher(parts[i]);
+                        while (matcher.find() && !blockedRule) {
+                            // group 1 is the feature name e.g. C_YEAR
+                            if (LookupTable.featureMap.get(matcher.group(1)) != null) {
+                                int featureId = LookupTable.featureMap.get(matcher.group(1));
+                                // group 2 is our min max, or discrete value
+                                String bounds[] = matcher.group(2).split("\\s-\\s");
+                                float min = 0.0f;
+                                try {
+                                    min = LookupTable.featureValueMaps[featureId].get(bounds[0].trim());
+                                } catch (NullPointerException e) {
+                                    // TODO: Remove this after certain that regex matches all possible feature values
+                                    System.out.println("ID for " + matcher.group(1) + " " + featureId);
+                                    System.out.println(LookupTable.featureValueMaps[featureId].get(bounds[0].trim()));
+                                    System.out.println("Size: " + LookupTable.featureValueMaps[featureId].size());
+                                    System.out.println(bounds[0].trim());
+                                    System.exit(1);
+                                }
+                                float max;
+                                // range
+                                if (bounds.length == 2) {
+                                    max = LookupTable.featureValueMaps[featureId].get(bounds[1].trim());
+                                    // discrete
+                                } else {
+                                    max = min;
+                                }
+                                if (!temp.addFeatureRequirement(new FeatureRequirement(featureId, i+1, min, max, 0))) {
+                                    System.out.println("WARNING: Error updating feature requirement: " + matcher.group(1) + "=" + matcher.group(2));
+                                }
+                            } else {
+                                System.out.println("WARNING: Rule \n" + rule + "\ncontains omitted feature " + matcher.group(1) + ". Skipping...");
+                                blockedRule = true;
+                                break;
+                            }
+                        }
+                        if (blockedRule)
+                            break;
+                    }
+                    if (temp.getFeatureRequirements().size() == 0 || blockedRule)
+                        continue;
+                    knownRegexs.add(temp);
+                }
+            } catch (IOException e) {
+                System.out.println("ERROR: I/O error when parsing rule file '" + ruleFilePath + "'");
+                System.out.println(e.getMessage());
+            }
+        }
+        System.out.println("Complete. Parsed " + knownRegexs.size() + " rule regexs.");
+        return knownRegexs;
     }
 
     public ArrayList<Rule> parseWekaRules (String wekaFilePath, LookupTable lookupTable, ArrayList<Integer> featuresToOmit) {
