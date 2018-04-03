@@ -42,10 +42,24 @@ public class Main
 
         //new wrapper class containing the config parameter values read from file
         ConfigParameters cp = parser.parseConfigParameters(configFilePath);
-        if (cp != null) {
-            printConfigDetails(cp); // I assume this will help a lot
-        }
-        //TODO: need to decide who is going to link these options up to the proper locations
+        if (cp == null)
+            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,1f,0f,0f,10,10,null,10); 
+        // default configuration when file is missing
+        // params in constructor are:
+        /*  1000        Initial Population Size
+            1000        Number of Generations
+            1300        Maximum Population Size
+            0.01        Minimum Coverage
+            0.01        Minimum Accuracy
+            1           Base Fitness Weighting
+            0           Fitness Ext1 Weighting
+            0           Fitness Ext2 Weighting
+            10          Max Features to allow in Antecedent
+            10          Max Features to allow in Consequent
+            null        List of Features to Ignore
+            10          Crossover to Mutation ratio
+        */
+        printConfigDetails(cp);
 
 
         //EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, 1);

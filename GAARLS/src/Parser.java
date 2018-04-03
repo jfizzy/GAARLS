@@ -212,7 +212,6 @@ public class Parser {
                     }
 
                 }
-                //TODO: lets talk about these default parameters and set them appropriately
                 ConfigParameters cp = new ConfigParameters(
                         initialPopSize != null ? initialPopSize : 1000,
                         numGenerations != null ? numGenerations : 1000,
@@ -220,10 +219,10 @@ public class Parser {
                         minCoverage != null ? minCoverage : 0.01f, 
                         minAccuracy != null ? minAccuracy : 0.01f,
                         baseFitnessWeight != null ? baseFitnessWeight : 1.0f,
-                        ext1FitnessWeight != null ? ext1FitnessWeight : 1.0f, 
-                        ext2FitnessWeight != null ? ext2FitnessWeight : 1.0f,
-                        numFeatAntecedent != null ? numFeatAntecedent : 2, 
-                        numFeatConsequent != null ? numFeatConsequent : 1,
+                        ext1FitnessWeight != null ? ext1FitnessWeight : 0f, 
+                        ext2FitnessWeight != null ? ext2FitnessWeight : 0f,
+                        numFeatAntecedent != null ? numFeatAntecedent : 10, 
+                        numFeatConsequent != null ? numFeatConsequent : 10,
                         featuresToIgnore != null ? featuresToIgnore : null,
                         crossToMute != null ? crossToMute : 10
                 );
