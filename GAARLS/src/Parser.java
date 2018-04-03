@@ -150,8 +150,6 @@ public class Parser {
                 Pattern minCovPatt = Pattern.compile("^MIN_COVERAGE\\s*=\\s*\\d*(\\.\\d*)?$");
                 Pattern minAccPatt = Pattern.compile("^MIN_ACCURACY\\s*=\\s*\\d*(\\.\\d*)?$");
 
-                Pattern pXPatt = Pattern.compile("^P_OF_CROSSOVER\\s*=\\s*\\d*(\\.\\d*)?$");
-                Pattern pMPatt = Pattern.compile("^P_OF_MUTATION\\s*=\\s*\\d*(\\.\\d*)?$");
                 Pattern crossToMutePatt = Pattern.compile("^CROSS_TO_MUTE\\s*=\\s*\\d*$");
 
                 Pattern bFWPatt = Pattern.compile("^BASE_FITNESS_WEIGHT\\s*=\\s*\\d*(\\.\\d*)?$");
@@ -164,7 +162,6 @@ public class Parser {
 
                 Integer initialPopSize = null, numGenerations = null, populationMax = null, crossToMute = null;
                 Float minCoverage = null, minAccuracy = null;
-                Float probOfCrossover = null, probOfMutation = null;
                 Float baseFitnessWeight = null, ext1FitnessWeight = null, ext2FitnessWeight = null;
                 Integer numFeatAntecedent = null, numFeatConsequent = null;
                 ArrayList<Integer> featuresToIgnore = null;
@@ -180,24 +177,14 @@ public class Parser {
                             continue; // nothing to due for empties
                         } else if (initPopPatt.matcher(paramLine).find()) {
                             initialPopSize = Integer.parseInt(paramLine.split("=")[1].trim());
-                            continue;
                         } else if (numGenPatt.matcher(paramLine).find()) {
                             numGenerations = Integer.parseInt(paramLine.split("=")[1].trim());
-                            continue;
                         } else if (popMaxPatt.matcher(paramLine).find()) {
                             populationMax = Integer.parseInt(paramLine.split("=")[1].trim());
-                            continue;
                         } else if (minCovPatt.matcher(paramLine).find()) {
                             minCoverage = Float.parseFloat(paramLine.split("=")[1].trim());
-                            continue;
                         } else if (minAccPatt.matcher(paramLine).find()) {
                             minAccuracy = Float.parseFloat(paramLine.split("=")[1].trim());
-                            continue;
-                        } else if (pXPatt.matcher(paramLine).find()) {
-                            probOfCrossover = Float.parseFloat(paramLine.split("=")[1].trim());
-                            continue;
-                        } else if (pMPatt.matcher(paramLine).find()) {
-                            probOfMutation = Float.parseFloat(paramLine.split("=")[1].trim());
                         } else if (bFWPatt.matcher(paramLine).find()) {
                             baseFitnessWeight = Float.parseFloat(paramLine.split("=")[1].trim());
                         } else if (e1FWPatt.matcher(paramLine).find()) {
@@ -231,9 +218,7 @@ public class Parser {
                         numGenerations != null ? numGenerations : 1000,
                         populationMax != null ? populationMax : 1300,
                         minCoverage != null ? minCoverage : 0.01f, 
-                        minAccuracy != null ? minAccuracy : 0.01f, 
-                        probOfCrossover != null ? probOfCrossover : 0.85f, 
-                        probOfMutation != null ? probOfMutation : 0.15f, 
+                        minAccuracy != null ? minAccuracy : 0.01f,
                         baseFitnessWeight != null ? baseFitnessWeight : 1.0f,
                         ext1FitnessWeight != null ? ext1FitnessWeight : 1.0f, 
                         ext2FitnessWeight != null ? ext2FitnessWeight : 1.0f,

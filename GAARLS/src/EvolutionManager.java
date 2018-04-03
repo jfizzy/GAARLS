@@ -243,8 +243,6 @@ public class EvolutionManager
         "Maximum Population Size: \t\t"+cp.populationMax+"\n" +
         "Min Coverage: \t\t\t\t"+cp.minCoverage+"\n" +
         "Min Accuracy: \t\t\t\t"+cp.minAccuracy+"\n" +
-        "Probability of Crossover: \t\t"+cp.probOfCrossover+"\n" +
-        "Probability of Mutation: \t\t"+cp.probOfMutation +"\n" +
         "Crossover to Mutation Ratio: \t\t"+cp.crossToMute +"\n" +
         "Base Fitness Weighting: \t\t"+cp.baseFitnessWeight +"\n" +
         "Ext1 Fitness Weighting: \t\t"+cp.ext1FitnessWeight +"\n" +

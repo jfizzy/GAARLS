@@ -110,8 +110,6 @@ public class Main
         System.out.println("Maximum Population Size: \t\t"+cp.populationMax);
         System.out.println("Min Coverage: \t\t\t\t"+cp.minCoverage);
         System.out.println("Min Accuracy: \t\t\t\t"+cp.minAccuracy);
-        System.out.println("Probability of Crossover: \t\t"+cp.probOfCrossover);
-        System.out.println("Probability of Mutation: \t\t"+cp.probOfMutation);
         System.out.println("Crossover to Mutation Ratio: \t\t"+cp.crossToMute);
         System.out.println("Base Fitness Weighting: \t\t"+cp.baseFitnessWeight);
         System.out.println("Ext1 Fitness Weighting: \t\t"+cp.ext1FitnessWeight);
