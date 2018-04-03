@@ -172,7 +172,11 @@ public class FeatureRequirement {
     @Override
     public boolean equals(Object obj) {
         FeatureRequirement req = (FeatureRequirement)obj;
-        if(req.getParticipation() == participation.getValue() && req.getFeatureID() == featureID && req.getLowerBound() == lowerBound && req.getUpperBound() == upperBound) {
+        if (req.getParticipation() == participation.getValue() &&
+            req.getFeatureID() == featureID &&
+            req.getLowerBound() == lowerBound &&
+            req.getUpperBound() == upperBound)
+        {
             return true;
         }
         return false;
