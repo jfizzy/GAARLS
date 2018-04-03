@@ -20,8 +20,6 @@ public class ConfigParameters {
     
     public final float minCoverage;
     public final float minAccuracy;
-    public final float probOfCrossover;
-    public final float probOfMutation;
     public final int crossToMute;
     
     public final float baseFitnessWeight;
@@ -33,7 +31,7 @@ public class ConfigParameters {
     public final ArrayList<Integer> featuresToIgnore;
     
     public ConfigParameters(int initPopSize, int numGens, int popMax, 
-            float minCov, float minAcc, float probCross, float probMut, 
+            float minCov, float minAcc, 
             float baseFitW, float ext1FitW, float ext2FitW, int numFeatA, 
             int numFeatC, ArrayList<Integer> featToIg, int crossToMute){
         this.initialPopSize = initPopSize;
@@ -41,8 +39,6 @@ public class ConfigParameters {
         this.populationMax = popMax;
         this.minCoverage = minCov;
         this.minAccuracy = minAcc;
-        this.probOfCrossover = probCross;
-        this.probOfMutation = probMut;
         this.baseFitnessWeight = baseFitW;
         this.ext1FitnessWeight = ext1FitW;
         this.ext2FitnessWeight = ext2FitW;
