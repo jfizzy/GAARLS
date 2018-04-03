@@ -1,4 +1,5 @@
 import Rule.Rule;
+import Rule.RuleRegex;
 import javafx.util.Pair;
 import sun.security.krb5.Config;
 
@@ -30,6 +31,7 @@ public class EvolutionManager
     private FitnessManager theFitnessManager;                                             // Has function to evaluate fitness of an individual
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
     private ArrayList<Rule> knownRules;
+    private ArrayList<RuleRegex> knownRegexs;
 
     private ArrayList<Rule> wekaRules;
     private ConfigParameters cp;
@@ -52,10 +54,11 @@ public class EvolutionManager
      * @param lookupTable: table of allowable feature values
      * @param cp: set of config parameters
      */
-    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<Rule> wekaRules, ConfigParameters cp) {
+    public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<RuleRegex> knownRegexs, ArrayList<Rule> wekaRules, ConfigParameters cp) {
         theFitnessManager = new FitnessManager(database, wekaRules);
         theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
+        this.knownRegexs = knownRegexs;
         this.wekaRules = wekaRules;
         this.maxPopulation = cp.populationMax;
         this.crossToMute = cp.crossToMute;
@@ -75,14 +78,24 @@ public class EvolutionManager
         Rule potentialRule;
         float ruleFitness;
         Pair ruleAndFit;
+        boolean regexMatch;
         for(int i = 0; i < initialSize; i++){
             do {
                 potentialRule = theRuleManager.generateRuleRandomSize();
                //potentialRule = theRuleManager.generateRule(numFeatAntecedent, numFeatConsequent);
 
+                regexMatch = false;
+
+                for (RuleRegex regex : knownRegexs) {
+                    if (regex.matches(potentialRule)) {
+                        regexMatch = true;
+                        break;
+                    }
+                }
+
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
                 ruleAndFit = new Pair<>(ruleFitness,potentialRule);
-            } while (!RuleManager.IsValidRule(potentialRule) || state.contains(ruleAndFit) || knownRules.contains(potentialRule));
+            } while (!RuleManager.IsValidRule(potentialRule) || state.contains(ruleAndFit) || knownRules.contains(potentialRule) || regexMatch);
 
             if((i > 0) && (i%100 == 0)) {
                 System.out.println(i + " total rules added to initial population");
@@ -147,9 +160,6 @@ public class EvolutionManager
         }
         System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
 
-
-
-
         // Associate to each individual, an portion of fitnessInterval according to their fitness
         // Note: As spots are determined with floor function, there may be an extra index available at the end
         // of fitness interval. This will hold 0 (null) and thus be allocated to the most fit individual.
@@ -171,13 +181,23 @@ public class EvolutionManager
             crossoversDone = 0;
             Rule child;
             Pair childAndFit;
+            boolean regexMatch;
             do {
+                regexMatch = false;
                 int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 Rule parent = nextState.get(parentIndex).getValue();
                 child = theRuleManager.mutate(parent);
+
+                for (RuleRegex regex : knownRegexs) {
+                    if (regex.matches(child)) {
+                        regexMatch = true;
+                        break;
+                    }
+                }
+
                 Float childFitness = theFitnessManager.fitnessOf(child);
                 childAndFit = new Pair<>(childFitness, child);
-            } while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child));
+            } while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child) || regexMatch);
 
             nextState.add(childAndFit);
         }
