@@ -183,10 +183,11 @@ public class EvolutionManager
             Pair childAndFit;
             boolean regexMatch;
             do {
-                regexMatch = false;
                 int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 Rule parent = nextState.get(parentIndex).getValue();
                 child = theRuleManager.mutate(parent);
+
+                regexMatch = false;
 
                 for (RuleRegex regex : knownRegexs) {
                     if (regex.matches(child)) {
