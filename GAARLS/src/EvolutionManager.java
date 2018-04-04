@@ -1,6 +1,5 @@
 import Rule.Rule;
 import javafx.util.Pair;
-import sun.security.krb5.Config;
 
 import java.io.*;
 import java.util.*;

@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class LookupTable
 {
     public static final int NUM_FEATURES_IN_FILE = 23;
+    public static final int NUM_ADDED_FEATURES = 1;
     public static LookupTable ParseFile(String filePath)
     {
         return ParseFile(filePath, new ArrayList<>());
@@ -22,11 +23,11 @@ public class LookupTable
     //public functions
     public static LookupTable ParseFile(String filePath, ArrayList<Integer> featuresToOmit)
     {
-        ArrayList<Boolean> desiredFeaturesList = new ArrayList<>(NUM_FEATURES_IN_FILE);
-        for (int i = 0; i < NUM_FEATURES_IN_FILE; ++i) desiredFeaturesList.add(true);
+        ArrayList<Boolean> desiredFeaturesList = new ArrayList<>();
+        for (int i = 0; i < NUM_FEATURES_IN_FILE + NUM_ADDED_FEATURES; ++i) desiredFeaturesList.add(true);
         for (int i = 0; i < featuresToOmit.size(); ++i) desiredFeaturesList.set(featuresToOmit.get(i), false);
 
-        ArrayList<SymbolTranslatorBase> symbolTranslatorBases = new ArrayList<>();
+        ArrayList<SymbolTranslatorBase> featureTranslators = new ArrayList<>();
         int translatorIdx = 0;
 
         // Feature 1: Collision Year
@@ -46,7 +47,7 @@ public class LookupTable
             }
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+                featureTranslators.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
             }
             translatorIdx++;
         }
@@ -81,7 +82,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
+                featureTranslators.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
             }
             translatorIdx++;
         }
@@ -111,7 +112,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
+                featureTranslators.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
             }
             translatorIdx++;
         }
@@ -133,7 +134,7 @@ public class LookupTable
             }
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
+                featureTranslators.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, true));
             }
             translatorIdx++;
         }
@@ -148,7 +149,7 @@ public class LookupTable
             String[] translations = new String[]{"Collision producing at least one fatality", "Collision producing non-fatal injury"};
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -173,7 +174,7 @@ public class LookupTable
             translations[numValues - 1] = symbols[numValues - 1] + " or more vehicles involved";
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+                featureTranslators.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
             }
             translatorIdx++;
         }
@@ -212,7 +213,7 @@ public class LookupTable
 
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -247,7 +248,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -277,7 +278,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -309,7 +310,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -338,7 +339,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -379,7 +380,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -403,7 +404,7 @@ public class LookupTable
 
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -449,7 +450,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -471,7 +472,7 @@ public class LookupTable
             }
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+                featureTranslators.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
             }
             translatorIdx++;
         }
@@ -493,7 +494,7 @@ public class LookupTable
             }
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -509,7 +510,7 @@ public class LookupTable
             String[] translations = {"Female", "Male"};
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -537,7 +538,7 @@ public class LookupTable
 
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
+                featureTranslators.add( new RangeSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations, false));
             }
             translatorIdx++;
         }
@@ -582,7 +583,7 @@ public class LookupTable
 
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -598,7 +599,7 @@ public class LookupTable
             String[] translations = {"No Injury", "Injury", "Fatality"};
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -622,7 +623,7 @@ public class LookupTable
             };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -649,7 +650,7 @@ public class LookupTable
                     };
             if (desiredFeaturesList.get(translatorIdx) )
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
@@ -676,18 +677,41 @@ public class LookupTable
             }
             if (desiredFeaturesList.get(translatorIdx))
             {
-                symbolTranslatorBases.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
             }
             translatorIdx++;
         }
 
-        featureValueMaps = new HashMap[symbolTranslatorBases.size()];
-        for (int i = 0; i < symbolTranslatorBases.size(); ++i) {
-            featureMap.put(symbolTranslatorBases.get(i).mFeatureName, i);
-            featureValueMaps[i] = symbolTranslatorBases.get(i).getmValueReverseLookupTable();
+        //-------------------------------------------ADDED FEATURES--------------------------------------------------------------//
+        int numFileFeatureTranslators = featureTranslators.size();
+        // Feature 24: Collision Occurance
+        {
+            int numValues = 2;
+            int symbolSize = 1;
+            String featureName = "C_OCCUR";
+
+            int[] values = new int[numValues];
+            String[] symbols = new String[numValues];
+            String[] translations = new String[numValues];
+            values[0] = 1; symbols[0] = "L"; translations[0] = "Low Fatal Collisions";
+            values[1] = 2; symbols[1] = "H"; translations[1] = "Low Fatal Collisions";
+
+            if (desiredFeaturesList.get(translatorIdx))
+            {
+                featureTranslators.add( new DiscreteSymbolTranslator(translatorIdx,featureName, symbolSize, values, symbols, translations));
+            }
+            translatorIdx++;
         }
 
-        return new LookupTable(symbolTranslatorBases.toArray(new SymbolTranslatorBase[symbolTranslatorBases.size()]));
+        featureValueMaps = new HashMap[featureTranslators.size()];
+        for (int i = 0; i < featureTranslators.size(); ++i) {
+            featureMap.put(featureTranslators.get(i).mFeatureName, i);
+            featureValueMaps[i] = featureTranslators.get(i).getmValueReverseLookupTable();
+        }
+
+        return new LookupTable(featureTranslators.toArray(new SymbolTranslatorBase[featureTranslators.size()]),
+                numFileFeatureTranslators,
+                featureTranslators.size() - numFileFeatureTranslators );
     }
 
     /**
@@ -796,21 +820,32 @@ public class LookupTable
         }
     }
 
+    public ArrayList<Integer> GetAddedIndices()
+    {
+        ArrayList<Integer> addedIndices = new ArrayList<>();
+        for (int i = NumFileFeatures; i < NumFeatures; ++i)
+        {
+            addedIndices.add(mFeatureLookupTable[i].GetFileFeatureIndex());
+        }
+        return addedIndices;
+    }
+
     public ArrayList<Integer> GetFileParsingIndices()
     {
         ArrayList<Integer> fileIndices = new ArrayList<>();
-        for (int i = 0; i < mFeatureLookupTable.length; ++i)
+        for (int i = 0; i < NumFileFeatures; ++i)
         {
             fileIndices.add(mFeatureLookupTable[i].GetFileFeatureIndex());
         }
         return fileIndices;
     }
 
-
     // private functions
-    private LookupTable(SymbolTranslatorBase[] featureLookupTable)
+    private LookupTable(SymbolTranslatorBase[] featureTranslators, int numFileFeatures, int numAddedFeatures)
     {
-        mFeatureLookupTable = featureLookupTable;
+        mFeatureLookupTable = featureTranslators;
+        NumFileFeatures = numFileFeatures;
+        NumAddedFeatures = numAddedFeatures;
         NumFeatures = mFeatureLookupTable.length;
     }
 
@@ -820,6 +855,8 @@ public class LookupTable
 
     // private members
     private SymbolTranslatorBase[] mFeatureLookupTable;
+    public int NumFileFeatures;
+    public int NumAddedFeatures;
     public int NumFeatures;
 
     public static void main(String args[])

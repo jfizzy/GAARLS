@@ -87,6 +87,16 @@ public class Database
                 System.out.println("Database.ParseFile() Found: " + itemIndex / numFeatures + ". Expected: " + numItemsInFile );
             }
 
+            ArrayList<Integer> addedIndices = databaseCodex.GetAddedIndices();
+
+            for (int addedIndice : addedIndices)
+            {
+                scanner = new Scanner(dataFile); // reset scanner to beginning of file
+                if (addedIndice == 24 - 1)  // C_OCCUR 0 offset
+                {
+                    InsertCollisionOccurrence(dataSet, databaseCodex, numItemsInFile);
+                }
+            }
             scanner.close();
         }
         catch (FileNotFoundException fnfe)
@@ -177,6 +187,112 @@ public class Database
         rule.setCompleteness(normalizedCompleteness);
     }
 
+    private static void InsertCollisionOccurrence(float[] dataset, LookupTable lookupTable, int numLinesInDataset)
+    {
+        ArrayList<Integer> monthlyCollisionCounts = new ArrayList<>();
+        ; // skip the headers
+        float currentMonth;
+        float currentCaseId;
+        int fatalityCounter = 0;
+
+        final int C_MONTH = lookupTable.featureMap.get("C_MONTH");
+        final int C_SEV = lookupTable.featureMap.get("C_SEV");
+        final float FATALITY = 1;
+        final int C_CASE = lookupTable.featureMap.get("C_CASE");
+        final int C_OCCUR = lookupTable.featureMap.get("C_OCCUR");
+
+        // Calculate the number of fatal collisions each month
+        currentMonth = dataset[C_MONTH];
+        currentCaseId = -1;
+        int offset = 0;
+        for (int lineNumber = 0; lineNumber < numLinesInDataset; ++lineNumber)
+        {
+            float month = dataset[offset + C_MONTH];
+            float caseId = dataset[offset + C_CASE];
+
+            if (currentMonth != month && month > 0 /* disregard unknown months */) // next month!
+            {
+                monthlyCollisionCounts.add(fatalityCounter);
+                fatalityCounter = 0;
+                currentMonth = month;
+            }
+
+            if (currentCaseId != caseId)
+            {
+                currentCaseId = caseId;
+                if (dataset[offset + C_SEV] == FATALITY)
+                {
+                    fatalityCounter++;
+                }
+            }
+
+            offset += lookupTable.NumFeatures;
+        }
+        monthlyCollisionCounts.add(fatalityCounter);
+
+        // Assign HIGH/LOW to each collision depending on average of months around it
+        final float LOW = 1; // hardcoded values from the translator
+        final float HIGH = 2; // hardcoded values from the translator
+        final float UNKOWN = -11;
+        float monthlyOccurrence = 0; // what will be assigned to each collision in a month
+        int collisionCountIndex = -1; // index of the collision count in @monthlyCollisionCounts
+        offset = 0;
+        currentMonth = 0;
+        for (int lineNumber = 0; lineNumber < numLinesInDataset; ++lineNumber)
+        {
+            float month = dataset[offset + C_MONTH];
+            if (currentMonth != month) // next month!
+            {
+                if (month < 0)
+                {
+                    monthlyOccurrence = UNKOWN;
+                }
+                else
+                {
+                    collisionCountIndex++;
+
+                    int occurrencesInMonth = monthlyCollisionCounts.get(collisionCountIndex);
+                    // Get average of current month with it's neighbours
+                    float average = 0;
+                    if (collisionCountIndex > 0 && collisionCountIndex < monthlyCollisionCounts.size() - 1)
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex - 1) + monthlyCollisionCounts.get(collisionCountIndex) + monthlyCollisionCounts.get(collisionCountIndex+1);
+                        average /= 3;
+                    }
+                    else if (collisionCountIndex == 0 && collisionCountIndex < monthlyCollisionCounts.size() - 1)
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex) + monthlyCollisionCounts.get(collisionCountIndex+1);
+                        average /= 2;
+                    }
+                    else if (collisionCountIndex == monthlyCollisionCounts.size() - 1 && collisionCountIndex > 0)
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex) + monthlyCollisionCounts.get(collisionCountIndex-1);
+                        average /= 2;
+                    }
+                    else
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex);
+                    }
+                    // determine if this month is high or low compared to it's neighbours
+                    if (occurrencesInMonth <= average)
+                    {
+                        monthlyOccurrence = LOW;
+                    }
+                    else
+                    {
+                        monthlyOccurrence = HIGH;
+                    }
+                }
+
+                currentMonth = month;
+            }
+
+            dataset[offset + C_OCCUR] = monthlyOccurrence;
+            offset += lookupTable.NumFeatures;
+        }
+    }
+
+
     public float[] GetDatabase() {return mDatatable;}
 
     // private functions
@@ -196,19 +312,20 @@ public class Database
     {
         LookupTable table = LookupTable.ParseFile("");
 
-        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, -1);
+        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, 413510);
         RuleManager ruleManager = new RuleManager(table);
 
         Rule rule = new Rule();
         FeatureRequirement[] featureRequirements = rule.getFeatureReqs();
         featureRequirements[16].setBoundRange(0, 0, 0);
         featureRequirements[16].setParticipation(1);
-        featureRequirements[0].setBoundRange(2000, 2015, 2 / 12.f);
+        featureRequirements[0].setBoundRange(1999, 2015, 2 / 12.f);
         featureRequirements[0].setParticipation(2);
+        featureRequirements[23].setParticipation(1);
+        featureRequirements[23].setBoundRange(2, 2, .5f);
         database.EvaluateRule(rule);
         System.out.println(table.TranslateRule(rule));
         System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
-
 
         Rule rule2 = new Rule();
         FeatureRequirement[] featureRequirements2 = rule2.getFeatureReqs();
