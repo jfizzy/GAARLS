@@ -27,7 +27,6 @@ public class RuleRegex {
     // Note that an empty set of featureRequirements matches every rule
     public boolean matches(Rule rule) {
         for (FeatureRequirement req: featureRequirements) {
-            // TODO: Override equals for FeatureRequirement to check internals
             if (!rule.getFeatureReq(req.getFeatureID()).equals(req))
                 return false;
         }
