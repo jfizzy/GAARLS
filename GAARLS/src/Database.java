@@ -199,7 +199,7 @@ public class Database
         final int C_SEV = 4;
         final String FATALITY = "1";
         final int C_CASE = 22;
-        final int C_OCCUR = 23;
+        final int C_OCCUR = lookupTable.featureMap.get("C_OCCUR");
 
         // Calculate the number of fatal collisions each month
         String[] splitLine = null;
