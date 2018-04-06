@@ -87,6 +87,16 @@ public class Database
                 System.out.println("Database.ParseFile() Found: " + itemIndex / numFeatures + ". Expected: " + numItemsInFile );
             }
 
+            ArrayList<Integer> addedIndices = databaseCodex.GetAddedIndices();
+
+            for (int addedIndice : addedIndices)
+            {
+                scanner = new Scanner(dataFile); // reset scanner to beginning of file
+                if (addedIndice == 24 - 1)  // C_OCCUR 0 offset
+                {
+                    InsertCollisionOccurrence(dataSet, filePath, databaseCodex, numItemsInFile);
+                }
+            }
             scanner.close();
         }
         catch (FileNotFoundException fnfe)
@@ -177,6 +187,119 @@ public class Database
         rule.setCompleteness(normalizedCompleteness);
     }
 
+    private static void InsertCollisionOccurrence(float[] dataset, String dataTableFileName, LookupTable lookupTable, int numLinesInDataset) throws IOException
+    {
+        ArrayList<Integer> monthlyCollisionCounts = new ArrayList<>();
+        ; // skip the headers
+        String currentMonth;
+        String currentCaseId;
+        int fatalityCounter = 0;
+
+        final int C_MONTH = 1;
+        final int C_SEV = 4;
+        final String FATALITY = "1";
+        final int C_CASE = 22;
+        final int C_OCCUR = lookupTable.featureMap.get("C_OCCUR");
+
+        // Calculate the number of fatal collisions each month
+        String[] splitLine = null;
+        currentMonth = "";
+        currentCaseId = "";
+        Scanner fileScanner = new Scanner(new File(dataTableFileName));
+        fileScanner.nextLine(); // skip the header
+        for (int lineNumber = 0; lineNumber < numLinesInDataset; ++lineNumber)
+        {
+            splitLine = fileScanner.nextLine().split(",");
+            String month = splitLine[C_MONTH];
+            String caseId = splitLine[C_CASE];
+
+            if (!currentMonth.equals(month) && month.charAt(0) != '-' /* disregard unknown months */) // next month!
+            {
+                if (currentMonth.length() > 0) {
+                    monthlyCollisionCounts.add(fatalityCounter);
+                }
+                fatalityCounter = 0;
+                currentMonth = month;
+            }
+
+            if (!currentCaseId.equals(caseId))
+            {
+                currentCaseId = caseId;
+                String severity = splitLine[C_SEV];
+                if (splitLine[C_SEV].equals(FATALITY))
+                {
+                    fatalityCounter++;
+                }
+            }
+        }
+        monthlyCollisionCounts.add(fatalityCounter);
+
+        // Assign HIGH/LOW to each collision depending on average of months around it
+        final float LOW = 1; // hardcoded values from the translator
+        final float HIGH = 2; // hardcoded values from the translator
+        final float UNKNOWN = -11;
+        float monthlyOccurrence = 0; // what will be assigned to each collision in a month
+        int collisionCountIndex = -1; // index of the collision count in @monthlyCollisionCounts
+        int offset = 0;
+        currentMonth = "";
+        fileScanner = new Scanner(new File(dataTableFileName));
+        fileScanner.nextLine(); // skip the header
+        for (int lineNumber = 0; lineNumber < numLinesInDataset; ++lineNumber)
+        {
+            splitLine = fileScanner.nextLine().split(",");
+            String month = splitLine[C_MONTH];
+            if (!currentMonth.equals(month)) // next month!
+            {
+                if (month.charAt(0) ==  '-') // negative
+                {
+                    monthlyOccurrence = UNKNOWN;
+                }
+                else
+                {
+                    collisionCountIndex++; // first time this happens collisionIndex will equal 0
+
+                    int occurrencesInMonth = monthlyCollisionCounts.get(collisionCountIndex);
+                    // Get average of current month with it's neighbours
+                    float average = 0;
+                    if (collisionCountIndex > 0 && collisionCountIndex < monthlyCollisionCounts.size() - 1)
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex - 1) + monthlyCollisionCounts.get(collisionCountIndex) + monthlyCollisionCounts.get(collisionCountIndex+1);
+                        average /= 3;
+                    }
+                    else if (collisionCountIndex == 0 && collisionCountIndex < monthlyCollisionCounts.size() - 1)
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex) + monthlyCollisionCounts.get(collisionCountIndex+1);
+                        average /= 2;
+                    }
+                    else if (collisionCountIndex == monthlyCollisionCounts.size() - 1 && collisionCountIndex > 0)
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex) + monthlyCollisionCounts.get(collisionCountIndex-1);
+                        average /= 2;
+                    }
+                    else
+                    {
+                        average = monthlyCollisionCounts.get(collisionCountIndex);
+                    }
+                    // determine if this month is high or low compared to it's neighbours
+                    if (occurrencesInMonth <= average)
+                    {
+                        monthlyOccurrence = LOW;
+                    }
+                    else
+                    {
+                        monthlyOccurrence = HIGH;
+                    }
+                }
+
+                currentMonth = month;
+            }
+
+            dataset[offset + C_OCCUR] = monthlyOccurrence;
+            offset += lookupTable.NumFeatures;
+        }
+    }
+
+
     public float[] GetDatabase() {return mDatatable;}
 
     // private functions
@@ -196,19 +319,33 @@ public class Database
     {
         LookupTable table = LookupTable.ParseFile("");
 
-        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, -1);
+//        ArrayList<Integer> ommitAddedFeature = new ArrayList<>();
+//        ommitAddedFeature.add(22);
+//        ommitAddedFeature.add(23);
+//        table = LookupTable.ParseFile("", ommitAddedFeature);
+//
+//        long systemTime = System.currentTimeMillis();
+//        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, 100000);
+//        System.out.println("Run Time: " + (System.currentTimeMillis() - systemTime));
+//
+//        table = LookupTable.ParseFile("");
+//
+//        systemTime = System.currentTimeMillis();
+//        database = Database.ParseFile("NCDB_1999_to_2015.csv", table, 1000);
+//        System.out.println("Run Time: " + (System.currentTimeMillis() - systemTime));
+
+        Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, 1000000);
         RuleManager ruleManager = new RuleManager(table);
 
         Rule rule = new Rule();
         FeatureRequirement[] featureRequirements = rule.getFeatureReqs();
-        featureRequirements[16].setBoundRange(0, 0, 0);
-        featureRequirements[16].setParticipation(1);
-        featureRequirements[0].setBoundRange(2000, 2015, 2 / 12.f);
-        featureRequirements[0].setParticipation(2);
+        featureRequirements[2].setBoundRange(6, 1, 0);
+        featureRequirements[2].setParticipation(1);
+        featureRequirements[4].setBoundRange(1,1,0);
+        featureRequirements[4].setParticipation(2);
         database.EvaluateRule(rule);
         System.out.println(table.TranslateRule(rule));
         System.out.println("Accuracy: " + rule.getAccuracy() + ". Coverage: " + rule.getCoverage());
-
 
         Rule rule2 = new Rule();
         FeatureRequirement[] featureRequirements2 = rule2.getFeatureReqs();

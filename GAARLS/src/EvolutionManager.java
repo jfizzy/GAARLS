@@ -1,7 +1,6 @@
 import Rule.Rule;
 import Rule.RuleRegex;
 import javafx.util.Pair;
-import sun.security.krb5.Config;
 
 import java.io.*;
 import java.util.*;

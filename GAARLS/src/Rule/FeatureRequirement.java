@@ -128,13 +128,9 @@ public class FeatureRequirement {
         // discrete bounds check
         if (this.lowerBound == this.upperBound) {
             return false; // value didn't equal either the upper or lower in the previous case
-        }        // normal bounds check
-        if (this.lowerBound < this.upperBound) {
-            return value > this.lowerBound && value < this.upperBound;
         }
 
-        // flipped bounds check. ie minFeatureValue <= value < (lowerBound,UpperBound) < value <= maxFeatureValue
-        return value < this.lowerBound || value > this.upperBound;
+        return value > this.lowerBound && value < this.upperBound;
     }
 
     /**
