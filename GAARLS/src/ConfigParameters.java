@@ -31,20 +31,20 @@ public class ConfigParameters {
     public final ArrayList<Integer> featuresToIgnore;
     
     public ConfigParameters(int initPopSize, int numGens, int popMax, 
-            float minCov, float minAcc, 
+            float minCov, float minAcc, int crossToMute, 
             float baseFitW, float ext1FitW, float ext2FitW, int numFeatA, 
-            int numFeatC, ArrayList<Integer> featToIg, int crossToMute){
+            int numFeatC, ArrayList<Integer> featToIg){
         this.initialPopSize = initPopSize;
         this.numGenerations = numGens;
         this.populationMax = popMax;
         this.minCoverage = minCov;
         this.minAccuracy = minAcc;
+        this.crossToMute = crossToMute;
         this.baseFitnessWeight = baseFitW;
         this.ext1FitnessWeight = ext1FitW;
         this.ext2FitnessWeight = ext2FitW;
         this.numFeatAntecedent = numFeatA;
         this.numFeatConsequent = numFeatC;
         this.featuresToIgnore = featToIg;
-        this.crossToMute = crossToMute;
     }
 }

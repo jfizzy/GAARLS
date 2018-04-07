@@ -293,13 +293,13 @@ public class Parser {
                         populationMax != null ? populationMax : 1300,
                         minCoverage != null ? minCoverage : 0.01f, 
                         minAccuracy != null ? minAccuracy : 0.01f,
+                        crossToMute != null ? crossToMute : 10,
                         baseFitnessWeight != null ? baseFitnessWeight : 1.0f,
                         ext1FitnessWeight != null ? ext1FitnessWeight : 0f, 
                         ext2FitnessWeight != null ? ext2FitnessWeight : 0f,
                         numFeatAntecedent != null ? numFeatAntecedent : 10, 
                         numFeatConsequent != null ? numFeatConsequent : 10,
-                        featuresToIgnore != null ? featuresToIgnore : null,
-                        crossToMute != null ? crossToMute : 10
+                        featuresToIgnore != null ? featuresToIgnore : null
                 );
                 return cp; // return the new obj
             } catch (IOException io) {

@@ -19,6 +19,41 @@ public class Main
     public static void main(String args[])
     {
         parseArgs(args);
+        System.out.println("Welcome to GAARLS :-)");
+        System.out.println("Genetic Algorithm-based Association Rule Learning System\n");
+        System.out.println("------------------------------------");
+        System.out.println("Lookup File:\t\t"+lookupFilePath);
+        System.out.println("Data File:\t\t"+dataFilePath);
+        System.out.println("Rule File:\t\t"+ruleFilePath);
+        System.out.println("WEKA File:\t\t"+wekaFilePath);
+        System.out.println("Config File:\t\t"+configFilePath);
+        System.out.println("------------------------------------\n");
+        
+        Parser parser = new Parser();
+        
+        ConfigParameters cp = parser.parseConfigParameters(configFilePath);
+        if (cp == null){
+            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,10,10,null);
+            System.out.println("Using Default Config.");
+        }
+        // desc of default configuration when file is missing
+        /*  1000        Initial Population Size
+            1000        Number of Generations
+            1300        Maximum Population Size
+            0.01        Minimum Coverage
+            0.01        Minimum Accuracy
+            10          Crossover to Mutation ratio
+            1           Base Fitness Weighting
+            0           Fitness Ext1 Weighting
+            0           Fitness Ext2 Weighting
+            10          Max Features to allow in Antecedent
+            10          Max Features to allow in Consequent
+            null        List of Features to Ignore
+        */
+        printConfigDetails(cp);
+        System.out.println("Complete.");
+        System.out.println("------------------------------------\n");
+        
         // get file paths for codex and database
         System.out.println("\nParsing Data Dictionary...");
 
@@ -28,44 +63,23 @@ public class Main
         featuresToOmit.add(22); // C_CASE
         LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, featuresToOmit); // parse lookup table file
 
-        System.out.println("Complete.\nParsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, 10000); // parse database file
+        System.out.println("Complete.");
+        System.out.println("------------------------------------\n");
+        System.out.println("Parsing data set...");
+        Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
         System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
-
+        System.out.println("------------------------------------\n");
         System.out.println("Parsing known rules...");
-        Parser parser = new Parser();
+        
         ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, featuresToOmit);
         ArrayList<RuleRegex> knownRegexs = parser.parseKnownRuleRegexs(ruleFilePath);
         System.out.println("Complete.");
-
+        System.out.println("------------------------------------\n");
         System.out.println("Parsing WEKA rules...");
         ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, featuresToOmit);
         System.out.println("Complete.");
-
-        //new wrapper class containing the config parameter values read from file
-        ConfigParameters cp = parser.parseConfigParameters(configFilePath);
-        if (cp == null)
-            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,1f,0f,0f,10,10,null,10); 
-        // default configuration when file is missing
-        // params in constructor are:
-        /*  1000        Initial Population Size
-            1000        Number of Generations
-            1300        Maximum Population Size
-            0.01        Minimum Coverage
-            0.01        Minimum Accuracy
-            1           Base Fitness Weighting
-            0           Fitness Ext1 Weighting
-            0           Fitness Ext2 Weighting
-            10          Max Features to allow in Antecedent
-            10          Max Features to allow in Consequent
-            null        List of Features to Ignore
-            10          Crossover to Mutation ratio
-        */
-        printConfigDetails(cp);
-
-
-        //EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules,wekaRules, 1);
-        //evolutionManager.evolve(500, 1000, 700);
+        System.out.println("------------------------------------\n");
+        
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, knownRegexs, wekaRules, cp);
         evolutionManager.evolve();
         evolutionManager.toFile("outputRules.txt", cp); //Keep in mind that as is, this will just keep appending rules to this file after each run
@@ -120,7 +134,7 @@ public class Main
      * consecutive configurations on our system to evaluate a personal experiment
      */
     private static void printConfigDetails(ConfigParameters cp){
-        System.out.println("---Configuration parameters---");
+        System.out.println("------Configuration parameters------");
         System.out.println("Initial Population Size: \t\t"+cp.initialPopSize);
         System.out.println("Number Of Generations: \t\t\t"+cp.numGenerations);
         System.out.println("Maximum Population Size: \t\t"+cp.populationMax);
@@ -140,6 +154,6 @@ public class Main
             });
             System.out.println("]");
         }
-        System.out.println("------------------------------");
+        System.out.println("------------------------------------\n");
     }
 }

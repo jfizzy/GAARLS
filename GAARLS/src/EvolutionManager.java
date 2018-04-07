@@ -54,7 +54,7 @@ public class EvolutionManager
      * @param cp: set of config parameters
      */
     public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<RuleRegex> knownRegexs, ArrayList<Rule> wekaRules, ConfigParameters cp) {
-        theFitnessManager = new FitnessManager(database, wekaRules);
+        theFitnessManager = new FitnessManager(database, wekaRules, cp);
         theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
         this.knownRegexs = knownRegexs;
