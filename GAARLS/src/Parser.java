@@ -235,18 +235,21 @@ public class Parser {
                 Pattern numFCPatt = Pattern.compile("^NUM_FEATURES_CONS\\s*=\\s*\\d*$");
                 Pattern featTIPatt = Pattern.compile("^FEATURES_TO_IGNORE\\s*=\\s*\\d*(\\s*,\\s*\\d*)*$");
 
+                Pattern featReqPatt = Pattern.compile("^REQUIRED_FEATURE\\s*=\\s*([^;]+;[^;]+;[^;]+;[^;]+)$");
+
                 Integer initialPopSize = null, numGenerations = null, populationMax = null, crossToMute = null;
                 Float minCoverage = null, minAccuracy = null;
                 Float baseFitnessWeight = null, ext1FitnessWeight = null, ext2FitnessWeight = null;
                 Integer numFeatAntecedent = null, numFeatConsequent = null;
                 ArrayList<Integer> featuresToIgnore = null;
+                ArrayList<FeatureRequirement> requiredFeatures = new ArrayList<>();
 
                 while ((paramLine = br.readLine()) != null) {
                     if (paramLine.contains("//")) {
                         paramLine = paramLine.split("//")[0]; // remove comments from line
                     }
                     paramLine = paramLine.trim();
-                    paramLine = paramLine.toUpperCase();
+//                    paramLine = paramLine.toUpperCase();
                     try {
                         if (emptyLinePatt.matcher(paramLine).find()) {
                             continue; // nothing to due for empties
@@ -281,6 +284,62 @@ public class Parser {
                             }
                         } else if (crossToMutePatt.matcher(paramLine).find()){
                             crossToMute = Integer.parseInt(paramLine.split("=")[1].trim());
+                        } else if (featReqPatt.matcher(paramLine).find()) {
+                            System.out.println("FOUND REQUIRED FEATURE");
+                            Matcher matcher = featReqPatt.matcher(paramLine);
+                            if (matcher.find()) {
+                                // indices refer to the following
+                                // 0: feature name
+                                // 1: min value
+                                // 2: max value
+                                // 3: participation (must be non 0 or *)
+                                String parts[] = matcher.group(1).split(";");
+                                System.out.println("Splitting the feautre required");
+                                System.out.println("Got: " + parts[0] + " " + parts[1] + " " + parts[2] + " " + parts[3]);
+                                if (parts.length == 4 && LookupTable.featureMap.get(parts[0]) != null) {
+                                    int featureID = LookupTable.featureMap.get(parts[0].trim());
+                                    try {
+                                        float min;
+                                        if (parts[1].trim().compareTo("*") == 0) {
+                                            min = -1f;
+                                        } else {
+                                            System.out.println("Finding value for: " + parts[1]);
+                                            min = LookupTable.featureValueMaps[featureID].get(parts[1].trim());
+                                        }
+                                        float max;
+                                        if (parts[2].trim().compareTo("*") == 0) {
+                                            max = -1f;
+                                        } else {
+                                            System.out.println("Finding value for: " + parts[2]);
+                                            max = LookupTable.featureValueMaps[featureID].get(parts[2].trim());
+                                        }
+                                        int participation;
+                                        if (parts[3].trim().compareTo("*") == 0) {
+                                            participation = -1;
+                                        } else if (parts[3].trim().compareTo("0") == 0){
+                                            System.out.println("WARNING: Required Feature participation should be non-zero.");
+                                            System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
+                                            continue;
+                                        } else {
+                                            try {
+                                                participation = Integer.parseInt(parts[3].trim());
+                                            } catch (NumberFormatException e) {
+                                                System.out.println("WARNING: Couldn't parse participation value to integer.");
+                                                System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
+                                                continue;
+                                            }
+                                        }
+                                        requiredFeatures.add(new FeatureRequirement(featureID, participation, max, min, 0));
+                                    } catch (NullPointerException e) {
+                                        System.out.println("WARNING: Couldn't translate feature values for feature " + parts[0]);
+                                        System.out.println("Trouble feature was: " + matcher.group(1) + ". Ignoring this parameter..." );
+                                        continue;
+                                    }
+                                } else {
+                                    System.out.println("WARNING: Parameter line was probably malformed.");
+                                    System.out.println("Trouble feature was: " + matcher.group(1) + ". Ignoring this parameter...");
+                                }
+                            }
                         }
                     } catch (Exception e) {
                         System.out.println("ERROR: There was an issue parsing [" + paramLine + "]");
@@ -298,8 +357,10 @@ public class Parser {
                         ext2FitnessWeight != null ? ext2FitnessWeight : 0f,
                         numFeatAntecedent != null ? numFeatAntecedent : 10, 
                         numFeatConsequent != null ? numFeatConsequent : 10,
-                        featuresToIgnore != null ? featuresToIgnore : null,
-                        crossToMute != null ? crossToMute : 10
+                        featuresToIgnore, // these don't need logic as the array is either null or contains stuff, we don't need to check
+                        crossToMute != null ? crossToMute : 10,
+                        requiredFeatures
+
                 );
                 return cp; // return the new obj
             } catch (IOException io) {

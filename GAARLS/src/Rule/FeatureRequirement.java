@@ -94,6 +94,9 @@ public class FeatureRequirement {
             case 2:
                 this.participation = pFlag.CONSEQUENT;
                 break;
+            case -1:
+                this.participation = pFlag.ANY;
+                break;
             default:
                 this.participation = pFlag.IGNORE; // ignore by default TODO: could decide to throw except
         }
@@ -145,7 +148,7 @@ public class FeatureRequirement {
     // public fields
     // TODO may want to make changes to this for negation?
     public enum pFlag { // flag for rule participation
-        IGNORE(0), ANTECEDENT(1), CONSEQUENT(2); // corresponding numerical values
+        ANY(-1), IGNORE(0), ANTECEDENT(1), CONSEQUENT(2); // corresponding numerical values
 
         private final int value;
 
@@ -170,8 +173,22 @@ public class FeatureRequirement {
         FeatureRequirement req = (FeatureRequirement)obj;
         if (req.getParticipation() == participation.getValue() &&
             req.getFeatureID() == featureID &&
-            req.getLowerBound() == lowerBound &&
-            req.getUpperBound() == upperBound)
+            Float.compare(req.getLowerBound(), lowerBound) == 0 &&
+            Float.compare(req.getUpperBound(), upperBound) == 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // compare a required feature requirement to that of a rule
+    // for simplicities sake we always do RequiredFeature.wildcardEquals(feature req from rule)
+    // if the required feature has -1 for participation, upper, or lower, we match
+    public boolean wildcardEquals(FeatureRequirement req) {
+        if (((participation.getValue() == -1 && req.getParticipation() != 0) || req.getParticipation() == participation.getValue()) &&
+             req.getFeatureID() == featureID &&
+            (Float.compare(upperBound, -1f) == 0 || Float.compare(req.getUpperBound(), upperBound) == 0) &&
+            (Float.compare(lowerBound, -1f) == 0 || Float.compare(req.getLowerBound(), lowerBound) == 0))
         {
             return true;
         }

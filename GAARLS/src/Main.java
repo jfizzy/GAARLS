@@ -45,7 +45,7 @@ public class Main
         //new wrapper class containing the config parameter values read from file
         ConfigParameters cp = parser.parseConfigParameters(configFilePath);
         if (cp == null)
-            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,1f,0f,0f,10,10,null,10); 
+            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,1f,0f,0f,10,10,null,10, null);
         // default configuration when file is missing
         // params in constructor are:
         /*  1000        Initial Population Size
