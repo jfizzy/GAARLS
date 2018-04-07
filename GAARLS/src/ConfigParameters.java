@@ -1,4 +1,6 @@
 
+import Rule.FeatureRequirement;
+
 import java.util.ArrayList;
 
 /*
@@ -29,11 +31,12 @@ public class ConfigParameters {
     public final int numFeatAntecedent;
     public final int numFeatConsequent;
     public final ArrayList<Integer> featuresToIgnore;
+    public final ArrayList<FeatureRequirement> requiredFeatures;
     
     public ConfigParameters(int initPopSize, int numGens, int popMax, 
             float minCov, float minAcc, int crossToMute, 
             float baseFitW, float ext1FitW, float ext2FitW, int numFeatA, 
-            int numFeatC, ArrayList<Integer> featToIg){
+            int numFeatC, ArrayList<Integer> featToIg, ArrayList<FeatureRequirement> requiredFeatures){
         this.initialPopSize = initPopSize;
         this.numGenerations = numGens;
         this.populationMax = popMax;
@@ -46,5 +49,6 @@ public class ConfigParameters {
         this.numFeatAntecedent = numFeatA;
         this.numFeatConsequent = numFeatC;
         this.featuresToIgnore = featToIg;
+        this.requiredFeatures = requiredFeatures;
     }
 }

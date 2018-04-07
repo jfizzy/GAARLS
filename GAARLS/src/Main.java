@@ -19,21 +19,25 @@ public class Main
     public static void main(String args[])
     {
         parseArgs(args);
+        // get file paths for codex and database
         System.out.println("Welcome to GAARLS :-)");
+
         System.out.println("Genetic Algorithm-based Association Rule Learning System\n");
         System.out.println("------------------------------------");
         System.out.println("Lookup File:\t\t"+lookupFilePath);
         System.out.println("Data File:\t\t"+dataFilePath);
         System.out.println("Rule File:\t\t"+ruleFilePath);
+
         System.out.println("WEKA File:\t\t"+wekaFilePath);
         System.out.println("Config File:\t\t"+configFilePath);
         System.out.println("------------------------------------\n");
+
         
         Parser parser = new Parser();
         
         ConfigParameters cp = parser.parseConfigParameters(configFilePath);
         if (cp == null){
-            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,10,10,null);
+            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,10,10,null, null);
             System.out.println("Using Default Config.");
         }
         // desc of default configuration when file is missing
