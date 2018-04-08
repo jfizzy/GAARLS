@@ -56,11 +56,9 @@ public class Main
             null        List of required features for rules
         */
         System.out.print(cp.formattedConfigDetails());
-        System.out.println("Complete.");
-        System.out.println("------------------------------------\n");
         
         // get file paths for codex and database
-        System.out.println("\nParsing Data Dictionary...");
+        System.out.println("Parsing Data Dictionary...");
         LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, cp.featuresToIgnore); // parse lookup table file
         System.out.println("Complete.");
         System.out.println("------------------------------------\n");
