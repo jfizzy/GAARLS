@@ -875,7 +875,7 @@ public class LookupTable
 
         Parser parser = new Parser();
 
-        ConfigParameters cp = parser.parseConfigParameters("config.txt");
+        ConfigParameters cp = parser.parseConfigParameters("config.txt", null);
 
         Database database = Database.ParseFile("NCDB_1999_to_2015.csv", lookupTable, 10); // parse database file
         float[] datatable = database.GetDatabase();

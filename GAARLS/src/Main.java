@@ -34,8 +34,15 @@ public class Main
 
         
         Parser parser = new Parser();
+        ArrayList<Integer> featuresToOmit = parser.parseFeaturesToIgnore(configFilePath);
         
-        ConfigParameters cp = parser.parseConfigParameters(configFilePath);
+        // get file paths for codex and database
+        System.out.println("Parsing Data Dictionary...");
+        LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, featuresToOmit); // parse lookup table file
+        System.out.println("Complete.");
+        System.out.println("------------------------------------\n");
+        
+        ConfigParameters cp = parser.parseConfigParameters(configFilePath, featuresToOmit);
         if (cp == null){
             cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,100,10,10,null, null);
             System.out.println("Using Default Config.");
@@ -58,22 +65,17 @@ public class Main
         */
         System.out.print(cp.formattedConfigDetails());
         
-        // get file paths for codex and database
-        System.out.println("Parsing Data Dictionary...");
-        LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, cp.featuresToIgnore); // parse lookup table file
-        System.out.println("Complete.");
-        System.out.println("------------------------------------\n");
         System.out.println("Parsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, 100000); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, 10000); // parse database file
         System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing known rules...");
-        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, cp.featuresToIgnore);
+        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, featuresToOmit);
         ArrayList<RuleRegex> knownRegexs = parser.parseKnownRuleRegexs(ruleFilePath);
         System.out.println("Complete.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing WEKA rules...");
-        ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, cp.featuresToIgnore);
+        ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, featuresToOmit);
         System.out.println("------------------------------------\n");
         
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, knownRegexs, wekaRules, cp);
