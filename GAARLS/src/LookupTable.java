@@ -25,7 +25,9 @@ public class LookupTable
     {
         ArrayList<Boolean> desiredFeaturesList = new ArrayList<>();
         for (int i = 0; i < NUM_FEATURES_IN_FILE + NUM_ADDED_FEATURES; ++i) desiredFeaturesList.add(true);
-        for (int i = 0; i < featuresToOmit.size(); ++i) desiredFeaturesList.set(featuresToOmit.get(i), false);
+        if (featuresToOmit != null) {
+            for (int i = 0; i < featuresToOmit.size(); ++i) desiredFeaturesList.set(featuresToOmit.get(i), false);
+        }
 
         ArrayList<SymbolTranslatorBase> featureTranslators = new ArrayList<>();
         int translatorIdx = 0;
@@ -847,6 +849,7 @@ public class LookupTable
         NumFileFeatures = numFileFeatures;
         NumAddedFeatures = numAddedFeatures;
         NumFeatures = mFeatureLookupTable.length;
+        Rule.setNumFeatures(NumFeatures);
     }
 
     // public members

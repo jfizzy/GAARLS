@@ -13,7 +13,7 @@ public class Rule {
 
     // private members
     private FeatureRequirement featureReqs[];
-    private static int features = 22;
+    private static int features;
     private float coverage;
     private float accuracy;
     private float rangeCoverage;
