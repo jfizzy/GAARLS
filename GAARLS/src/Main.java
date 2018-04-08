@@ -55,7 +55,7 @@ public class Main
             null        List of Feature Indices to Ignore
             null        List of required features for rules
         */
-        printConfigDetails(cp);
+        System.out.print(cp.formattedConfigDetails());
         System.out.println("Complete.");
         System.out.println("------------------------------------\n");
         
@@ -120,37 +120,5 @@ public class Main
             System.out.println("ERROR: Malformed commandline: " + Arrays.toString(args));
             System.out.println("Available optional switches: \n\t-d <datafile> \n\t-r <rulefile> \n\t-w <wekafile> \n\t-l <lookupfile>");
         }
-    }
-    
-    /** printConfigDetails: method to quickly print the configuration details 
-     * for this run of the program
-     * 
-     * @param cp - the ConfigParameters object to display info about
-     * 
-     * this should be handy if and when we get into running a series of 
-     * consecutive configurations on our system to evaluate a personal experiment
-     */
-    private static void printConfigDetails(ConfigParameters cp){
-        System.out.println("------Configuration parameters------");
-        System.out.println("Initial Population Size: \t\t"+cp.initialPopSize);
-        System.out.println("Number Of Generations: \t\t\t"+cp.numGenerations);
-        System.out.println("Maximum Population Size: \t\t"+cp.populationMax);
-        System.out.println("Min Coverage: \t\t\t\t"+cp.minCoverage);
-        System.out.println("Min Accuracy: \t\t\t\t"+cp.minAccuracy);
-        System.out.println("Crossover to Mutation Ratio: \t\t"+cp.crossToMute);
-        System.out.println("Base Fitness Weighting: \t\t"+cp.baseFitnessWeight);
-        System.out.println("Ext1 Fitness Weighting: \t\t"+cp.ext1FitnessWeight);
-        System.out.println("Ext2 Fitness Weighting: \t\t"+cp.ext2FitnessWeight);
-        System.out.println("Num Antecedent Features: \t\t"+cp.numFeatAntecedent);
-        System.out.println("Num Consequent Features: \t\t"+cp.numFeatConsequent);
-        if (cp.featuresToIgnore != null) {
-            System.out.print("Indices of Features to Ignore: \t\t");
-            System.out.print("[");
-            cp.featuresToIgnore.forEach((feature) -> {
-                System.out.print(" " + feature + " ");
-            });
-            System.out.println("]");
-        }
-        System.out.println("------------------------------------\n");
     }
 }

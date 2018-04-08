@@ -51,4 +51,41 @@ public class ConfigParameters {
         this.featuresToIgnore = featToIg;
         this.requiredFeatures = requiredFeatures;
     }
+    
+    /** printConfigDetails: method to quickly print the configuration details 
+     * for this run of the program
+     * 
+     * this should be handy if and when we get into running a series of 
+     * consecutive configurations on our system to evaluate a personal experiment
+     * @return formatted string with all config details listed
+     */
+    public String formattedConfigDetails(){
+        String returnVal = ""+
+        "------Configuration parameters------\n"+
+        "Initial Population Size: \t\t"+this.initialPopSize+"\n"+
+        "Number Of Generations: \t\t\t"+this.numGenerations+"\n"+
+        "Maximum Population Size: \t\t"+this.populationMax+"\n"+
+        "Min Coverage: \t\t\t\t"+this.minCoverage+"\n"+
+        "Min Accuracy: \t\t\t\t"+this.minAccuracy+"\n"+
+        "Crossover to Mutation Ratio: \t\t"+this.crossToMute+"\n"+
+        "Base Fitness Weighting: \t\t"+this.baseFitnessWeight+"\n"+
+        "Ext1 Fitness Weighting: \t\t"+this.ext1FitnessWeight+"\n"+
+        "Ext2 Fitness Weighting: \t\t"+this.ext2FitnessWeight+"\n"+
+        "Num Antecedent Features: \t\t"+this.numFeatAntecedent+"\n"+
+        "Num Consequent Features: \t\t"+this.numFeatConsequent+"\n";
+        if (this.featuresToIgnore != null) {
+            returnVal += "Indices of Features to Ignore: \t\t"+
+            "[";
+            returnVal = this.featuresToIgnore.stream().map((feature) -> " " + feature + " ").reduce(returnVal, String::concat);
+            returnVal += "]\n";
+        }
+        if (this.requiredFeatures != null) {
+            returnVal += "Indices of Required Features: \t\t"+
+            "[";
+            returnVal = this.requiredFeatures.stream().map((feature) -> " " + feature + " ").reduce(returnVal, String::concat);
+            returnVal += "]\n";
+        }
+        returnVal += "------------------------------------\n\n";
+        return returnVal;
+    }
 }
