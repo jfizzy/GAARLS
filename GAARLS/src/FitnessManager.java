@@ -16,10 +16,22 @@ public class FitnessManager {
     // private members
     private Database theDatabase;
     private ArrayList<Rule> theWekaRules;
+    private final float baseFitnessWeight;
+    private final float ext1FitnessWeight;      //weights remain consistent for the lifespan 
+    private final float ext2FitnessWeight;      //of this class, once assigned
 
     // public functions
-    public FitnessManager(Database database, ArrayList<Rule> wekaRules)
+    public FitnessManager(Database database, ArrayList<Rule> wekaRules, ConfigParameters cp)
     {
+        if(cp == null){
+            baseFitnessWeight = 1.0f;
+            ext1FitnessWeight = 0.0f;       // base weights for testing
+            ext2FitnessWeight = 0.0f;
+        }else{
+            baseFitnessWeight = cp.baseFitnessWeight;
+            ext1FitnessWeight = cp.ext1FitnessWeight;   // gather weights defined by cp 
+            ext2FitnessWeight = cp.ext2FitnessWeight;
+        }
         theDatabase = database;
         theWekaRules = wekaRules;
     }
@@ -28,23 +40,21 @@ public class FitnessManager {
      * Calculate the fitness of a rule given internal fitness functions
      * @param rule to evaluate
      *             NOTE: information relevant to rule will be cached inside rule at the same time
- *                       will not change functionality of rule
-     * @return fitness value of rule; value between 0 and 300
+     *                   will not change functionality of rule
+     *             UPDATE: Now properly uses weights defined by the ConfigParameters object that is passed into
+     *                     the class constructor
+     * @return fitness value of rule; the value range will be completely controlled by the weights of the components
      */
     public float fitnessOf(Rule rule) {
-
-        float w1 = 1.0f;
-        float w2 = 1.0f;
-        float w3 = 1.0f;
 
         if (!RuleManager.IsValidRule(rule))
             return 0;
 
-        if(theWekaRules.size() == 0) {
+        if(theWekaRules.isEmpty()) {
             return fitnessBasic(rule);
         }
         else{
-            float fitness = (w1*fitnessBasic(rule) + w2*ext1(rule) + w3*ext2(rule));
+            float fitness = (baseFitnessWeight*fitnessBasic(rule) + ext1FitnessWeight*ext1(rule) + ext2FitnessWeight*ext2(rule));
             return fitness;
         }
     }

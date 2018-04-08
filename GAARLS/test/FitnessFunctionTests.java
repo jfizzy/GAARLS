@@ -25,7 +25,7 @@ public class FitnessFunctionTests {
             System.out.println(e.getMessage());
         }
 
-        FitnessManager theFitnessManager = new FitnessManager(null, null);
+        FitnessManager theFitnessManager = new FitnessManager(null, null, null);
 
 
         Rule rule1 = new Rule(r1FeatureVector);
@@ -82,12 +82,12 @@ public class FitnessFunctionTests {
         theWekaRules.add(rule2);
         theWekaRules.add(rule3);
 
-        FitnessManager theFitnessManager = new FitnessManager(null, theWekaRules);
+        FitnessManager theFitnessManager = new FitnessManager(null, theWekaRules, null);
 
         assertEquals((double) theFitnessManager.ext1(rule), (double) (3/rule.getFeatureReqs().length), 0.0);
 
         theWekaRules.add(rule);
-        FitnessManager newFitnessManager = new FitnessManager(null, theWekaRules);
+        FitnessManager newFitnessManager = new FitnessManager(null, theWekaRules, null);
         assertEquals(newFitnessManager.ext1(rule), 0, 0.0);
 
     }

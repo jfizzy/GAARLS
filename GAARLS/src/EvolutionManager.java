@@ -1,6 +1,7 @@
 import Rule.Rule;
 import Rule.RuleRegex;
 import javafx.util.Pair;
+import Rule.FeatureRequirement;
 
 import java.io.*;
 import java.util.*;
@@ -31,6 +32,7 @@ public class EvolutionManager
     private RuleManager theRuleManager;                                                   // Has functions for crossover and mutation
     private ArrayList<Rule> knownRules;
     private ArrayList<RuleRegex> knownRegexs;
+    ArrayList<FeatureRequirement> requiredFeatures;
 
     private ArrayList<Rule> wekaRules;
     private ConfigParameters cp;
@@ -38,6 +40,7 @@ public class EvolutionManager
     private int maxPopulation;
     private int crossToMute;
     private int initialSize;
+    private int individualsToTrim;
     private int maxGenerations;
     private int numFeatAntecedent;
     private int numFeatConsequent;
@@ -54,18 +57,20 @@ public class EvolutionManager
      * @param cp: set of config parameters
      */
     public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<RuleRegex> knownRegexs, ArrayList<Rule> wekaRules, ConfigParameters cp) {
-        theFitnessManager = new FitnessManager(database, wekaRules);
-        theRuleManager = new RuleManager(lookupTable);
+        this.theFitnessManager = new FitnessManager(database, wekaRules, cp);
+        this.theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
         this.knownRegexs = knownRegexs;
         this.wekaRules = wekaRules;
         this.maxPopulation = cp.populationMax;
         this.crossToMute = cp.crossToMute;
         this.initialSize = cp.initialPopSize;
+        this.individualsToTrim = cp.individualsToTrim;
         this.maxGenerations = cp.numGenerations;
         this.numFeatAntecedent = cp.numFeatAntecedent;
         this.numFeatConsequent = cp.numFeatConsequent;
-        crossoversDone = 0;
+        this.requiredFeatures = cp.requiredFeatures;
+        this.crossoversDone = 0;
     }
 
     /**
@@ -78,6 +83,7 @@ public class EvolutionManager
         float ruleFitness;
         Pair ruleAndFit;
         boolean regexMatch;
+        boolean missingRequiredFeature;
         for(int i = 0; i < initialSize; i++){
             do {
                 potentialRule = theRuleManager.generateRuleRandomSize();
@@ -92,9 +98,17 @@ public class EvolutionManager
                     }
                 }
 
+                missingRequiredFeature = false;
+
+                for (FeatureRequirement required : requiredFeatures) {
+                    if (!required.wildcardEquals(potentialRule.getFeatureReq(required.getFeatureID()))) {
+                       missingRequiredFeature = true;
+                    }
+                }
+
                 ruleFitness = theFitnessManager.fitnessOf(potentialRule);
                 ruleAndFit = new Pair<>(ruleFitness,potentialRule);
-            } while (!RuleManager.IsValidRule(potentialRule) || state.contains(ruleAndFit) || knownRules.contains(potentialRule) || regexMatch);
+            } while (!RuleManager.IsValidRule(potentialRule) || state.contains(ruleAndFit) || knownRules.contains(potentialRule) || regexMatch || missingRequiredFeature);
 
             if((i > 0) && (i%100 == 0)) {
                 System.out.println(i + " total rules added to initial population");
@@ -109,8 +123,9 @@ public class EvolutionManager
 
     public void evolve() {
         int numGenerations = 0;
-        int cullToSize = maxPopulation - 100;
-
+        int cullToSize = (maxPopulation - this.individualsToTrim > 0) ? maxPopulation - this.individualsToTrim : (maxPopulation/10);
+        // handles a mismatch between max pop and num individuals to trim
+        // defauts to 10% of max pop size
         System.out.println("Generating initial population...");
         state = this.initializePopulation();
 
@@ -123,7 +138,7 @@ public class EvolutionManager
 
             if(state.size() > maxPopulation) {
                 System.out.println("\nPopulation size: " + state.size());
-                System.out.println("Max population size exceeded. Trimming 100 individuals...");
+                System.out.println("Max population size exceeded. Trimming "+cullToSize+" individuals...");
                 while(state.size() > cullToSize) {
                     state.remove(state.size() - 1);
                 }
@@ -181,6 +196,7 @@ public class EvolutionManager
             Rule child;
             Pair childAndFit;
             boolean regexMatch;
+            boolean missingRequiredFeature;
             do {
                 int parentIndex = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 Rule parent = nextState.get(parentIndex).getValue();
@@ -195,9 +211,17 @@ public class EvolutionManager
                     }
                 }
 
+                missingRequiredFeature = false;
+
+                for (FeatureRequirement required : requiredFeatures) {
+                    if (!required.wildcardEquals(child.getFeatureReq(required.getFeatureID()))) {
+                       missingRequiredFeature = true;
+                    }
+                }
+
                 Float childFitness = theFitnessManager.fitnessOf(child);
                 childAndFit = new Pair<>(childFitness, child);
-            } while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child) || regexMatch);
+            } while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child) || regexMatch || missingRequiredFeature);
 
             nextState.add(childAndFit);
         }
@@ -215,10 +239,47 @@ public class EvolutionManager
             Rule child = theRuleManager.crossover(parent1,parent2);
             Float childFitness = theFitnessManager.fitnessOf(child);
             Pair childAndFit = new Pair<>(childFitness, child);
+            boolean regexMatch;
+            boolean missingRequiredFeature;
+
+            regexMatch = false;
+
+            for (RuleRegex regex : knownRegexs) {
+                if (regex.matches(child)) {
+                    regexMatch = true;
+                    break;
+                }
+            }
+
+            missingRequiredFeature = false;
+
+            for (FeatureRequirement required : requiredFeatures) {
+                if (!required.wildcardEquals(child.getFeatureReq(required.getFeatureID()))) {
+                   missingRequiredFeature = true;
+                }
+            }
 
             int crossOverAttempts = 0;
-            while(crossOverAttempts < 20 && (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child))) { //keep going until pivot point produces valid Rule
+            while(crossOverAttempts < 20 && (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child)) || missingRequiredFeature || regexMatch) { //keep going until pivot point produces valid Rule
                 child = theRuleManager.crossover(parent1, parent2);
+
+                regexMatch = false;
+
+                for (RuleRegex regex : knownRegexs) {
+                    if (regex.matches(child)) {
+                        regexMatch = true;
+                        break;
+                    }
+                }
+
+                missingRequiredFeature = false;
+
+                for (FeatureRequirement required : requiredFeatures) {
+                    if (!required.wildcardEquals(child.getFeatureReq(required.getFeatureID()))) {
+                       missingRequiredFeature = true;
+                    }
+                }
+
                 childFitness = theFitnessManager.fitnessOf(child);
                 childAndFit = new Pair<>(childFitness, child);
                 crossOverAttempts += 1;
@@ -229,8 +290,24 @@ public class EvolutionManager
                     child = theRuleManager.mutate(child); // keep mutating child until it meets constraints
                     childFitness = theFitnessManager.fitnessOf(child);
                     childAndFit = new Pair<>(childFitness, child);
+                                    regexMatch = false;
+
+                    for (RuleRegex regex : knownRegexs) {
+                        if (regex.matches(child)) {
+                            regexMatch = true;
+                            break;
+                        }
+                    }
+
+                    missingRequiredFeature = false;
+
+                    for (FeatureRequirement required : requiredFeatures) {
+                        if (!required.wildcardEquals(child.getFeatureReq(required.getFeatureID()))) {
+                            missingRequiredFeature = true;
+                        }
+                    }
                 }
-                while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child));//keep going until pivot point produces valid Rule
+                while (!RuleManager.IsValidRule(child) || nextState.contains(childAndFit) || knownRules.contains(child) || regexMatch || missingRequiredFeature);//keep going until pivot point produces valid Rule
             }
 
             nextState.add(childAndFit);
