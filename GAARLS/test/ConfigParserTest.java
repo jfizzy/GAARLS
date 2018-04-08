@@ -47,7 +47,8 @@ public class ConfigParserTest {
     public void testConfigParamInit() {
         ArrayList<Integer> al = new ArrayList<>();
         al.add(0);
-        cp = new ConfigParameters(0,0,0,0,0,0,0,0,0,0,0,al, null);
+        cp = new ConfigParameters(0,0,0,0,0,0,0,0,0,0,0,0,al, null);
         assertTrue(cp.numGenerations == 0);
+        assertTrue(cp.individualsToTrim == 0);
     }
 }

@@ -37,7 +37,7 @@ public class Main
         
         ConfigParameters cp = parser.parseConfigParameters(configFilePath);
         if (cp == null){
-            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,10,10,null, null);
+            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,100,10,10,null, null);
             System.out.println("Using Default Config.");
         }
         // desc of default configuration when file is missing
@@ -50,6 +50,7 @@ public class Main
             1           Base Fitness Weighting
             0           Fitness Ext1 Weighting
             0           Fitness Ext2 Weighting
+            100         Individuals to Trim
             10          Max Features to allow in Antecedent
             10          Max Features to allow in Consequent
             null        List of Feature Indices to Ignore

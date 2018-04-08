@@ -230,7 +230,8 @@ public class Parser {
                 Pattern bFWPatt = Pattern.compile("^BASE_FITNESS_WEIGHT\\s*=\\s*\\d*(\\.\\d*)?$");
                 Pattern e1FWPatt = Pattern.compile("^EXT1_FITNESS_WEIGHT\\s*=\\s*\\d*(\\.\\d*)?$");
                 Pattern e2FWPatt = Pattern.compile("^EXT2_FITNESS_WEIGHT\\s*=\\s*\\d*(\\.\\d*)?$");
-
+                Pattern iToTrimPatt = Pattern.compile("^INDIVIDUALS_TO_TRIM\\s*=\\s*\\d*$");
+                
                 Pattern numFAPatt = Pattern.compile("^NUM_FEATURES_ANTE\\s*=\\s*\\d*$");
                 Pattern numFCPatt = Pattern.compile("^NUM_FEATURES_CONS\\s*=\\s*\\d*$");
                 Pattern featTIPatt = Pattern.compile("^FEATURES_TO_IGNORE\\s*=\\s*(\\d*|[CVP]_[A-Z]{1,5})?((\\s*,\\s*\\d*)|(\\s*,\\s*[CVP]_[A-Z]{1,5}))*$");
@@ -240,7 +241,7 @@ public class Parser {
                 Integer initialPopSize = null, numGenerations = null, populationMax = null, crossToMute = null;
                 Float minCoverage = null, minAccuracy = null;
                 Float baseFitnessWeight = null, ext1FitnessWeight = null, ext2FitnessWeight = null;
-                Integer numFeatAntecedent = null, numFeatConsequent = null;
+                Integer individualsToTrim = null,numFeatAntecedent = null, numFeatConsequent = null;
                 ArrayList<Integer> featuresToIgnore = null;
                 ArrayList<FeatureRequirement> requiredFeatures = new ArrayList<>();
 
@@ -269,6 +270,8 @@ public class Parser {
                             ext1FitnessWeight = Float.parseFloat(paramLine.split("=")[1].trim());
                         } else if (e2FWPatt.matcher(paramLine).find()) {
                             ext2FitnessWeight = Float.parseFloat(paramLine.split("=")[1].trim());
+                        } else if (iToTrimPatt.matcher(paramLine).find()) {
+                            individualsToTrim = Integer.parseInt(paramLine.split("=")[1].trim());
                         } else if (numFAPatt.matcher(paramLine).find()) {
                             numFeatAntecedent = Integer.parseInt(paramLine.split("=")[1].trim());
                         } else if (numFCPatt.matcher(paramLine).find()) {
@@ -367,6 +370,7 @@ public class Parser {
                         baseFitnessWeight != null ? baseFitnessWeight : 1.0f,
                         ext1FitnessWeight != null ? ext1FitnessWeight : 0f, 
                         ext2FitnessWeight != null ? ext2FitnessWeight : 0f,
+                        individualsToTrim != null ? individualsToTrim : 100,
                         numFeatAntecedent != null ? numFeatAntecedent : 10, 
                         numFeatConsequent != null ? numFeatConsequent : 10,
                         featuresToIgnore != null ? featuresToIgnore : null,

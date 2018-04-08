@@ -56,19 +56,19 @@ public class EvolutionManager
      * @param cp: set of config parameters
      */
     public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<RuleRegex> knownRegexs, ArrayList<Rule> wekaRules, ConfigParameters cp) {
-        theFitnessManager = new FitnessManager(database, wekaRules, cp);
-        theRuleManager = new RuleManager(lookupTable);
+        this.theFitnessManager = new FitnessManager(database, wekaRules, cp);
+        this.theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
         this.knownRegexs = knownRegexs;
         this.wekaRules = wekaRules;
-        maxPopulation = cp.populationMax;
-        crossToMute = cp.crossToMute;
-        initialSize = cp.initialPopSize;
-        maxGenerations = cp.numGenerations;
-        numFeatAntecedent = cp.numFeatAntecedent;
-        numFeatConsequent = cp.numFeatConsequent;
-        requiredFeatures = cp.requiredFeatures;
-        crossoversDone = 0;
+        this.maxPopulation = cp.populationMax;
+        this.crossToMute = cp.crossToMute;
+        this.initialSize = cp.initialPopSize;
+        this.maxGenerations = cp.numGenerations;
+        this.numFeatAntecedent = cp.numFeatAntecedent;
+        this.numFeatConsequent = cp.numFeatConsequent;
+        this.requiredFeatures = cp.requiredFeatures;
+        this.crossoversDone = 0;
     }
 
     /**

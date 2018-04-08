@@ -12,7 +12,9 @@ import java.util.ArrayList;
  */
 
 /**
- *
+ * ConfigParameters: wrapper class to hold all of the configuration file's
+ * defined parameters so that classes who need this information can use them.
+ * 
  * @author James MacIsaac
  */
 public class ConfigParameters {
@@ -28,6 +30,8 @@ public class ConfigParameters {
     public final float ext1FitnessWeight;
     public final float ext2FitnessWeight;
     
+    public final int individualsToTrim;
+    
     public final int numFeatAntecedent;
     public final int numFeatConsequent;
     public final ArrayList<Integer> featuresToIgnore;
@@ -35,7 +39,7 @@ public class ConfigParameters {
     
     public ConfigParameters(int initPopSize, int numGens, int popMax, 
             float minCov, float minAcc, int crossToMute, 
-            float baseFitW, float ext1FitW, float ext2FitW, int numFeatA, 
+            float baseFitW, float ext1FitW, float ext2FitW, int iToTrim,int numFeatA, 
             int numFeatC, ArrayList<Integer> featToIg, ArrayList<FeatureRequirement> requiredFeatures){
         this.initialPopSize = initPopSize;
         this.numGenerations = numGens;
@@ -46,6 +50,7 @@ public class ConfigParameters {
         this.baseFitnessWeight = baseFitW;
         this.ext1FitnessWeight = ext1FitW;
         this.ext2FitnessWeight = ext2FitW;
+        this.individualsToTrim = iToTrim;
         this.numFeatAntecedent = numFeatA;
         this.numFeatConsequent = numFeatC;
         this.featuresToIgnore = featToIg;
@@ -71,6 +76,7 @@ public class ConfigParameters {
         "Base Fitness Weighting: \t\t"+this.baseFitnessWeight+"\n"+
         "Ext1 Fitness Weighting: \t\t"+this.ext1FitnessWeight+"\n"+
         "Ext2 Fitness Weighting: \t\t"+this.ext2FitnessWeight+"\n"+
+        "Individuals to Trim: \t\t"+this.individualsToTrim+"\n"+
         "Num Antecedent Features: \t\t"+this.numFeatAntecedent+"\n"+
         "Num Consequent Features: \t\t"+this.numFeatConsequent+"\n";
         if (this.featuresToIgnore != null) {
