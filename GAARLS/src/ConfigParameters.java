@@ -88,7 +88,11 @@ public class ConfigParameters {
         if (this.requiredFeatures != null) {
             returnVal += "Required Features: \t\t\t"+
             "[";
-            returnVal = this.requiredFeatures.stream().map((feature) -> " " + ConfigParameters.indexToFeat(feature.getFeatureID()) + " ").reduce(returnVal, String::concat);
+            returnVal = this.requiredFeatures.stream().map((featureReq) -> featureReq.getFeatureID()).map((id) -> {
+                int realID = id;
+                realID = this.featuresToIgnore.stream().filter((f) -> (id >= f)).map((_item) -> 1).reduce(realID, Integer::sum);
+                return realID;
+            }).map((realID) -> " " + ConfigParameters.indexToFeat(realID) + " ").reduce(returnVal, String::concat);
             returnVal += "]\n";
         }
         returnVal += "------------------------------------\n\n";
