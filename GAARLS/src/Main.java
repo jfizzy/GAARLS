@@ -52,7 +52,8 @@ public class Main
             0           Fitness Ext2 Weighting
             10          Max Features to allow in Antecedent
             10          Max Features to allow in Consequent
-            null        List of Features to Ignore
+            null        List of Feature Indices to Ignore
+            null        List of required features for rules
         */
         printConfigDetails(cp);
         System.out.println("Complete.");
@@ -60,13 +61,7 @@ public class Main
         
         // get file paths for codex and database
         System.out.println("\nParsing Data Dictionary...");
-
-        ArrayList<Integer> featuresToOmit = new ArrayList<>();
-        featuresToOmit.add(12); // V_ID
-        featuresToOmit.add(15); // P_ID
-        featuresToOmit.add(22); // C_CASE
-        LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, featuresToOmit); // parse lookup table file
-
+        LookupTable lookupTable = LookupTable.ParseFile(lookupFilePath, cp.featuresToIgnore); // parse lookup table file
         System.out.println("Complete.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing data set...");
@@ -74,14 +69,12 @@ public class Main
         System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing known rules...");
-        
-        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, featuresToOmit);
+        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, cp.featuresToIgnore);
         ArrayList<RuleRegex> knownRegexs = parser.parseKnownRuleRegexs(ruleFilePath);
         System.out.println("Complete.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing WEKA rules...");
-        ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, featuresToOmit);
-        System.out.println("Complete.");
+        ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, cp.featuresToIgnore);
         System.out.println("------------------------------------\n");
         
         EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, knownRegexs, wekaRules, cp);

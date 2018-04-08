@@ -233,7 +233,7 @@ public class Parser {
 
                 Pattern numFAPatt = Pattern.compile("^NUM_FEATURES_ANTE\\s*=\\s*\\d*$");
                 Pattern numFCPatt = Pattern.compile("^NUM_FEATURES_CONS\\s*=\\s*\\d*$");
-                Pattern featTIPatt = Pattern.compile("^FEATURES_TO_IGNORE\\s*=\\s*\\d*(\\s*,\\s*\\d*)*$");
+                Pattern featTIPatt = Pattern.compile("^FEATURES_TO_IGNORE\\s*=\\s*(\\d*|[CVP]_[A-Z]{1,5})?((\\s*,\\s*\\d*)|(\\s*,\\s*[CVP]_[A-Z]{1,5}))*$");
 
                 Pattern featReqPatt = Pattern.compile("^REQUIRED_FEATURE\\s*=\\s*([^;]+;[^;]+;[^;]+;[^;]+)$");
 
@@ -277,7 +277,18 @@ public class Parser {
                             String[] feats = paramLine.split("=")[1].trim().split(",");
                             ArrayList<Integer> featList = new ArrayList<>();
                             for (String feat : feats) {
-                                featList.add(Integer.parseInt(feat.trim()));
+                                try{
+                                    int i = Integer.parseInt(feat.trim());
+                                    if(!featList.contains(i)) // dont add it twice
+                                        featList.add(i);
+                                } catch (NumberFormatException e){
+                                    Integer featIndex = Parser.featToIndex(feat); // get index
+                                    if(featIndex != null && !featList.contains(featIndex)){ // don't add it twice
+                                        featList.add(featIndex);
+                                    }else{
+                                        System.out.println("Feature name did not resolve");
+                                    }
+                                }
                             }
                             if (!featList.isEmpty()) {
                                 featuresToIgnore = featList;
@@ -360,8 +371,6 @@ public class Parser {
                         numFeatConsequent != null ? numFeatConsequent : 10,
                         featuresToIgnore != null ? featuresToIgnore : null,
                         // these don't need logic as the array is either null or contains stuff, we don't need to check
-                        // NOTE: I agree, I also think that this config param can get consumed by the logic existing in requireFeatures
-                        //          -James
                         requiredFeatures
 
                 );
@@ -373,6 +382,70 @@ public class Parser {
             }
         }
         return null; // couldnt find file
+    }
+    
+    /**
+     * featToIndex: translates the string version of the feature
+     * to its index in the list of features.
+     * (Used to omit features by name)
+     * 
+     * @param featStr
+     * @return Int of index for specified feature
+     *         null otherwise
+     */
+    private static Integer featToIndex(String featStr){
+        switch (featStr){
+            case "C_YEAR":
+                return 0;
+            case "C_MONTH":
+                return 1;
+            case "C_WDAY":
+                return 2;
+            case "C_HOUR":
+                return 3;
+            case "C_SEV":
+                return 4;
+            case "C_VEHS":
+                return 5;
+            case "C_CONF":
+                return 6;
+            case "C_RCFG":
+                return 7;
+            case "C_WTHR":
+                return 8;
+            case "C_RSUR":
+                return 9;
+            case "C_RALN":
+                return 10;
+            case "C_TRAF":
+                return 11;
+            case "V_ID":
+                return 12;
+            case "V_TYPE":
+                return 13;
+            case "V_YEAR":
+                return 14;
+            case "P_ID":
+                return 15;
+            case "P_SEX":
+                return 16;
+            case "P_AGE":
+                return 17;
+            case "P_PSN":
+                return 18;
+            case "P_ISEV":
+                return 19;
+            case "P_SAFE":
+                return 20;
+            case "P_USER":
+                return 21;
+            case "C_CASE":
+                return 22;
+            case "C_OCCUR":
+                return 23;
+            default:
+                return null;
+        }
     }
 
 }
