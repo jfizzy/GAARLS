@@ -76,7 +76,7 @@ public class ConfigParameters {
         "Base Fitness Weighting: \t\t"+this.baseFitnessWeight+"\n"+
         "Ext1 Fitness Weighting: \t\t"+this.ext1FitnessWeight+"\n"+
         "Ext2 Fitness Weighting: \t\t"+this.ext2FitnessWeight+"\n"+
-        "Individuals to Trim: \t\t"+this.individualsToTrim+"\n"+
+        "Individuals to Trim: \t\t\t"+this.individualsToTrim+"\n"+
         "Num Antecedent Features: \t\t"+this.numFeatAntecedent+"\n"+
         "Num Consequent Features: \t\t"+this.numFeatConsequent+"\n";
         if (this.featuresToIgnore != null) {

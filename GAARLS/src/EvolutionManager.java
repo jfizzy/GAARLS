@@ -40,6 +40,7 @@ public class EvolutionManager
     private int maxPopulation;
     private int crossToMute;
     private int initialSize;
+    private int individualsToTrim;
     private int maxGenerations;
     private int numFeatAntecedent;
     private int numFeatConsequent;
@@ -64,6 +65,7 @@ public class EvolutionManager
         this.maxPopulation = cp.populationMax;
         this.crossToMute = cp.crossToMute;
         this.initialSize = cp.initialPopSize;
+        this.individualsToTrim = cp.individualsToTrim;
         this.maxGenerations = cp.numGenerations;
         this.numFeatAntecedent = cp.numFeatAntecedent;
         this.numFeatConsequent = cp.numFeatConsequent;
@@ -121,8 +123,9 @@ public class EvolutionManager
 
     public void evolve() {
         int numGenerations = 0;
-        int cullToSize = maxPopulation - 100;
-
+        int cullToSize = (maxPopulation - this.individualsToTrim > 0) ? maxPopulation - this.individualsToTrim : (maxPopulation/10);
+        // handles a mismatch between max pop and num individuals to trim
+        // defauts to 10% of max pop size
         System.out.println("Generating initial population...");
         state = this.initializePopulation();
 
@@ -135,7 +138,7 @@ public class EvolutionManager
 
             if(state.size() > maxPopulation) {
                 System.out.println("\nPopulation size: " + state.size());
-                System.out.println("Max population size exceeded. Trimming 100 individuals...");
+                System.out.println("Max population size exceeded. Trimming "+cullToSize+" individuals...");
                 while(state.size() > cullToSize) {
                     state.remove(state.size() - 1);
                 }
