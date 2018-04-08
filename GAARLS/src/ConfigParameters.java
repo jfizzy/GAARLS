@@ -74,18 +74,80 @@ public class ConfigParameters {
         "Num Antecedent Features: \t\t"+this.numFeatAntecedent+"\n"+
         "Num Consequent Features: \t\t"+this.numFeatConsequent+"\n";
         if (this.featuresToIgnore != null) {
-            returnVal += "Indices of Features to Ignore: \t\t"+
+            returnVal += "Features to Ignore: \t\t\t"+
             "[";
-            returnVal = this.featuresToIgnore.stream().map((feature) -> " " + feature + " ").reduce(returnVal, String::concat);
+            returnVal = this.featuresToIgnore.stream().map((feature) -> " " + ConfigParameters.indexToFeat(feature) + " ").reduce(returnVal, String::concat);
             returnVal += "]\n";
         }
         if (this.requiredFeatures != null) {
-            returnVal += "Indices of Required Features: \t\t"+
+            returnVal += "Required Features: \t\t\t"+
             "[";
-            returnVal = this.requiredFeatures.stream().map((feature) -> " " + feature + " ").reduce(returnVal, String::concat);
+            returnVal = this.requiredFeatures.stream().map((feature) -> " " + ConfigParameters.indexToFeat(feature.getFeatureID()) + " ").reduce(returnVal, String::concat);
             returnVal += "]\n";
         }
         returnVal += "------------------------------------\n\n";
         return returnVal;
+    }
+    
+    /**
+     * indexToFeat: used to print the common name of features to the user
+     * 
+     * @param index
+     * @return Name of feature
+     *         null otherwise
+     */
+    private static String indexToFeat(int index){
+        switch (index){
+            case 0:
+                return "C_YEAR";
+            case 1:
+                return "C_MONTH";
+            case 2:
+                return "C_WDAY";
+            case 3:
+                return "C_HOUR";
+            case 4:
+                return "C_SEV";
+            case 5:
+                return "C_VEHS";
+            case 6:
+                return "C_CONF";
+            case 7:
+                return "C_RCFG";
+            case 8:
+                return "C_WTHR";
+            case 9:
+                return "C_RSUR";
+            case 10:
+                return "C_RALN";
+            case 11:
+                return "C_TRAF";
+            case 12:
+                return "V_ID";
+            case 13:
+                return "V_TYPE";
+            case 14:
+                return "V_YEAR";
+            case 15:
+                return "P_ID";
+            case 16:
+                return "P_SEX";
+            case 17:
+                return "P_AGE";
+            case 18:
+                return "P_PSN";
+            case 19:
+                return "P_ISEV";
+            case 20:
+                return "P_SAFE";
+            case 21:
+                return "P_USER";
+            case 22:
+                return "C_CASE";
+            case 23:
+                return "C_OCCUR";
+            default:
+                return null;
+        }
     }
 }
