@@ -63,7 +63,7 @@ public class Main
             null        List of Feature Indices to Ignore
             null        List of required features for rules
         */
-        System.out.print(cp.formattedConfigDetails());
+        System.out.print(cp.formattedConfigDetails(lookupTable));
         
         System.out.println("Parsing data set...");
         Database database = Database.ParseFile(dataFilePath, lookupTable, 10000); // parse database file

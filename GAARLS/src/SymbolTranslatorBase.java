@@ -57,6 +57,7 @@ public abstract class SymbolTranslatorBase
     }
 
     public int GetFileFeatureIndex() {return mFileFeatureId;}
+    public String GetFeatureName() {return  mFeatureName;}
     public HashMap<String, Float> getmValueReverseLookupTable() {
         return mValueReverseLookupTable;
     }
