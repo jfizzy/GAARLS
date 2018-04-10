@@ -842,6 +842,10 @@ public class LookupTable
         return fileIndices;
     }
 
+    public String getFeatureName(int featureIndex) {
+        return mFeatureLookupTable[featureIndex].GetFeatureName();
+    }
+
     // private functions
     private LookupTable(SymbolTranslatorBase[] featureTranslators, int numFileFeatures, int numAddedFeatures)
     {
