@@ -722,11 +722,11 @@ public class LookupTable
      * @param toModify feature requirement that will house the changes
      *                 NOTE: @toModify is altered through this function call
      */
-    public void GenerateRandomValue(int featureId, FeatureRequirement toModify)
+    public void GenerateRandomValue(int featureId, FeatureRequirement toModify, int wildcards)
     {
         if (featureId >= 0 && featureId < mFeatureLookupTable.length)
         {
-            mFeatureLookupTable[featureId].GenerateRandomFeatureRequirement(toModify);
+            mFeatureLookupTable[featureId].GenerateRandomFeatureRequirement(toModify, wildcards);
         }
         else
         {
@@ -895,14 +895,14 @@ public class LookupTable
         try
         {
             FeatureRequirement feature = new FeatureRequirement(11, 0, 0, 0, 0);
-            lookupTable.GenerateRandomValue(11, feature);
+            lookupTable.GenerateRandomValue(11, feature, 3);
             System.out.println( lookupTable.TranslateFeatureRequirement(11, feature));
         }
         catch (Exception e)
         {
 
         }
-        RuleManager ruleManager = new RuleManager(lookupTable);
+        RuleManager ruleManager = new RuleManager(lookupTable, new ArrayList<>());
         Rule testRule = ruleManager.generateRuleRandomSize();
 
         System.out.println(lookupTable.TranslateRule(testRule));

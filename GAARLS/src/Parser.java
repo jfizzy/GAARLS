@@ -317,13 +317,13 @@ public class Parser {
                                         int participation;
                                         if (parts[3].trim().compareTo("*") == 0) {
                                             participation = -1;
-                                        } else if (parts[3].trim().compareTo("0") == 0) {
-                                            System.out.println("WARNING: Required Feature participation should be non-zero.");
-                                            System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
-                                            continue;
                                         } else {
                                             try {
                                                 participation = Integer.parseInt(parts[3].trim());
+                                                if (participation < 1 || participation > 2) {
+                                                    System.out.println("WARNING: Non-wildcard participation value must be either 1 or 2");
+                                                    System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
+                                                }
                                             } catch (NumberFormatException e) {
                                                 System.out.println("WARNING: Couldn't parse participation value to integer.");
                                                 System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
