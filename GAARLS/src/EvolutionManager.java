@@ -87,6 +87,7 @@ public class EvolutionManager
             do {
                 potentialRule = theRuleManager.generateRuleRandomSize();
                //potentialRule = theRuleManager.generateRule(numFeatAntecedent, numFeatConsequent);
+               //potentialRule = theRuleManager.generateRuleMaxFeatures();
 
                 regexMatch = false;
 
