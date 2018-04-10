@@ -2,6 +2,7 @@ import Rule.Rule;
 import Rule.FeatureRequirement;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 
 /**
@@ -17,12 +18,14 @@ public class RuleManager
     private LookupTable mLookupTable;
     private final int num_features;
     private static Random rand = new Random();
+    private ArrayList<FeatureRequirement> requiredFeatures;
 
     // public methods
-    public RuleManager(LookupTable lookupTable)
+    public RuleManager(LookupTable lookupTable, ArrayList<FeatureRequirement> requiredFeatures)
     {
         mLookupTable = lookupTable;
         num_features = lookupTable.NumFeatures;
+        this.requiredFeatures = requiredFeatures;
         Rule.setNumFeatures(lookupTable.NumFeatures);
     }
 
@@ -36,19 +39,16 @@ public class RuleManager
     {
         // copy the rule
         Rule mutatedRule = parent.copy();
-
-        // choose a random feature
         int featureId = rand.nextInt(num_features);
         // ensure that we are selecting a new participation value
         int participation = (rand.nextInt(2) + 1 + mutatedRule.getFeatureReq(featureId).getParticipation()) % 3;
         // we only care if this feature is now, or is still participating in the rule
         if (participation != 0) {
             // get a random feature value
-            mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId));
+//            mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId), 3);
         }
         // set the participation
-        mutatedRule.getFeatureReq(featureId).setParticipation(participation);
-
+ //       mutatedRule.getFeatureReq(featureId).setParticipation(participation);
         // return the rule
         return mutatedRule;
     }
@@ -101,9 +101,32 @@ public class RuleManager
     public Rule generateRuleRandomSize()
     {
         Rule newRule = new Rule();
-        int numFeatures = 2 + rand.nextInt(num_features - 3);// -1 is to prevent setting C_CASE, +2 increases chances it is valid
+        int numFeatures = 2 + rand.nextInt(num_features - 3) - requiredFeatures.size();// -1 is to prevent setting C_CASE, +2 increases chances it is valid
         ArrayList<Integer> featuresInRule = new ArrayList(); // will hold the index of the features already active in the rule
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
+
+        // place the required features first
+        for (FeatureRequirement required : requiredFeatures) {
+            int featureID = required.getFeatureID();
+            int participation = required.getParticipation();
+            // 1 or 2 for wildcard participation
+            if (participation == -1) {
+                participation = 1 + rand.nextInt(2);
+            }
+            featureRequirements[featureID].setParticipation(participation);
+            int wildcards = getWildcardValue(required);
+//            System.out.println("wildcard value: " + wildcards);
+            // set the bounds here, this way if we need to flip the range values in GenerateRandomRule
+            // we already know what our fixed value is (think hardcoded min with wildcard max on a non-wrapping range feature)
+            featureRequirements[featureID].setBoundRange(required.getLowerBound(), required.getUpperBound(), 0);
+            // only generate if we have wildcards, otherwise we just needed to unpack the required feature
+            // into our new rule, which is already done (boundrange and participation are set)
+            if (Float.compare(featureRequirements[featureID].getLowerBound(), -1f) == 0 || Float.compare(featureRequirements[featureID].getUpperBound(), -1f) == 0) {
+                mLookupTable.GenerateRandomValue(featureID, featureRequirements[featureID], wildcards);
+            }
+            featuresInRule.add(required.getFeatureID());
+        }
+
         int feature;
 
         for(int i = 0; i < numFeatures; i ++){
@@ -112,10 +135,12 @@ public class RuleManager
                 feature = rand.nextInt(num_features-1);
             } while (featuresInRule.contains(feature));
             featuresInRule.add(feature);
-            mLookupTable.GenerateRandomValue(feature, featureRequirements[feature]);
+            mLookupTable.GenerateRandomValue(feature, featureRequirements[feature], 3);
             featureRequirements[feature].setParticipation(participation);
         }
 
+//        System.out.println("Generating rule: " + mLookupTable.TranslateRule(newRule));
+//        new Scanner(System.in).nextLine();
         return newRule;
     }
 
@@ -154,12 +179,12 @@ public class RuleManager
         }
 
         for (int index : antecedents) {
-            mLookupTable.GenerateRandomValue(index, featureRequirements[index]);
+            mLookupTable.GenerateRandomValue(index, featureRequirements[index], 3);
             featureRequirements[index].setParticipation(1);
         }
 
         for (int index : consequents) {
-            mLookupTable.GenerateRandomValue(index, featureRequirements[index]);
+            mLookupTable.GenerateRandomValue(index, featureRequirements[index], 3);
             featureRequirements[index].setParticipation(2);
         }
 
@@ -183,7 +208,7 @@ public class RuleManager
             int participation = rand.nextInt(2); // generate random participation value of 0,1, or 2
             featureRequirements[i].setParticipation(participation);
             if (participation != 0){
-                mLookupTable.GenerateRandomValue(i, featureRequirements[i]);
+                mLookupTable.GenerateRandomValue(i, featureRequirements[i], 3);
 
             }
         }
@@ -202,6 +227,23 @@ public class RuleManager
             consequentPresent |= featureRequirement.getParticipation() == consequentParticipationValue;
         }
         return antecedentPresent && consequentPresent;
+    }
+
+    private int getWildcardValue(FeatureRequirement required) {
+        // wildcards indicates which features we can randomly generate versus which are fixed
+        // this is so we only have to hand an integer value through to GenerateRandomValue
+        // 0 indicates no wildcards, don't do a generation, our values were hardcoded
+        // 1 indicates just the min value is a wildcard
+        // 2 indicates just the max value is a wildcard
+        // 3 indicates that both are a wildcard
+        int wildcards = 0;
+        if (Float.compare(required.getLowerBound(), -1f) == 0) {
+            wildcards += 1;
+        }
+        if (Float.compare(required.getUpperBound(), -1f) == 0) {
+            wildcards += 2;
+        }
+        return wildcards;
     }
 
     public String TranslateRule(Rule rule)

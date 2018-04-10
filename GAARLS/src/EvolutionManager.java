@@ -58,7 +58,6 @@ public class EvolutionManager
      */
     public EvolutionManager(Database database, LookupTable lookupTable, ArrayList<Rule> knownRules, ArrayList<RuleRegex> knownRegexs, ArrayList<Rule> wekaRules, ConfigParameters cp) {
         this.theFitnessManager = new FitnessManager(database, wekaRules, cp);
-        this.theRuleManager = new RuleManager(lookupTable);
         this.knownRules = knownRules;
         this.knownRegexs = knownRegexs;
         this.wekaRules = wekaRules;
@@ -71,6 +70,7 @@ public class EvolutionManager
         this.numFeatConsequent = cp.numFeatConsequent;
         this.requiredFeatures = cp.requiredFeatures;
         this.crossoversDone = 0;
+        this.theRuleManager = new RuleManager(lookupTable, requiredFeatures);
     }
 
     /**
