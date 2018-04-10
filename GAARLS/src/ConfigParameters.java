@@ -1,7 +1,4 @@
-
 import Rule.FeatureRequirement;
-import jdk.nashorn.internal.lookup.Lookup;
-
 import java.util.ArrayList;
 
 /*
