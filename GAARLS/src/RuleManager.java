@@ -39,16 +39,47 @@ public class RuleManager
     {
         // copy the rule
         Rule mutatedRule = parent.copy();
-        int featureId = rand.nextInt(num_features);
-        // ensure that we are selecting a new participation value
-        int participation = (rand.nextInt(2) + 1 + mutatedRule.getFeatureReq(featureId).getParticipation()) % 3;
-        // we only care if this feature is now, or is still participating in the rule
-        if (participation != 0) {
-            // get a random feature value
-//            mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId), 3);
+        int featureId;
+        boolean isImmutableFeature;
+        boolean mutateParticipation;
+        boolean isRequiredFeature;
+        int wildcards = 0;
+        do {
+            featureId = rand.nextInt(num_features);
+            isImmutableFeature = false;
+            mutateParticipation = false;
+            isRequiredFeature = false;
+            for (FeatureRequirement required : requiredFeatures) {
+                if (required.getFeatureID() == featureId) {
+                    isRequiredFeature = true;
+                    wildcards = getWildcardValue(required);
+                    if (required.getParticipation() == -1) {
+                        mutateParticipation = true;
+                    }
+                    if (wildcards == 0 && !mutateParticipation) {
+                        isImmutableFeature = true;
+                    }
+                }
+            }
+        } while(isImmutableFeature);
+        if (isRequiredFeature) {
+            if (mutateParticipation) {
+                mutatedRule.getFeatureReq(featureId).setParticipation(((mutatedRule.getFeatureReq(featureId).getParticipation() + 2) % 2) + 1);
+            }
+            if (wildcards > 0) {
+                mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId), wildcards);
+            }
+        } else {
+            // ensure that we are selecting a new participation value
+            int participation = (rand.nextInt(2) + 1 + mutatedRule.getFeatureReq(featureId).getParticipation()) % 3;
+            // we only care if this feature is now, or is still participating in the rule
+            if (participation != 0) {
+                // get a random feature value
+                mLookupTable.GenerateRandomValue(featureId, mutatedRule.getFeatureReq(featureId), 3);
+            }
+            // set the participation
+            mutatedRule.getFeatureReq(featureId).setParticipation(participation);
         }
-        // set the participation
- //       mutatedRule.getFeatureReq(featureId).setParticipation(participation);
         // return the rule
         return mutatedRule;
     }
@@ -115,7 +146,6 @@ public class RuleManager
             }
             featureRequirements[featureID].setParticipation(participation);
             int wildcards = getWildcardValue(required);
-//            System.out.println("wildcard value: " + wildcards);
             // set the bounds here, this way if we need to flip the range values in GenerateRandomRule
             // we already know what our fixed value is (think hardcoded min with wildcard max on a non-wrapping range feature)
             featureRequirements[featureID].setBoundRange(required.getLowerBound(), required.getUpperBound(), 0);
@@ -138,9 +168,6 @@ public class RuleManager
             mLookupTable.GenerateRandomValue(feature, featureRequirements[feature], 3);
             featureRequirements[feature].setParticipation(participation);
         }
-
-//        System.out.println("Generating rule: " + mLookupTable.TranslateRule(newRule));
-//        new Scanner(System.in).nextLine();
         return newRule;
     }
 

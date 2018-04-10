@@ -295,8 +295,6 @@ public class Parser {
                                 // 2: max value
                                 // 3: participation (must be non 0 or *)
                                 String parts[] = matcher.group(1).split(";");
-                                System.out.println("Splitting the feature required");
-                                System.out.println("Got: " + parts[0] + " " + parts[1] + " " + parts[2] + " " + parts[3]);
                                 if (parts.length == 4 && LookupTable.featureMap.get(parts[0].trim()) != null) {
                                     int featureID = LookupTable.featureMap.get(parts[0].trim());
                                     try {
@@ -304,14 +302,12 @@ public class Parser {
                                         if (parts[1].trim().compareTo("*") == 0) {
                                             min = -1f;
                                         } else {
-                                            System.out.println("Finding value for: " + parts[1]);
                                             min = LookupTable.featureValueMaps[featureID].get(parts[1].trim());
                                         }
                                         float max;
                                         if (parts[2].trim().compareTo("*") == 0) {
                                             max = -1f;
                                         } else {
-                                            System.out.println("Finding value for: " + parts[2]);
                                             max = LookupTable.featureValueMaps[featureID].get(parts[2].trim());
                                         }
                                         int participation;
