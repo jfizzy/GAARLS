@@ -22,9 +22,9 @@ public class ConfigParameters {
     public final int numGenerations;
     public final int populationMax;
     
-    public final float minCoverage;
-    public final float minAccuracy;
-    public final int crossToMute;
+    public float minCoverage;
+    public  float minAccuracy;
+    public  int crossToMute;
     
     public final float baseFitnessWeight;
     public final float ext1FitnessWeight;

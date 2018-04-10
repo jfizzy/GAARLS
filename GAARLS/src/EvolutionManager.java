@@ -45,6 +45,7 @@ public class EvolutionManager
     private int numFeatAntecedent;
     private int numFeatConsequent;
 
+
     private int crossoversDone;
     private ArrayList<Pair<Float,Rule>> state;                                            // All the current Fitness/Rule pairs.
 
@@ -121,7 +122,7 @@ public class EvolutionManager
         return state;
     }
 
-    public void evolve() {
+    public ArrayList<Float> evolve() {
         int numGenerations = 0;
         int cullToSize = (maxPopulation - this.individualsToTrim > 0) ? maxPopulation - this.individualsToTrim : (maxPopulation/10);
         // handles a mismatch between max pop and num individuals to trim
@@ -131,28 +132,32 @@ public class EvolutionManager
 
         Scanner input = new Scanner(System.in);
         System.out.println("Initial population generated. Press RETURN to begin evolution of rules.");
-        System.out.print(input.nextLine());
+        //System.out.print(input.nextLine());
 
+        ArrayList<Float> growthRate = new ArrayList<>();
+        int incrementAfterGenerations = maxGenerations / 10;
         while (numGenerations < maxGenerations) {
-            state = fSelect(state);
+
+            numGenerations++;
+            state = fSelect(state, numGenerations > incrementAfterGenerations * growthRate.size() / 3, growthRate);
 
             if(state.size() > maxPopulation) {
-                System.out.println("\nPopulation size: " + state.size());
-                System.out.println("Max population size exceeded. Trimming "+cullToSize+" individuals...");
+                //System.out.println("\nPopulation size: " + state.size());
+                //System.out.println("Max population size exceeded. Trimming "+cullToSize+" individuals...");
                 while(state.size() > cullToSize) {
                     state.remove(state.size() - 1);
                 }
-                System.out.println("\nPopulation size: " + state.size());
+                //System.out.println("\nPopulation size: " + state.size());
             }
-            numGenerations++;
-        }
 
+        }
+        return growthRate;
     }
 
     /**
      * Create new state from current one by application of genetic operations
      */
-    private ArrayList<Pair<Float, Rule>> fSelect(ArrayList<Pair<Float, Rule>> aState){
+    private ArrayList<Pair<Float, Rule>> fSelect(ArrayList<Pair<Float, Rule>> aState, boolean append, ArrayList<Float> appendList){
 
         ArrayList<Pair<Float, Rule>> nextState = aState;
 
@@ -164,15 +169,25 @@ public class EvolutionManager
                 return o2.getKey().compareTo(o1.getKey());
             }
         });
-        System.out.println("Fitness of fittest: " + nextState.get(0).getKey());
-        System.out.println("Fitness of weakest: " + nextState.get(nextState.size()-1).getKey());
+        //System.out.println("Fitness of fittest: " + nextState.get(0).getKey());
+        //System.out.println("Fitness of weakest: " + nextState.get(nextState.size()-1).getKey());
 
 
         Float FIT = 0.0f;
         for(int i = 0; i < nextState.size(); i++){
             FIT += nextState.get(i).getKey();
         }
-        System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
+        //System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
+
+        if (append)
+        {
+            System.out.println("Fitness of fittest: " + nextState.get(0).getKey());
+            System.out.println("Fitness of weakest: " + nextState.get(nextState.size()-1).getKey());
+            System.out.println("Average rule fitness: " + ((FIT)/((float)nextState.size())));
+            appendList.add(nextState.get(nextState.size()-1).getKey());
+            appendList.add(nextState.get(0).getKey());
+            appendList.add((FIT)/((float)nextState.size()));
+        }
 
         // Associate to each individual, an portion of fitnessInterval according to their fitness
         // Note: As spots are determined with floor function, there may be an extra index available at the end

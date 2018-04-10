@@ -1,4 +1,5 @@
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import Rule.Rule;
@@ -66,20 +67,104 @@ public class Main
         System.out.print(cp.formattedConfigDetails());
         
         System.out.println("Parsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, 10000); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, 1000); // parse database file
         System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing known rules...");
-        ArrayList<Rule> knownRules = parser.parseKnownRules(ruleFilePath, featuresToOmit);
-        ArrayList<RuleRegex> knownRegexs = parser.parseKnownRuleRegexs(ruleFilePath);
+        ArrayList<Rule> knownRules = new ArrayList<>(); //parser.parseKnownRules(ruleFilePath, featuresToOmit);
+        ArrayList<RuleRegex> knownRegexs = new ArrayList<>(); //parser.parseKnownRuleRegexs(ruleFilePath);
         System.out.println("Complete.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing WEKA rules...");
-        ArrayList<Rule> wekaRules = parser.parseWekaRules(wekaFilePath, lookupTable, featuresToOmit);
+        ArrayList<Rule> wekaRules = new ArrayList<>();//parser.parseWekaRules(wekaFilePath, lookupTable, featuresToOmit);
         System.out.println("------------------------------------\n");
-        
-        EvolutionManager evolutionManager = new EvolutionManager(database, lookupTable, knownRules, knownRegexs, wekaRules, cp);
-        evolutionManager.evolve();
+
+
+        EvolutionManager evolutionManager = null;
+        try
+        {
+            float numAveragingRuns = 10;
+            { // min coverage
+                File newFile = new File("minCoverage.csv");
+                newFile.createNewFile();
+                FileWriter fw = new FileWriter(newFile);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw);
+                float increment = 0.001f;
+                for (int i = 0; i < 10; ++i) {
+                    float minCoverage = increment * (i + 1);
+                    cp.minCoverage = minCoverage;
+                    evolutionManager = new EvolutionManager(database, lookupTable, knownRules, knownRegexs, wekaRules, cp);
+                    ArrayList<Float> toOutput = evolutionManager.evolve();
+                    String min = "";
+                    String max = "";
+                    String avg = "";
+                    for (int generation = 0; generation < toOutput.size() / 3; generation++) {
+                        min += Float.toString(toOutput.get(generation * 3)) + ",";
+                        max += Float.toString(toOutput.get(generation * 3 + 1)) + ",";
+                        avg += Float.toString(toOutput.get(generation * 3 + 2)) + ",";
+                    }
+                    out.println("MinCov: " + minCoverage);
+                    out.println(min.substring(0, min.length() - 1));
+                    out.println(max.substring(0, max.length() - 1));
+                    out.println(avg.substring(0, avg.length() - 1));
+                }
+                out.flush();
+                out.close();
+            }
+
+            { // min accuracy
+                File newFile = new File("minAccuracy.csv");
+                newFile.createNewFile();
+                FileWriter fw = new FileWriter(newFile);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw);
+                float increment = 0.005f;
+                for (int i = 0; i < 10; ++i) {
+                    float minCoverage = increment * (i + 1);
+                    cp.minAccuracy = minCoverage;
+                    ArrayList<Float> toOutput = null;
+
+                    for (int testNum = 0; testNum < numAveragingRuns; testNum++)
+                    {
+                        evolutionManager = new EvolutionManager(database, lookupTable, knownRules, knownRegexs, wekaRules, cp);
+                         ArrayList<Float> accum = evolutionManager.evolve();
+                         if (toOutput == null) toOutput = accum;
+                         else
+                         {
+                             for (int j = 0; j < toOutput.size(); j++)
+                             {
+                                 toOutput.set(j, toOutput.get(j) + accum.get(j));
+                             }
+                         }
+                    }
+                    for (int j = 0; j < toOutput.size(); j++)
+                    {
+                        toOutput.set(j, toOutput.get(j) / numAveragingRuns);
+                    }
+
+                    String min = "";
+                    String max = "";
+                    String avg = "";
+                    for (int generation = 0; generation < toOutput.size() / 3; generation++) {
+                        min += Float.toString(toOutput.get(generation * 3)) + ",";
+                        max += Float.toString(toOutput.get(generation * 3 + 1)) + ",";
+                        avg += Float.toString(toOutput.get(generation * 3 + 2)) + ",";
+                    }
+                    out.println("MinAcc: " + minCoverage);
+                    out.println(min.substring(0, min.length() - 1));
+                    out.println(max.substring(0, max.length() - 1));
+                    out.println(avg.substring(0, avg.length() - 1));
+                }
+                out.flush();
+                out.close();
+            }
+        }
+        catch (IOException ioe)
+        {
+
+        }
+
         evolutionManager.toFile("outputRules.txt", cp); //Keep in mind that as is, this will just keep appending rules to this file after each run
         System.out.println("Evolution complete. \nLearned rules output to outputRules.txt");
     }
