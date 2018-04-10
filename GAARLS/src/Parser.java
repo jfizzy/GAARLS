@@ -286,7 +286,6 @@ public class Parser {
                         } else if (crossToMutePatt.matcher(paramLine).find()) {
                             crossToMute = Integer.parseInt(paramLine.split("=")[1].trim());
                         } else if (featReqPatt.matcher(paramLine).find()) {
-                            System.out.println("FOUND REQUIRED FEATURE");
                             Matcher matcher = featReqPatt.matcher(paramLine);
                             if (matcher.find()) {
                                 // indices refer to the following
@@ -335,8 +334,19 @@ public class Parser {
                                     }
                                 } else {
                                     System.out.println("WARNING: Parameter line was probably malformed.");
+                                    if (parts.length != 4) {
+                                        System.out.println("There should be 4 parts to a REQUIRED_FEATURE");
+                                    } else {
+                                        System.out.println("Couldn't translate the Feature Name");
+                                    }
                                     System.out.println("Trouble feature was: " + matcher.group(1) + ". Ignoring this parameter...");
                                 }
+                            }
+                        } else {
+                            String parts[] = paramLine.split("=");
+                            if (parts.length > 0 && parts[0].compareTo("FEATURES_TO_IGNORE") != 0) {
+                                System.out.println("WARNING: Config Parameter could not be parsed.");
+                                System.out.println("The parameter was: " + paramLine + ". Ignoring...");
                             }
                         }
                     } catch (Exception e) {
