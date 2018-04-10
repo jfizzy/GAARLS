@@ -319,6 +319,7 @@ public class Parser {
                                                 if (participation < 1 || participation > 2) {
                                                     System.out.println("WARNING: Non-wildcard participation value must be either 1 or 2");
                                                     System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
+                                                    continue;
                                                 }
                                             } catch (NumberFormatException e) {
                                                 System.out.println("WARNING: Couldn't parse participation value to integer.");
