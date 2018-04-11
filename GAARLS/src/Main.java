@@ -44,7 +44,7 @@ public class Main
         
         ConfigParameters cp = parser.parseConfigParameters(configFilePath, featuresToOmit);
         if (cp == null){
-            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,100,10,10,null, null);
+            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,100,10,10,new ArrayList<>(), new ArrayList<>());
             System.out.println("Using Default Config.");
         }
         // desc of default configuration when file is missing
@@ -63,10 +63,10 @@ public class Main
             null        List of Feature Indices to Ignore
             null        List of required features for rules
         */
-        System.out.print(cp.formattedConfigDetails());
+        System.out.print(cp.formattedConfigDetails(lookupTable));
         
         System.out.println("Parsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, 10000); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
         System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing known rules...");

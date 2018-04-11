@@ -20,13 +20,31 @@ public class RangeSymbolTranslator extends SymbolTranslatorBase
     }
 
     @Override
-    public void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize)
+    public void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize, int wildcards)
     {
-        int randomValueIdx1 = mRandomValueGenerator.nextInt(mSymbolValues.length);
-        int randomValueIdx2 = mRandomValueGenerator.nextInt(mSymbolValues.length);
+        int value1;
+        int value2;
 
-        int value1 = mSymbolValues[randomValueIdx1];
-        int value2 = mSymbolValues[randomValueIdx2];
+        // randomize if wildcard
+        if (wildcards == 1) {
+            value2 = Math.round(toRandomize.getUpperBound());
+            do {
+                int randomValueIdx = mRandomValueGenerator.nextInt(mSymbolValues.length);
+                value1 = mSymbolValues[randomValueIdx];
+            } while (value2 < value1);
+        } else if (wildcards == 2) {
+            value1 = Math.round(toRandomize.getLowerBound());
+            do {
+                int randomValueIdx = mRandomValueGenerator.nextInt(mSymbolValues.length);
+                value2 = mSymbolValues[randomValueIdx];
+            } while (value2 < value1);
+        } else {
+            int randomValueIdx1 = mRandomValueGenerator.nextInt(mSymbolValues.length);
+            int randomValueIdx2 = mRandomValueGenerator.nextInt(mSymbolValues.length);
+            value1 = mSymbolValues[randomValueIdx1];
+            value2 = mSymbolValues[randomValueIdx2];
+        }
+
 
         if (!mCanFlipRange && value1 > value2)
         {

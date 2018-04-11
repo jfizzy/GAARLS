@@ -57,13 +57,14 @@ public abstract class SymbolTranslatorBase
     }
 
     public int GetFileFeatureIndex() {return mFileFeatureId;}
+    public String GetFeatureName() {return  mFeatureName;}
     public HashMap<String, Float> getmValueReverseLookupTable() {
         return mValueReverseLookupTable;
     }
 
     public abstract String FeatureRequirementToDescription(FeatureRequirement featureRequirement);
 
-    public abstract void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize);
+    public abstract void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize, int wildcards);
 
     // protected methods
     protected SymbolTranslatorBase(int fileFeatureId, String featureName, int symbolSize, int[] values, String[] symbols, String[] translations)

@@ -1,6 +1,4 @@
-
 import Rule.FeatureRequirement;
-
 import java.util.ArrayList;
 
 /*
@@ -37,9 +35,9 @@ public class ConfigParameters {
     public final ArrayList<Integer> featuresToIgnore;
     public final ArrayList<FeatureRequirement> requiredFeatures;
     
-    public ConfigParameters(int initPopSize, int numGens, int popMax, 
-            float minCov, float minAcc, int crossToMute, 
-            float baseFitW, float ext1FitW, float ext2FitW, int iToTrim,int numFeatA, 
+    public ConfigParameters(int initPopSize, int numGens, int popMax,
+            float minCov, float minAcc, int crossToMute,
+            float baseFitW, float ext1FitW, float ext2FitW, int iToTrim,int numFeatA,
             int numFeatC, ArrayList<Integer> featToIg, ArrayList<FeatureRequirement> requiredFeatures){
         this.initialPopSize = initPopSize;
         this.numGenerations = numGens;
@@ -64,7 +62,7 @@ public class ConfigParameters {
      * consecutive configurations on our system to evaluate a personal experiment
      * @return formatted string with all config details listed
      */
-    public String formattedConfigDetails(){
+    public String formattedConfigDetails(LookupTable lookupTable){
         String returnVal = ""+
         "------Configuration parameters------\n"+
         "Initial Population Size: \t\t"+this.initialPopSize+"\n"+
@@ -88,7 +86,7 @@ public class ConfigParameters {
         if (this.requiredFeatures != null) {
             returnVal += "Required Features: \t\t\t"+
             "[";
-            returnVal = this.requiredFeatures.stream().map((featureReq) -> featureReq.getFeatureID()).map((id) -> {
+            returnVal = this.requiredFeatures.stream().map((feature) -> " " + lookupTable.getFeatureName(feature.getFeatureID()) + " ").reduce(returnVal, String::concat);
                 int realID = id;
                 realID = this.featuresToIgnore.stream().filter((f) -> (id >= f)).map((_item) -> 1).reduce(realID, Integer::sum);
                 return realID;

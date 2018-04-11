@@ -335,7 +335,7 @@ public class Database
 //        System.out.println("Run Time: " + (System.currentTimeMillis() - systemTime));
 
         Database database = Database.ParseFile("NCDB_1999_to_2015.csv", table, 1000000);
-        RuleManager ruleManager = new RuleManager(table);
+        RuleManager ruleManager = new RuleManager(table, new ArrayList<>());
 
         Rule rule = new Rule();
         FeatureRequirement[] featureRequirements = rule.getFeatureReqs();
