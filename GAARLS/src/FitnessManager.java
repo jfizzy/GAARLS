@@ -19,19 +19,27 @@ public class FitnessManager {
     private final float baseFitnessWeight;
     private final float ext1FitnessWeight;      //weights remain consistent for the lifespan 
     private final float ext2FitnessWeight;      //of this class, once assigned
+    private final float minAccuracy;            // rules with accuracy below min will receive fitness of 0
+    private final float minCoverage;            // rules with coverage below min will receive fitness of 0
 
     // public functions
     public FitnessManager(Database database, ArrayList<Rule> wekaRules, ConfigParameters cp)
     {
+        // BAD PRACTICE. IF CP IS NULL IT SHOULD BE AN ERROR
         if(cp == null){
             baseFitnessWeight = 1.0f;
             ext1FitnessWeight = 0.0f;       // base weights for testing
             ext2FitnessWeight = 0.0f;
+            minAccuracy = 0.001f;
+            minCoverage = 0.005f;
         }else{
             baseFitnessWeight = cp.baseFitnessWeight;
             ext1FitnessWeight = cp.ext1FitnessWeight;   // gather weights defined by cp 
             ext2FitnessWeight = cp.ext2FitnessWeight;
+            minAccuracy = cp.minAccuracy;
+            minCoverage = cp.minCoverage;
         }
+
         theDatabase = database;
         theWekaRules = wekaRules;
     }
@@ -50,24 +58,23 @@ public class FitnessManager {
         if (!RuleManager.IsValidRule(rule))
             return 0;
 
-        if(theWekaRules.isEmpty()) {
-            return fitnessBasic(rule);
-        }
-        else{
-            float fitness = (baseFitnessWeight*fitnessBasic(rule) + ext1FitnessWeight*ext1(rule) + ext2FitnessWeight*ext2(rule));
-            return fitness;
-        }
+        theDatabase.EvaluateRule(rule); // populates rule with accuracy, coverage and completeness
+
+        if (rule.getAccuracy() < minAccuracy || rule.getCoverage() < minCoverage)
+            return 0;
+
+        return baseFitnessWeight * fitnessBasic(rule) // accuracy coverage and range fitness
+                + (theWekaRules.isEmpty() ? 0 : ext1FitnessWeight * ext1(rule)) // weka comparison
+                + ext2FitnessWeight * ext2(rule); // completeness
     }
 
     //Basic version of fitness function:
-
     /**
      *
      * @param rule
      * @return fitness value between 0.0 and 100.0
      */
     private float fitnessBasic(Rule rule){
-        theDatabase.EvaluateRule(rule);                       // Initializes coverage and accuracy values in rule
         float coverage = rule.getCoverage();
         float accuracy = rule.getAccuracy();
         float rangeFitness = rule.getRangeCoverage();
