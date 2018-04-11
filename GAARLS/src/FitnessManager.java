@@ -60,7 +60,8 @@ public class FitnessManager {
 
         theDatabase.EvaluateRule(rule); // populates rule with accuracy, coverage and completeness
 
-        if (rule.getAccuracy() < minAccuracy || rule.getCoverage() < minCoverage)
+        //if (rule.getAccuracy() < minAccuracy || rule.getCoverage() < minCoverage)
+        if (rule.getCoverage() < minCoverage)
             return 0;
 
         return baseFitnessWeight * fitnessBasic(rule) // accuracy coverage and range fitness

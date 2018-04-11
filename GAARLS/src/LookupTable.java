@@ -236,7 +236,7 @@ public class LookupTable
 
             translations = new String[]{
                     "Non-intersection"
-                    , "At an intersection of atleast two public roadways"
+                    , "At an intersection of at least two public roadways"
                     , "Intersection with parking lot entrance/exit, private driveway or laneway"
                     , "Railroad level crossing"
                     , "Bridge,overpass,viaduct"

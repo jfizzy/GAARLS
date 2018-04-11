@@ -128,7 +128,6 @@ public class RuleManager
      * clauses
      * @return random new rule
      */
-    //TODO: figure out why this is always returning a 0.0 fitness rule
     public Rule generateRuleRandomSize()
     {
         Rule newRule = new Rule();

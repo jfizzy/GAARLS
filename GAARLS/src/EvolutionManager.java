@@ -214,7 +214,6 @@ public class EvolutionManager
             do {
                 parent1Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
                 parent2Index = fitnessInterval[rand.nextInt((int) Math.ceil(FIT))];
- //               System.out.println("index 1: " + parent1Index + "\nindex 2: " + parent2Index);
             } while (parent1Index == parent2Index);
 
             Rule parent1 = nextState.get(parent1Index).getValue();
@@ -280,7 +279,7 @@ public class EvolutionManager
      * @param filePath
      */
     public void toFile(String filePath, ConfigParameters cp) {
-        float minAccuracy = 0.1f;           // TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
+        float minPrintAccuracy = 40f;           // Only print rules with accuracy >= this level (0-100%)TODO: make this a global parameter, entered at runtime. Alternatively, print some % of top rules
         File f = new File(filePath);
 
         if(f.exists() && !f.isDirectory()) {
@@ -319,7 +318,7 @@ public class EvolutionManager
                 float individualsAccuracy = ind.getAccuracy()*100;
                 float indCov = ind.getCoverage()*100;
 
-                if (Float.compare(individualsAccuracy, minAccuracy) >= 0) {
+                if (Float.compare(individualsAccuracy, minPrintAccuracy) >= 0) {
                     String lineInFile = theRuleManager.TranslateRule(ind);
                     out.println("Rule Accuracy: " + individualsAccuracy + "; Rule Coverage: " + indCov + "\n" + lineInFile);
                 }
