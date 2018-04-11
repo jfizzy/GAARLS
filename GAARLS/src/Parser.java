@@ -120,7 +120,6 @@ public class Parser {
                                 try {
                                     min = LookupTable.featureValueMaps[featureId].get(bounds[0].trim());
                                 } catch (NullPointerException e) {
-                                    // TODO: Remove this after certain that regex matches all possible feature values
                                     System.out.println("ID for " + matcher.group(1) + " " + featureId);
                                     System.out.println(LookupTable.featureValueMaps[featureId].get(bounds[0].trim()));
                                     System.out.println("Size: " + LookupTable.featureValueMaps[featureId].size());
@@ -367,7 +366,7 @@ public class Parser {
                         individualsToTrim != null ? individualsToTrim : 100,
                         numFeatAntecedent != null ? numFeatAntecedent : 10,
                         numFeatConsequent != null ? numFeatConsequent : 10,
-                        featuresToIgnore != null ? featuresToIgnore : null,
+                        featuresToIgnore != null ? featuresToIgnore : new ArrayList<>(),
                         // these don't need logic as the array is either null or contains stuff, we don't need to check
                         requiredFeatures
                 );
