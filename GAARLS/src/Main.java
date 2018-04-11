@@ -66,7 +66,7 @@ public class Main
         System.out.print(cp.formattedConfigDetails(lookupTable));
         
         System.out.println("Parsing data set...");
-        Database database = Database.ParseFile(dataFilePath, lookupTable, 10000); // parse database file
+        Database database = Database.ParseFile(dataFilePath, lookupTable, -1); // parse database file
         System.out.println("Complete. Data set contains " + database.getNumDataItems() + " items.");
         System.out.println("------------------------------------\n");
         System.out.println("Parsing known rules...");

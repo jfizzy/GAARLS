@@ -72,7 +72,13 @@ public class FitnessManager {
         float accuracy = rule.getAccuracy();
         float rangeFitness = rule.getRangeCoverage();
 
-        float fitnessBase = ((coverage + accuracy + rangeFitness)/3.0f)*100;
+        // The following three weights should sum to 1
+        float w1 = 0.5f;                                      // Accuracy weight
+        float w2 = 0.15f;                                     // Coverage weight
+        float w3 = 0.35f;                                     // Range weight
+
+
+        float fitnessBase = ((w1*accuracy + w2*coverage + w3*rangeFitness))*100;
         return fitnessBase;
     }
 
