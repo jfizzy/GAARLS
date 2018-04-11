@@ -87,10 +87,6 @@ public class ConfigParameters {
             returnVal += "Required Features: \t\t\t"+
             "[";
             returnVal = this.requiredFeatures.stream().map((feature) -> " " + lookupTable.getFeatureName(feature.getFeatureID()) + " ").reduce(returnVal, String::concat);
-                int realID = id;
-                realID = this.featuresToIgnore.stream().filter((f) -> (id >= f)).map((_item) -> 1).reduce(realID, Integer::sum);
-                return realID;
-            }).map((realID) -> " " + ConfigParameters.indexToFeat(realID) + " ").reduce(returnVal, String::concat);
             returnVal += "]\n";
         }
         returnVal += "------------------------------------\n\n";
