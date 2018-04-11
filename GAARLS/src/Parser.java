@@ -120,7 +120,6 @@ public class Parser {
                                 try {
                                     min = LookupTable.featureValueMaps[featureId].get(bounds[0].trim());
                                 } catch (NullPointerException e) {
-                                    // TODO: Remove this after certain that regex matches all possible feature values
                                     System.out.println("ID for " + matcher.group(1) + " " + featureId);
                                     System.out.println(LookupTable.featureValueMaps[featureId].get(bounds[0].trim()));
                                     System.out.println("Size: " + LookupTable.featureValueMaps[featureId].size());
@@ -286,7 +285,6 @@ public class Parser {
                         } else if (crossToMutePatt.matcher(paramLine).find()) {
                             crossToMute = Integer.parseInt(paramLine.split("=")[1].trim());
                         } else if (featReqPatt.matcher(paramLine).find()) {
-                            System.out.println("FOUND REQUIRED FEATURE");
                             Matcher matcher = featReqPatt.matcher(paramLine);
                             if (matcher.find()) {
                                 // indices refer to the following
@@ -295,8 +293,6 @@ public class Parser {
                                 // 2: max value
                                 // 3: participation (must be non 0 or *)
                                 String parts[] = matcher.group(1).split(";");
-                                System.out.println("Splitting the feature required");
-                                System.out.println("Got: " + parts[0] + " " + parts[1] + " " + parts[2] + " " + parts[3]);
                                 if (parts.length == 4 && LookupTable.featureMap.get(parts[0].trim()) != null) {
                                     int featureID = LookupTable.featureMap.get(parts[0].trim());
                                     try {
@@ -304,26 +300,25 @@ public class Parser {
                                         if (parts[1].trim().compareTo("*") == 0) {
                                             min = -1f;
                                         } else {
-                                            System.out.println("Finding value for: " + parts[1]);
                                             min = LookupTable.featureValueMaps[featureID].get(parts[1].trim());
                                         }
                                         float max;
                                         if (parts[2].trim().compareTo("*") == 0) {
                                             max = -1f;
                                         } else {
-                                            System.out.println("Finding value for: " + parts[2]);
                                             max = LookupTable.featureValueMaps[featureID].get(parts[2].trim());
                                         }
                                         int participation;
                                         if (parts[3].trim().compareTo("*") == 0) {
                                             participation = -1;
-                                        } else if (parts[3].trim().compareTo("0") == 0) {
-                                            System.out.println("WARNING: Required Feature participation should be non-zero.");
-                                            System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
-                                            continue;
                                         } else {
                                             try {
                                                 participation = Integer.parseInt(parts[3].trim());
+                                                if (participation < 1 || participation > 2) {
+                                                    System.out.println("WARNING: Non-wildcard participation value must be either 1 or 2");
+                                                    System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
+                                                    continue;
+                                                }
                                             } catch (NumberFormatException e) {
                                                 System.out.println("WARNING: Couldn't parse participation value to integer.");
                                                 System.out.println("Trouble feature was " + matcher.group(1) + ". Ignoring this parameter...");
@@ -338,8 +333,19 @@ public class Parser {
                                     }
                                 } else {
                                     System.out.println("WARNING: Parameter line was probably malformed.");
+                                    if (parts.length != 4) {
+                                        System.out.println("There should be 4 parts to a REQUIRED_FEATURE");
+                                    } else {
+                                        System.out.println("Couldn't translate the Feature Name");
+                                    }
                                     System.out.println("Trouble feature was: " + matcher.group(1) + ". Ignoring this parameter...");
                                 }
+                            }
+                        } else {
+                            String parts[] = paramLine.split("=");
+                            if (parts.length > 0 && parts[0].compareTo("FEATURES_TO_IGNORE") != 0) {
+                                System.out.println("WARNING: Config Parameter could not be parsed.");
+                                System.out.println("The parameter was: " + paramLine + ". Ignoring...");
                             }
                         }
                     } catch (Exception e) {
@@ -360,7 +366,7 @@ public class Parser {
                         individualsToTrim != null ? individualsToTrim : 100,
                         numFeatAntecedent != null ? numFeatAntecedent : 10,
                         numFeatConsequent != null ? numFeatConsequent : 10,
-                        featuresToIgnore != null ? featuresToIgnore : null,
+                        featuresToIgnore != null ? featuresToIgnore : new ArrayList<>(),
                         // these don't need logic as the array is either null or contains stuff, we don't need to check
                         requiredFeatures
                 );

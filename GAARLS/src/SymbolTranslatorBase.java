@@ -64,7 +64,7 @@ public abstract class SymbolTranslatorBase
 
     public abstract String FeatureRequirementToDescription(FeatureRequirement featureRequirement);
 
-    public abstract void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize);
+    public abstract void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize, int wildcards);
 
     // protected methods
     protected SymbolTranslatorBase(int fileFeatureId, String featureName, int symbolSize, int[] values, String[] symbols, String[] translations)

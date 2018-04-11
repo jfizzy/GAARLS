@@ -19,12 +19,14 @@ public class DiscreteSymbolTranslator extends SymbolTranslatorBase
     }
 
     @Override
-    public void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize)
+    public void GenerateRandomFeatureRequirement(FeatureRequirement toRandomize, int wildcards)
     {
-        int randomValueIdx = mRandomValueGenerator.nextInt(mSymbolValues.length);
-        int newValue = mSymbolValues[randomValueIdx];
+        if (wildcards != 2) {
+            int randomValueIdx = mRandomValueGenerator.nextInt(mSymbolValues.length);
+            int newValue = mSymbolValues[randomValueIdx];
 
-        toRandomize.setBoundRange(newValue, newValue, 0); 
+            toRandomize.setBoundRange(newValue, newValue, 0);
+        }
     }
 
     @Override
