@@ -4,10 +4,10 @@ import Rule.*;
 import java.util.ArrayList;
 
 /**
- * Class: FitnessManager
+ * Class: FitnessManager.java
  * Intended functionality: Util class that is in charge of all fitness function calculations, using the feature database
- * for value queries
- * Feature Owner: Shane, Evan, David
+ * for value queries.
+ * Feature Owner: Shane, Peter
  */
 
 
@@ -17,10 +17,9 @@ public class FitnessManager {
     private Database theDatabase;
     private ArrayList<Rule> theWekaRules;
     private final float baseFitnessWeight;
-    private final float ext1FitnessWeight;      //weights remain consistent for the lifespan 
-    private final float ext2FitnessWeight;      //of this class, once assigned
-    private final float minAccuracy;            // rules with accuracy below min will receive fitness of 0
-    private final float minCoverage;            // rules with coverage below min will receive fitness of 0
+    private final float ext1FitnessWeight;                                                                              // Weights remain consistent for the lifespan
+    private final float ext2FitnessWeight;                                                                              // of this class, once assigned
+    private final float minCoverage;                                                                                    // rules with coverage below min will receive fitness of 0
 
     // public functions
     public FitnessManager(Database database, ArrayList<Rule> wekaRules, ConfigParameters cp)
@@ -30,13 +29,11 @@ public class FitnessManager {
             baseFitnessWeight = 1.0f;
             ext1FitnessWeight = 0.0f;       // base weights for testing
             ext2FitnessWeight = 0.0f;
-            minAccuracy = 0.001f;
             minCoverage = 0.005f;
         }else{
             baseFitnessWeight = cp.baseFitnessWeight;
             ext1FitnessWeight = cp.ext1FitnessWeight;   // gather weights defined by cp 
             ext2FitnessWeight = cp.ext2FitnessWeight;
-            minAccuracy = cp.minAccuracy;
             minCoverage = cp.minCoverage;
         }
 
@@ -58,20 +55,19 @@ public class FitnessManager {
         if (!RuleManager.IsValidRule(rule))
             return 0;
 
-        theDatabase.EvaluateRule(rule); // populates rule with accuracy, coverage and completeness
+        theDatabase.EvaluateRule(rule);                                                                                 // Populates rule with accuracy, coverage and completeness
 
-        //if (rule.getAccuracy() < minAccuracy || rule.getCoverage() < minCoverage)
         if (rule.getCoverage() < minCoverage)
             return 0;
 
-        return baseFitnessWeight * fitnessBasic(rule) // accuracy coverage and range fitness
-                + (theWekaRules.isEmpty() ? 0 : ext1FitnessWeight * ext1(rule)) // weka comparison
-                + ext2FitnessWeight * ext2(rule); // completeness
+        return baseFitnessWeight * fitnessBasic(rule)                                                                   // Accuracy coverage and range fitness
+                + (theWekaRules.isEmpty() ? 0 : ext1FitnessWeight * ext1(rule))                                         // Weka comparison
+                + ext2FitnessWeight * ext2(rule);                                                                       // Completeness
     }
 
-    //Basic version of fitness function:
     /**
-     *
+     * This is the most basic version of the fitness function; to be used in runs
+     * of the 'Base System' version
      * @param rule
      * @return fitness value between 0.0 and 100.0
      */
@@ -80,13 +76,13 @@ public class FitnessManager {
         float accuracy = rule.getAccuracy();
         float rangeFitness = rule.getRangeCoverage();
 
-        // The following three weights should sum to 1
-        float w1 = 0.5f;                                      // Accuracy weight
-        float w2 = 0.15f;                                     // Coverage weight
-        float w3 = 0.35f;                                     // Range weight
-
+        // The following three weights sum to 1 for legibility; not a requirement
+        float w1 = 0.50f;                                                                                               // Accuracy weight
+        float w2 = 0.15f;                                                                                               // Coverage weight
+        float w3 = 0.35f;                                                                                               // Range weight
 
         float fitnessBase = ((w1*accuracy + w2*coverage + w3*rangeFitness))*100;
+
         return fitnessBase;
     }
 
@@ -100,7 +96,6 @@ public class FitnessManager {
      * @return  the number of elements of the featureRequirement vector 'participation' values that are different between the two rules, normalized
      * to value between 0.0 and 100.0
      */
-
     protected float hammingDistance(Rule r1, Rule r2){
         int distance = 0;
 
@@ -114,7 +109,7 @@ public class FitnessManager {
     }
 
     protected float ext1(Rule rule){
-        float smallestDistance = rule.getFeatureReqs().length;   // holds the smallest Hamming distance found to exist between rule and anu rule in known rules
+        float smallestDistance = rule.getFeatureReqs().length;                                                          // Holds the smallest Hamming distance found to exist between rule and anu rule in known rules
         for(Rule wekaRule : theWekaRules){
             float dist = hammingDistance(rule, wekaRule);
             if(dist < smallestDistance) {
@@ -135,7 +130,4 @@ public class FitnessManager {
         return (rule.getCompleteness()*100);
     }
 
-    public static void main(String[] args){
-
-    }
 }

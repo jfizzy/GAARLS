@@ -166,6 +166,9 @@ public class RuleManager
      */
     public Rule generateRule(int numFeatAntecedent, int numFeatConsequent)
     {
+        if(numFeatAntecedent < 0 || numFeatConsequent < 0){                 // User has set these params as -1 in in config file
+            return generateRuleRandomSize();
+        }
         Rule newRule = new Rule();
 
         FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
@@ -209,38 +212,6 @@ public class RuleManager
         return newRule;
     }
 
-    /**
-     * Helper function to generate new rules in the population initialization phase
-     * Creates a new rule with randomized requirements found from LookupTable, with
-     * the possibility that all features are activated.
-     * @return random new rule
-     */
-    public Rule generateRuleMaxFeatures()
-    {
-        Rule newRule = new Rule();
-        FeatureRequirement[] featureRequirements = newRule.getFeatureReqs();
-        ArrayList<Integer> featuresInRule;
-
-        if (requiredFeatures.size() > 0) {
-            featuresInRule = placeRequiredFeatures(featureRequirements);
-        } else {
-            featuresInRule = null;
-        }
-
-        // TODO: When no longer hard coding rules, ensure that there is always a valid number of antecedents and consequents
-        for(int i = 0; i < num_features; i++){ // TODO: Remove hard coded rule generation
-            if (featuresInRule == null || !featuresInRule.contains(i)) {
-                // choose 3 features randomly for generating a random rule
-                int participation = rand.nextInt(3); // generate random participation value of 0,1, or 2
-                featureRequirements[i].setParticipation(participation);
-                if (participation != 0) {
-                    mLookupTable.GenerateRandomValue(i, featureRequirements[i], 3);
-
-                }
-            }
-        }
-        return newRule;
-    }
 
 
     public static boolean IsValidRule(Rule rule)
