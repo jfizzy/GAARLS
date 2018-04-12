@@ -1,0 +1,7 @@
+[A] P_ID: 1 |  => [C] C_SEV: Collision producing non-fatal injury | 
+[A] P_ID: 1 | P_USER: Motor Vehicle Driver |  => [C] C_SEV: Collision producing non-fatal injury | 
+[A] P_SEX: Male |  => [C] C_SEV: Collision producing non-fatal injury | 
+[A] P_SEX: Female |  => [C] C_SEV: Collision producing non-fatal injury | 
+[A] C_OCCUR: Low Fatal Collisions |  => [C] C_SEV: Collision producing non-fatal injury | 
+[A] P_ID: 1 | P_SEX: Male |  => [C] C_SEV: Collision producing non-fatal injury | 
+[A] P_SEX: Male | P_USER: Motor Vehicle Driver |  => [C] C_SEV: Collision producing non-fatal injury | 

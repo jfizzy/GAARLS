@@ -44,7 +44,8 @@ public class Main
         
         ConfigParameters cp = parser.parseConfigParameters(configFilePath, featuresToOmit);
         if (cp == null){
-            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,1f,0f,0f,100,10,10,new ArrayList<>(), new ArrayList<>());
+            cp = new ConfigParameters(1000,1000,1300,0.01f,0.01f,10,
+                    1f,0f,0f,100,10,10,new ArrayList<>(), new ArrayList<>());
             System.out.println("Using Default Config.");
         }
         // desc of default configuration when file is missing
