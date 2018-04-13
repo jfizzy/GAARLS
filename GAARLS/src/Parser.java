@@ -364,8 +364,8 @@ public class Parser {
                         ext1FitnessWeight != null ? ext1FitnessWeight : 0f,
                         ext2FitnessWeight != null ? ext2FitnessWeight : 0f,
                         individualsToTrim != null ? individualsToTrim : 100,
-                        numFeatAntecedent != null ? numFeatAntecedent : 10,
-                        numFeatConsequent != null ? numFeatConsequent : 10,
+                        numFeatAntecedent != null ? numFeatAntecedent : -1,
+                        numFeatConsequent != null ? numFeatConsequent : -1,
                         featuresToIgnore != null ? featuresToIgnore : new ArrayList<>(),
                         // these don't need logic as the array is either null or contains stuff, we don't need to check
                         requiredFeatures
